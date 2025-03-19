@@ -9,12 +9,21 @@ jobs:
     if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Debug branch name
+        run: |
+          echo "Deleting branch: ${{ github.head_ref }}"
+
       - name: Delete branch
         run: |
           git push origin --delete ${{ github.head_ref }}
         env:
-          GIT_AUTHOR_NAME: "GitHub Actions"
-          GIT_AUTHOR_EMAIL: "actions@github.com"
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        shell: bash
-        continue-on-error: true # Tiếp tục chạy ngay cả khi có lỗi (ví dụ: branch đã bị xóa trước đó)
+        continue-on-error: true
+
+      - name: Verify deletion (optional)
+        run: |
+          git fetch origin
+          git branch -r | grep "${{ github.head_ref }}" || echo "Branch deleted successfully"
