@@ -10,7 +10,7 @@ import java.util.Date;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Payment {
+public class PaymentTransaction {
     @Id
     private String transactionId;
     private String orderId;

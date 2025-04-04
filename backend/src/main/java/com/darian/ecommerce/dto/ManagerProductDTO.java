@@ -9,7 +9,7 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ManagerProductDTO {
+public class ManagerProductDTO  extends ProductDTO{
     private float value;
     private String barcode;
     private int stockQuantity;

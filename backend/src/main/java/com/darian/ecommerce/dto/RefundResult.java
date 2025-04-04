@@ -9,6 +9,9 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 public class RefundResult extends BasePaymentResult{
+    // Status of the refund (e.g., SUCCESS, FAILED)
     private String refundStatus;
+
+    // Date of the refund transaction
     private Date refundDate;
 }
