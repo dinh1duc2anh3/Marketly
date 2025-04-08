@@ -228,7 +228,8 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public List<CategoryDTO> findAllCategories() {
         logger.info("Fetching all categories");
-        return categoryRepository.findAll();
+        List<Category>  allCategory = categoryRepository.findAll();
+        return allCategory.stream().map(this::mapToCategoryDTO).toList();
     }
 
     // Save a new category
@@ -236,9 +237,9 @@ public class ProductServiceImpl implements ProductService {
     public CategoryDTO saveCategory(CategoryDTO category) {
         //- check again saveCategory , check if the input is category or categoryDTO
         logger.info("Saving category: {}", category.getName());
-        Category savedCategory = categoryRepository.save(category);
+        Category savedCategory = categoryRepository.save(mapToCategory(category));
         logger.info("Category saved: {}", savedCategory.getId());
-        return savedCategory;
+        return category;
     }
 
     // Add a review for a product
@@ -285,5 +286,23 @@ public class ProductServiceImpl implements ProductService {
         dto.setPrice(product.getPrice());
         dto.setDescription(product.getDescription());
         return dto;
+    }
+
+    // Private method to map Category entity to CategoryDTO
+    private CategoryDTO mapToCategoryDTO(Category category) {
+        CategoryDTO dto = new CategoryDTO();
+        dto.setId(category.getId());
+        dto.setName(category.getName());
+        dto.setDescription(category.getDescription());
+        return dto;
+    }
+
+    // Private method to map CategoryDTO to Category entity
+    private Category mapToCategory(CategoryDTO dto) {
+        Category category = new Category();
+        category.setId(dto.getId());
+        category.setName(dto.getName());
+        category.setDescription(dto.getDescription());
+        return category;
     }
 }

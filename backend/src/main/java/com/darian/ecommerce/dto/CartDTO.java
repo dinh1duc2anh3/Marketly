@@ -4,12 +4,15 @@ import lombok.*;
 
 import java.util.List;
 
+@Data
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class CartDTO {
-    private Long id;
+    // ID of the user owning the cart
     private String userId;
-    private List<CartItemDTO>;
+
+    // List of items in the cart
+    private List<CartItemDTO>  items;
 }

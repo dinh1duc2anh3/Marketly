@@ -26,7 +26,7 @@ public interface AuditLogService {
     Boolean logUpdateAction(String userId, String productId, String role);
 
     // Log an order-related action, return true if successful
-    Boolean logOrderAction(String userId, String orderId, String role);
+    Boolean logOrderAction(String userId, String orderId, String role,String action);
 
     // Log a payment transaction
     void logPayment(BasePaymentResult paymentResult);

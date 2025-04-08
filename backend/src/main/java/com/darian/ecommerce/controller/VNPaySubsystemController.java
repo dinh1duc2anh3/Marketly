@@ -13,7 +13,7 @@ public class VNPaySubsystemController implements PaymentInterface {
     private VNPaySubsystemService vnPaySubsystemService;
 
     @Override
-    public PaymentResult processPayment(float amount, String transactionContent) {
+    public PaymentResult processPayment(String orderId, float amount, String transactionContent) {
         return null;
     }
 

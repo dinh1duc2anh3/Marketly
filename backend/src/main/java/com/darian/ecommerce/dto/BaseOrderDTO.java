@@ -2,6 +2,7 @@ package com.darian.ecommerce.dto;
 
 import lombok.*;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -15,8 +16,8 @@ public class BaseOrderDTO {
     private List<OrderItemDTO> items;
     private String status;
     private DeliveryInfoDTO deliveryInfo;
-    private int subtotal;
-    private int shippingFee;
-    private int total;
-    private Date createdDate;
+    private float subtotal;
+    private float shippingFee;
+    private float total;
+    private LocalDateTime createdDate;
 }

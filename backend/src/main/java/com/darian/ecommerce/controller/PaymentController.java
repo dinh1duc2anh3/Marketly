@@ -3,16 +3,42 @@ package com.darian.ecommerce.controller;
 import com.darian.ecommerce.dto.PaymentResult;
 import com.darian.ecommerce.dto.RefundResult;
 import com.darian.ecommerce.service.impl.PaymentServiceImpl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
+
+@RestController
+@RequestMapping("/payments")
 public class PaymentController {
-    private PaymentServiceImpl paymentService;
+    private static final Logger logger = LoggerFactory.getLogger(PaymentController.class);
 
-    public ResponseEntity<PaymentResult> payOrder(String orderId, String paymentMethod){
+    private final PaymentServiceImpl paymentService;
 
+    // Constructor injection for PaymentServiceImpl
+    public PaymentController(PaymentServiceImpl paymentService) {
+        this.paymentService = paymentService;
     }
 
-    public ResponseEntity<RefundResult> processRefund(String orderId){
-
+    // Process payment for an order
+    @PostMapping("/{orderId}/pay")
+    public ResponseEntity<PaymentResult> payOrder(@PathVariable String orderId,
+                                                  @RequestParam String paymentMethod) {
+        logger.info("Initiating payment for order {} with method {}", orderId, paymentMethod);
+        PaymentResult result = paymentService.payOrder(orderId, paymentMethod);
+        logger.info("Payment completed for order {}: status {}", orderId, result.getPaymentStatus());
+        return ResponseEntity.ok(result);
     }
+
+    // Process refund for an order
+    @PostMapping("/{orderId}/refund")
+    public ResponseEntity<RefundResult> processRefund(@PathVariable String orderId) {
+        logger.info("Initiating refund for order {}", orderId);
+        RefundResult result = paymentService.processRefund(orderId);
+        logger.info("Refund completed for order {}: status {}", orderId, result.getRefundStatus());
+        return ResponseEntity.ok(result);
+    }
+
+
 }

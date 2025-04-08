@@ -1,1 +1,61 @@
-a
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My E-commerce Store</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <div class="container">
+      <h1>My E-commerce Store</h1>
+      <button id="view-cart-btn">View Cart <span id="cart-count">0</span></button>
+    </div>
+  </header>
+
+  <main>
+    <section class="products container">
+      <h2>Our Products</h2>
+      <div id="products-grid" class="products-grid">
+        <!-- Products will be loaded here -->
+        <div class="loading">Loading products...</div>
+      </div>
+    </section>
+
+    <section class="checkout container">
+      <h2>Checkout</h2>
+      <form id="payment-form" class="payment-form">
+        <div class="form-group">
+          <label for="order-id">Order ID:</label>
+          <input type="text" id="order-id" placeholder="Enter your order ID" required>
+        </div>
+        <button type="submit" class="btn-primary">Pay with VNPay</button>
+      </form>
+    </section>
+  </main>
+
+  <div id="cart-modal" class="modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <h2>Your Cart</h2>
+      <div id="cart-items">
+        <!-- Cart items will be loaded here -->
+      </div>
+      <div class="cart-total">
+        <p>Total: <span id="cart-total-amount">$0.00</span></p>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <div class="container">
+      <p>&copy; 2025 My Store</p>
+    </div>
+  </footer>
+
+  <div id="toast" class="toast"></div>
+  <script src="script.js"></script>
+</body>
+</html>

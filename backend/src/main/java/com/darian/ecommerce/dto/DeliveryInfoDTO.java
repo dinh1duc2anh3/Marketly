@@ -6,6 +6,7 @@ import lombok.*;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Data
 public class DeliveryInfoDTO {
     private String recipientName;
     private String phoneNumber;

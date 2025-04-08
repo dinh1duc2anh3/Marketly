@@ -7,4 +7,5 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class OrderDTO extends BaseOrderDTO{
+    // Inherits all fields from BaseOrderDTO
 }

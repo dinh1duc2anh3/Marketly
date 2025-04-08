@@ -2,22 +2,17 @@ package com.darian.ecommerce.dto;
 
 import lombok.*;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
+@Data
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class PaymentResult extends BasePaymentResult {
-    // Total amount of the payment
     private float totalAmount;
-
-    // Content or description of the transaction
     private String transactionContent;
-
-    // Date of the payment transaction
-    private Date transactionDate;
-
-    // Status of the payment (e.g., SUCCESS, FAILED)
+    private LocalDateTime transactionDate;
     private String paymentStatus;
 }

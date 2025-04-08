@@ -8,10 +8,16 @@ import lombok.*;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Data
 public class Category {
+    // Primary key
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Long id;
+
+    // Name of the category
     private String name;
+
+    // Description of the category
     private String description;
 }
