@@ -28,6 +28,9 @@ public class Order {
     // Status of the order (e.g., PENDING, SHIPPED)
     private String status;
 
+
+    private Boolean isRushOrder;
+
     // Delivery information (1-1 relationship)
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "delivery_info_id")
