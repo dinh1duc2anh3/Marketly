@@ -9,13 +9,16 @@ import lombok.*;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Table(name = "product_image")
 public class ProductImage {
     // Primary key
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "image_id")
     private Long id;
 
     // URL of the image
+    @Column(name = "image_url")
     private String url;
 
     // Product this image belongs to (1-* relationship)

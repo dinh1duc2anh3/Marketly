@@ -9,6 +9,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
+@Table(name = "category")
 public class Category {
     // Primary key
     @Id
@@ -16,8 +17,10 @@ public class Category {
     private Long id;
 
     // Name of the category
+    @Column(name = "category_name", nullable = false)
     private String name;
 
     // Description of the category
+    @Column(name = "category_description")
     private String description;
 }

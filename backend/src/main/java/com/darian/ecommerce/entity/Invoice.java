@@ -3,7 +3,7 @@ package com.darian.ecommerce.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
-@Entity
+//nay ko phai la mot entity duoc luu trong db
 @Getter
 @Setter
 @NoArgsConstructor

@@ -1,8 +1,6 @@
 package com.darian.ecommerce.entity;
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Entity;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.Id;
 
@@ -15,16 +13,20 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Table(name = "cart")
 public class Cart {
     // Primary key (userId acts as cartId)
     @Id
-    private String userId;
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
     // List of items in the cart (1-* relationship)
     @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CartItem> items = new ArrayList<>();
 
     // Total cost of the cart
+    @Column(name = "total")
     private float total;
 
     // Constructor for initializing with userId

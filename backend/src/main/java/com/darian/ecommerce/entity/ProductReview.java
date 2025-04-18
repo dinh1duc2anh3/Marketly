@@ -11,24 +11,31 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
+@Table(name = "product_review")
 public class ProductReview {
     // Primary key
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Long id;
 
     // ID of the product being reviewed
-    private String productId;
+    @ManyToOne
+    @JoinColumn(name = "product_id", nullable = false)
+    private Product product;
 
-    // ID of the customer who wrote the review
-    private String customerId;
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
     // Rating given by the customer (e.g., 1-5)
-    private int rating;
+    @Column(name = "rating")
+    private Integer rating;
 
     // Comment or review content
+    @Column(name = "review_comment")
     private String comment;
 
     // Date and time the review was created
+    @Column(name = "review_created_date")
     private Date createdDate;
 }

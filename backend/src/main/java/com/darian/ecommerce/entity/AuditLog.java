@@ -6,23 +6,30 @@ import lombok.*;
 import java.time.LocalDateTime;
 
 @Entity
+@Data
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Table(name = "audit_log")
 public class AuditLog {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     // Type of action (e.g., SEARCH_PRODUCTS, ADD_PRODUCT)
+    @Column(name = "action_type")
     private String actionType;
 
     // ID of the user performing the action
-    private String userId;
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
 
     // ID of the product involved (nullable)
-    private String productId;
+    @ManyToOne
+    @JoinColumn(name = "product_id")
+    private Product product;
 
     // Keyword used in search (nullable)
     private String keyword;

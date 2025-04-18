@@ -9,23 +9,25 @@ import lombok.*;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Table(name = "cart_item")
 public class CartItem {
     // Primary key
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
     // ID of the product
-    private String productId;
+    @Id
+    @ManyToOne
+    @JoinColumn(name = "product_id")
+    private Product product;
 
     // Quantity of the product
     private int quantity;
 
     // Price of the product at the time of adding to cart
+    @Column(name = "product_price")
     private float productPrice;
 
-    // Reference to the parent cart (*-1 relationship)
-    @ManyToOne
-    @JoinColumn(name = "cart_id")
-    private Cart cart;
 }

@@ -9,19 +9,24 @@ import lombok.*;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Table(name = "order_item")
 public class OrderItem {
     // Primary key
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "order_item_id")
     private Long id;
 
     // ID of the product in the order
-    private String productId;
+    @ManyToOne
+    @JoinColumn(name = "product_id")
+    private Product product;
 
     // Quantity of the product
     private int quantity;
 
     // Unit price of the product
+    @Column(name = "unit_price")
     private float unitPrice;
 
 

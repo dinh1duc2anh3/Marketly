@@ -13,30 +13,41 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 
+@Table(name = "product")
 public class Product {
     // Primary key
     @Id
+    @Column(name = "product_id")
+//    @GeneratedValue(strategy = GenerationType.IDENTITY)  tôi muốn product của tôi là string ,  chứ ko phỉa là long, và nó sẽ được sinh ra tự động dựa trên nguyên tắc : tên có chữ cái + số , kiểu pr123 hay gì đso ấy
+
     private String productId;
 
     // Name of the product
+    @Column(name = "product_name", nullable = false)
     private String name;
 
     // Description of the product
+    @Column(name = "product_description")
     private String description;
 
     // Price of the product
+    @Column(name = "product_price")
     private float price;
 
     // Value (could be cost or another metric)
+    @Column(name = "product_value")
     private float value;
 
     // Barcode of the product
+    @Column(name = "product_barcode")
     private String barcode;
 
     // Quantity in stock
+    @Column(name = "stock_quantity")
     private int stockQuantity;
 
     // Date the product entered the warehouse
+    @Column(name = "warehouse_entry_date")
     private Date warehouseEntryDate;
 
     // List of edit history records (1-* relationship)
@@ -44,6 +55,7 @@ public class Product {
     private List<ProductEditHistory> editHistory;
 
     // Product specifications
+    @Column(name = "product_specification")
     private String specifications;
 
     // List of product images (1-* relationship)
@@ -55,7 +67,7 @@ public class Product {
     private List<ProductImage> images;
 
     // Category of the product (1-1 relationship)
-    @JoinColumn(name = "category_id")
+    @JoinColumn(name = "category_id", nullable = false)
     @ManyToOne
     private Category category;
 }

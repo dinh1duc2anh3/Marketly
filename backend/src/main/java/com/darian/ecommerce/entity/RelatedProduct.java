@@ -12,11 +12,12 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-
+@Table(name = "related_product")
 public class RelatedProduct {
     // Primary key
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "relation_id")
     private Long id;
 
     // The main product (1-* relationship)
@@ -30,5 +31,6 @@ public class RelatedProduct {
     private Product relatedProduct; // Sản phẩm liên quan được gán
 
     // Type of relation (e.g., "similar", "accessory")
+    @Column(name = "relation_type")
     private String relationType; // (Tùy chọn) Loại quan hệ: "SIMILAR", "FREQUENTLY_BOUGHT_TOGETHER", v.v.
 }
