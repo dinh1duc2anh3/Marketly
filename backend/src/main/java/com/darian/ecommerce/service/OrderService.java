@@ -1,9 +1,11 @@
 package com.darian.ecommerce.service;
 
 import com.darian.ecommerce.dto.*;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+@Service
 public interface OrderService {
     OrderDTO createOrder(CartDTO cartDTO);
 

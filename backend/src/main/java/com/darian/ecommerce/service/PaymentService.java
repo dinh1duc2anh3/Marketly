@@ -2,7 +2,9 @@ package com.darian.ecommerce.service;
 
 import com.darian.ecommerce.dto.PaymentResult;
 import com.darian.ecommerce.dto.RefundResult;
+import org.springframework.stereotype.Service;
 
+@Service
 public interface PaymentService {
     // Process payment for an order with a specified payment method
     public PaymentResult payOrder(String orderId, String paymentMethod);

@@ -1,7 +1,9 @@
 package com.darian.ecommerce.businesslogic.productdetail;
 
 import com.darian.ecommerce.repository.ProductRepository;
+import org.springframework.stereotype.Component;
 
+@Component
 public class ProductDetailFetcherFactory {
     private final ProductRepository productRepository;
 

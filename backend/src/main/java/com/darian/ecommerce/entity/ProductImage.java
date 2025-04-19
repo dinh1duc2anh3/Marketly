@@ -17,12 +17,14 @@ public class ProductImage {
     @Column(name = "image_id")
     private Long id;
 
-    // URL of the image
-    @Column(name = "image_url")
-    private String url;
-
     // Product this image belongs to (1-* relationship)
     @ManyToOne
     @JoinColumn(name = "product_id")
     private Product product;
+
+    // URL of the image
+    @Column(name = "image_url")
+    private String url;
+
+
 }

@@ -4,16 +4,16 @@ import com.darian.ecommerce.dto.DeliveryInfoDTO;
 import com.darian.ecommerce.dto.InvoiceDTO;
 import com.darian.ecommerce.dto.OrderDTO;
 import com.darian.ecommerce.dto.RushOrderDTO;
-import com.darian.ecommerce.service.impl.OrderServiceImpl;
+import com.darian.ecommerce.service.OrderService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/orders")
 public class OrderController {
-    private final OrderServiceImpl orderService;
+    private final OrderService orderService;
 
-    public OrderController(OrderServiceImpl orderService) {
+    public OrderController(OrderService orderService) {
         this.orderService = orderService;
     }
 

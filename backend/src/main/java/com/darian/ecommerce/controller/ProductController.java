@@ -2,13 +2,14 @@ package com.darian.ecommerce.controller;
 
 import com.darian.ecommerce.dto.ManagerProductDTO;
 import com.darian.ecommerce.dto.ProductDTO;
+import com.darian.ecommerce.service.ProductService;
 import com.darian.ecommerce.service.impl.ProductServiceImpl;
 import org.springframework.http.ResponseEntity;
 
 import java.util.List;
 
 public class ProductController {
-    private ProductServiceImpl productService;
+    private ProductService productService;
 
     public ResponseEntity<List<ProductDTO>> getProductList(String role){
 
@@ -26,7 +27,7 @@ public class ProductController {
 
     }
 
-    public ResponseEntity<Void> deleteProduct(String productId){
+    public ResponseEntity<Void> deleteProduct(String productId,String userId){
 
     }
 

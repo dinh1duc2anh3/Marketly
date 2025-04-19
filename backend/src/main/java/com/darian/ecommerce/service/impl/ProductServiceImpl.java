@@ -14,22 +14,27 @@ import com.darian.ecommerce.repository.CategoryRepository;
 import com.darian.ecommerce.repository.ProductRepository;
 import com.darian.ecommerce.repository.ProductReviewRepository;
 import com.darian.ecommerce.service.AuditLogService;
+import com.darian.ecommerce.service.OrderService;
 import com.darian.ecommerce.service.ProductService;
 import org.slf4j.*;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+@Service
 public class ProductServiceImpl implements ProductService {
     // Logger for logging actions and errors
     private static final Logger logger = LoggerFactory.getLogger(ProductServiceImpl.class);
 
     // Dependencies injected via constructor
+
     private final ProductRepository productRepository;
     private final ProductListFetcherFactory productListFetcherFactory;
     private final ProductDetailFetcherFactory productDetailFetcherFactory;
     private final ProductSearchFetcherFactory productSearchFetcherFactory;
     private final AuditLogService auditLogService;
     private final CategoryRepository categoryRepository;
+    private final OrderService orderService;
     private final ProductReviewRepository productReviewRepository;
 
     // Constructor for dependency injection
@@ -39,6 +44,7 @@ public class ProductServiceImpl implements ProductService {
                               ProductSearchFetcherFactory productSearchFetcherFactory,
                               AuditLogService auditLogService,
                               CategoryRepository categoryRepository,
+                              OrderService orderService,
                               ProductReviewRepository productReviewRepository) {
         this.productRepository = productRepository;
         this.productListFetcherFactory = productListFetcherFactory;
@@ -46,6 +52,7 @@ public class ProductServiceImpl implements ProductService {
         this.productSearchFetcherFactory = productSearchFetcherFactory;
         this.auditLogService = auditLogService;
         this.categoryRepository = categoryRepository;
+        this.orderService = orderService;
         this.productReviewRepository = productReviewRepository;
     }
 
@@ -155,13 +162,12 @@ public class ProductServiceImpl implements ProductService {
 
     // Delete a product by ID (Manager only)
     @Override
-    public void deleteProduct(String productId) {
+    public void deleteProduct(String productId, String userId) {
         logger.info("Attempting to delete product: {}", productId);
-        validateDeletion(productId);
+        validateDeletion(productId,userId);
         productRepository.deleteById(productId);
-        //need more check function here
-        logger.info("Product deleted successfully: {}", productId);
-        auditLogService.logDeleteAction("MANAGER", "DELETE_PRODUCT", "Deleted product: " + productId);
+        logger.info("Product {} deleted successfully by {}", productId,userId);
+        auditLogService.logDeleteAction(userId ,productId,"MANAGER");
 
     }
 
@@ -183,15 +189,23 @@ public class ProductServiceImpl implements ProductService {
                 .orElse(0);
     }
 
-    // Validate conditions before deleting a product
+    // Validate general conditions before deleting a product
     @Override
-    public void validateDeletion(String productId) {
-        logger.info("Validating deletion for product: {}", productId);
+    public void validateDeletion(String productId,String userId) {
+        logger.info("Validating deletion for product {} by user {}", productId,userId);
+
+        //check if quantity of available product is > 0
         if (!checkDeletionConstraints(productId)) {
             logger.warn("Deletion constraints violated for product: {}", productId);
             throw new IllegalStateException("Cannot delete due to constraints");
         }
+
         if (checkOrdersAffected(productId)){
+            logger.warn("Active orders affected by product deletion: {}", productId);
+            throw new IllegalStateException("Cannot delete due to affected orders");
+        }
+
+        if (checkDeleteLimit(userId)){
             logger.warn("Active orders affected by product deletion: {}", productId);
             throw new IllegalStateException("Cannot delete due to affected orders");
         }
@@ -212,7 +226,6 @@ public class ProductServiceImpl implements ProductService {
         logger.info("Checking deletion constraints for product: {}", productId);
         int stock = checkProductQuantity(productId);
         return stock > 0; //Can only delete if stock is above 0
-        //check if there is any deletion constraints else ?
     }
 
     // Check if deleting a product affects any orders
@@ -220,6 +233,7 @@ public class ProductServiceImpl implements ProductService {
     public Boolean checkOrdersAffected(String productId) {
         logger.info("Checking if orders are affected for product: {}", productId);
         //logic to check if any order affected ?
+
         return false; //assume that No orders affected for now
 
     }

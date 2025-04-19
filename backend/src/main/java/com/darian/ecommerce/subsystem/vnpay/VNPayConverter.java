@@ -4,7 +4,9 @@ import com.darian.ecommerce.dto.PaymentResult;
 import com.darian.ecommerce.dto.RefundResult;
 import com.darian.ecommerce.dto.VNPayRequest;
 import com.darian.ecommerce.dto.VNPayResponse;
+import org.springframework.stereotype.Component;
 
+@Component
 public class VNPayConverter {
     // Convert payment details to VNPayRequest
     public VNPayRequest toVNPayRequest(String orderId, float amount, String transactionContent, String transactionType) {

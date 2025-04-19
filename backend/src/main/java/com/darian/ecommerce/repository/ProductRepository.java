@@ -4,11 +4,13 @@ import com.darian.ecommerce.dto.ProductDTO;
 import com.darian.ecommerce.entity.Product;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.stereotype.Repository;
 
 import java.nio.channels.FileChannel;
 import java.util.List;
 import java.util.Optional;
 
+@Repository
 public interface ProductRepository extends JpaRepository<Product,String> {
     // Find all products (inherited from JpaRepository)
     List<Product> findAll();

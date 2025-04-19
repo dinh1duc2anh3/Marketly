@@ -2,9 +2,11 @@ package com.darian.ecommerce.service;
 
 import com.darian.ecommerce.dto.CartDTO;
 import com.darian.ecommerce.dto.CartItemDTO;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+@Service
 public interface CartService {
     // Add a product to the user's cart
     CartDTO addProductToCart(String userId, String productId, int quantity);

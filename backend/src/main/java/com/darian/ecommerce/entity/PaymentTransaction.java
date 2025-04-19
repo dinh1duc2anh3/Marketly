@@ -4,13 +4,13 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.Date;
-
-@Entity
 @Data
+@Entity
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Table(name = "payment_transaction")
 public class PaymentTransaction {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,7 +30,7 @@ public class PaymentTransaction {
     @Column(name = "transaction_content")
     private String transactionContent;
 
-    @Column(name = "transaction_date")
+    @Column(name = "transaction_timestamp")
     private Date transactionDate;
 
     @Column(name = "payment_method")
@@ -42,7 +42,8 @@ public class PaymentTransaction {
     @Column(name = "refund_status")
     private String refundStatus;
 
-    @Column(name = "refund_date")
+    @Column(name = "refund_timestamp")
     private Date refundDate;
+
 
 }

@@ -17,21 +17,18 @@ import java.util.List;
 public class Order {
     // Primary key
     @Id
-//    @GeneratedValue(strategy = GenerationType.IDENTITY) tôi muốn nó gen có thêm text thì làm ntn
-    private String orderId;
+    @Column(name = "order_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long orderId;
 
     // ID of the customer who placed the order
     @ManyToOne
     @JoinColumn(name = "customer_id", nullable = false)
     private User user;
 
-    // List of order items (1-* relationship)
-    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
-    private List<OrderItem> items;
-
     // Status of the order (e.g., PENDING, SHIPPED)
     @Column(name = "order_status")
-    private String status;
+    private String orderStatus;
 
     @Column(name = "is_rush_order")
     private Boolean isRushOrder;
@@ -42,7 +39,6 @@ public class Order {
     private DeliveryInfo deliveryInfo;
 
     // Subtotal of the order
-    @Column(name = "subtotal")
     private float subtotal;
 
     // Shipping fee for the order
@@ -50,16 +46,26 @@ public class Order {
     private float shippingFee;
 
     // Total amount (including shipping and discount)
-    @Column(name = "total")
     private float total;
 
     // Date and time the order was created
-    @Column(name = "created_date")
+    @Column(name = "created_timestamp")
     private LocalDateTime createdDate;
 
     // Discount applied to the order
-    @Column(name = "discount")
     private float discount;
+
+    // Status of the payment (e.g., PAID, REFUNDED , UNPAID , ... ) //need more check
+    @Column(name = "payment_status")
+    private String paymentStatus;
+
+    // List of order items (1-* relationship)
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
+    private List<OrderItem> items;
+
+
+
+    //getter + setter
 
     // Calculate subtotal (sum of line totals)
     public float getSubtotal(){

@@ -1,17 +1,17 @@
 package com.darian.ecommerce.controller;
 
 import com.darian.ecommerce.dto.CartDTO;
-import com.darian.ecommerce.service.impl.CartServiceImpl;
+import com.darian.ecommerce.service.CartService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/cart")
 public class CartController {
-    private final CartServiceImpl cartService;
+    private final CartService cartService;
 
-    // Constructor injection for CartServiceImpl
-    public CartController(CartServiceImpl cartService) {
+    // Constructor injection for CartService
+    public CartController(CartService cartService) {
         this.cartService = cartService;
     }
 

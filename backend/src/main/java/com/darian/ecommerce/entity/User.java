@@ -3,6 +3,7 @@ package com.darian.ecommerce.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Entity
@@ -13,18 +14,22 @@ import java.util.Date;
 @Table(name = "user_account")
 public class User {
     @Id
+    @Column(name = "user_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Integer id;
 
-    @Column(name = "username", nullable = false, unique = true)
+    @Column(nullable = false, unique = true)
     private String username;
 
-    @Column(name = "password", nullable = false)
+    @Column(nullable = false)
     private String password;
 
-    @Column(name = "role", nullable = false)
+    @Column(nullable = false)
     private String role;
 
-    @Column(name= "timestamp", nullable = false)
-    private Date timestamp;
+    @Column(nullable = false)
+    private String email;
+
+    @Column(name= "create_at", nullable = false)
+    private LocalDateTime createdAt;
 }

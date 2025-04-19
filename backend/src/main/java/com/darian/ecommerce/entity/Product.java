@@ -2,7 +2,9 @@ package com.darian.ecommerce.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.cglib.core.Local;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -18,17 +20,17 @@ public class Product {
     // Primary key
     @Id
     @Column(name = "product_id")
-//    @GeneratedValue(strategy = GenerationType.IDENTITY)  tôi muốn product của tôi là string ,  chứ ko phỉa là long, và nó sẽ được sinh ra tự động dựa trên nguyên tắc : tên có chữ cái + số , kiểu pr123 hay gì đso ấy
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long productId;
 
-    private String productId;
+    // Category of the product (1-1 relationship)
+    @JoinColumn(name = "category_id", nullable = false)
+    @ManyToOne
+    private Category category;
 
     // Name of the product
     @Column(name = "product_name", nullable = false)
     private String name;
-
-    // Description of the product
-    @Column(name = "product_description")
-    private String description;
 
     // Price of the product
     @Column(name = "product_price")
@@ -42,21 +44,25 @@ public class Product {
     @Column(name = "product_barcode")
     private String barcode;
 
+    // Description of the product
+    @Column(name = "product_description")
+    private String description;
+
+    // Product specifications
+    @Column(name = "product_specification")
+    private String specifications;
+
     // Quantity in stock
     @Column(name = "stock_quantity")
     private int stockQuantity;
 
     // Date the product entered the warehouse
-    @Column(name = "warehouse_entry_date")
-    private Date warehouseEntryDate;
+    @Column(name = "warehouse_entry_timestamp")
+    private LocalDateTime warehouseEntryDate;
 
     // List of edit history records (1-* relationship)
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true) //dòng này có đúng ko nhỉ ?
     private List<ProductEditHistory> editHistory;
-
-    // Product specifications
-    @Column(name = "product_specification")
-    private String specifications;
 
     // List of product images (1-* relationship)
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
@@ -66,8 +72,5 @@ public class Product {
      */
     private List<ProductImage> images;
 
-    // Category of the product (1-1 relationship)
-    @JoinColumn(name = "category_id", nullable = false)
-    @ManyToOne
-    private Category category;
+
 }

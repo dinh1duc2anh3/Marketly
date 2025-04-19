@@ -2,6 +2,7 @@ package com.darian.ecommerce.controller;
 
 import com.darian.ecommerce.dto.PaymentResult;
 import com.darian.ecommerce.dto.RefundResult;
+import com.darian.ecommerce.service.PaymentService;
 import com.darian.ecommerce.service.impl.PaymentServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,10 +15,10 @@ import org.springframework.web.bind.annotation.*;
 public class PaymentController {
     private static final Logger logger = LoggerFactory.getLogger(PaymentController.class);
 
-    private final PaymentServiceImpl paymentService;
+    private final PaymentService paymentService;
 
     // Constructor injection for PaymentServiceImpl
-    public PaymentController(PaymentServiceImpl paymentService) {
+    public PaymentController(PaymentService paymentService) {
         this.paymentService = paymentService;
     }
 

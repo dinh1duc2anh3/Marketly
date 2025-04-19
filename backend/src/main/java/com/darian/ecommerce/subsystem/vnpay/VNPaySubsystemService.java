@@ -4,7 +4,9 @@ import com.darian.ecommerce.dto.PaymentResult;
 import com.darian.ecommerce.dto.RefundResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
+@Component
 public class VNPaySubsystemService {
     private static final Logger logger = LoggerFactory.getLogger(VNPaySubsystemService.class);
 

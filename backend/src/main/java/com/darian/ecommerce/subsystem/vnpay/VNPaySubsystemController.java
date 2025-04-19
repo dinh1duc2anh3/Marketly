@@ -2,7 +2,9 @@ package com.darian.ecommerce.subsystem.vnpay;
 
 import com.darian.ecommerce.dto.PaymentResult;
 import com.darian.ecommerce.dto.RefundResult;
+import org.springframework.stereotype.Component;
 
+@Component
 public class VNPaySubsystemController  {
     private final VNPaySubsystemService vnPaySubsystemService;
 

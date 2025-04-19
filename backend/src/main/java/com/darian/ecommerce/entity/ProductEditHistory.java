@@ -3,6 +3,7 @@ package com.darian.ecommerce.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -17,7 +18,7 @@ public class ProductEditHistory {
     // Primary key
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "edit_history_id")
+    @Column(name = "edit_id")
     private Long id;
 
     // Product being edited (1-* relationship)
@@ -29,11 +30,13 @@ public class ProductEditHistory {
     @JoinColumn(name = "editor_user_id")
     private User editor;
 
+    // Date of the edit
+    @Column(name = "edit_timestamp")
+    private LocalDateTime editDate;
+
     // Description of changes made
     @Column(name = "changes_made")
     private String changes; // Nội dung chỉnh sửa
 
-    // Date of the edit
-    @Column(name = "edit_date")
-    private Date editDate;
+
 }

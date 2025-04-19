@@ -4,9 +4,11 @@ import com.darian.ecommerce.dto.CategoryDTO;
 import com.darian.ecommerce.dto.ManagerProductDTO;
 import com.darian.ecommerce.dto.ProductDTO;
 import com.darian.ecommerce.dto.ProductReviewDTO;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+@Service
 public interface ProductService {
     // Get product list based on role (Customer or Manager)
     <T extends ProductDTO> List<T> getProductList(String role);
@@ -30,7 +32,7 @@ public interface ProductService {
     ManagerProductDTO updateProduct(String productId, ProductDTO productDTO);
 
     // Delete a product by ID (Manager only)
-    void deleteProduct(String productId);
+    void deleteProduct(String productId, String userId);
 
     // Validate product details before adding/updating
     Boolean validateProductDetails(ProductDTO productDTO);
@@ -39,7 +41,7 @@ public interface ProductService {
     int checkProductQuantity(String productId);
 
     // Validate conditions before deleting a product
-    void validateDeletion(String productId);
+    void validateDeletion(String productId, String userId);
 
     // Check if the user has exceeded the deletion limit
     Boolean checkDeleteLimit(String userId);

@@ -3,6 +3,7 @@ package com.darian.ecommerce.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Entity
@@ -15,6 +16,7 @@ import java.util.Date;
 public class ProductReview {
     // Primary key
     @Id
+    @Column(name = "review_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
@@ -28,7 +30,6 @@ public class ProductReview {
     private User user;
 
     // Rating given by the customer (e.g., 1-5)
-    @Column(name = "rating")
     private Integer rating;
 
     // Comment or review content
@@ -36,6 +37,6 @@ public class ProductReview {
     private String comment;
 
     // Date and time the review was created
-    @Column(name = "review_created_date")
-    private Date createdDate;
+    @Column(name = "review_timestamp")
+    private LocalDateTime createdDate;
 }

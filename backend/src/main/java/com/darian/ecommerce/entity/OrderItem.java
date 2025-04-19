@@ -17,6 +17,11 @@ public class OrderItem {
     @Column(name = "order_item_id")
     private Long id;
 
+    // Reference to the parent order (*-1 relationship)
+    @ManyToOne
+    @JoinColumn(name = "order_id")
+    private Order order;
+
     // ID of the product in the order
     @ManyToOne
     @JoinColumn(name = "product_id")
@@ -30,10 +35,7 @@ public class OrderItem {
     private float unitPrice;
 
 
-    // Reference to the parent order (*-1 relationship)
-    @ManyToOne
-    @JoinColumn(name = "order_id")
-    private Order order;
+
 
     // Calculate line total (quantity * unitPrice)
     public float getLineTotal(){

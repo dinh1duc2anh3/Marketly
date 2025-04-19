@@ -13,8 +13,9 @@ import lombok.*;
 public class Category {
     // Primary key
     @Id
+    @Column(name =  "category_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Integer id;
 
     // Name of the category
     @Column(name = "category_name", nullable = false)

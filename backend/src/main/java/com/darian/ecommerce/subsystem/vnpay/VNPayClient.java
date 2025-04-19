@@ -8,7 +8,9 @@ import com.darian.ecommerce.dto.VNPayRequest;
 import com.darian.ecommerce.dto.VNPayResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
+@Component
 public class VNPayClient {
     private static final Logger logger = LoggerFactory.getLogger(VNPayClient.class);
     private final VNPayConverter paymentConverter;

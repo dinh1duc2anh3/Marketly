@@ -1,7 +1,9 @@
 package com.darian.ecommerce.service;
 
 import com.darian.ecommerce.dto.BasePaymentResult;
+import org.springframework.stereotype.Service;
 
+@Service
 public interface AuditLogService {
 
     // Log a search action performed by a user
