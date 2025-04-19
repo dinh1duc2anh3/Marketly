@@ -164,7 +164,9 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public void deleteProduct(Long productId, Integer userId) {
         logger.info("Attempting to delete product: {}", productId);
-        validateDeletion(productId,userId);
+        if (!validateDeletion(productId,userId)) return;
+        //update catalog??? need more check
+        //update database
         productRepository.deleteById(productId);
         logger.info("Product {} deleted successfully by {}", productId,userId);
         auditLogService.logDeleteAction(userId ,productId,"MANAGER");
@@ -191,24 +193,28 @@ public class ProductServiceImpl implements ProductService {
 
     // Validate general conditions before deleting a product
     @Override
-    public void validateDeletion(Long productId,Integer userId) {
+    public Boolean validateDeletion(Long productId, Integer userId) {
         logger.info("Validating deletion for product {} by user {}", productId,userId);
 
         //check if quantity of available product is > 0
         if (!checkDeletionConstraints(productId)) {
             logger.warn("Deletion constraints violated for product: {}", productId);
             throw new IllegalStateException("Cannot delete due to constraints");
+            return false;
         }
 
         if (checkOrdersAffected(productId)){
             logger.warn("Active orders affected by product deletion: {}", productId);
             throw new IllegalStateException("Cannot delete due to affected orders");
+            return false;
         }
 
         if (checkDeleteLimit(userId)){
             logger.warn("Active orders affected by product deletion: {}", productId);
             throw new IllegalStateException("Cannot delete due to affected orders");
+            return false;
         }
+        return true;
 
     }
 
@@ -217,7 +223,8 @@ public class ProductServiceImpl implements ProductService {
     public Boolean checkDeleteLimit(Integer userId) {
         logger.info("Checking delete limit for user: {}", userId);
         Integer deleteCount = auditLogService.countDeletesByUserId(userId);
-        return deleteCount < 30;  //check again if the delete limit is 30 or else
+        return deleteCount < 30;
+        //need more check as daily limit is 30 , not permanent limit is 30
     }
 
     // Check constraints that might prevent deletion

@@ -1,5 +1,6 @@
 package com.darian.ecommerce.entity;
 
+import com.darian.ecommerce.enums.UserRole;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -24,8 +25,9 @@ public class User {
     @Column(nullable = false)
     private String password;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private String role;
+    private UserRole role;
 
     @Column(nullable = false)
     private String email;

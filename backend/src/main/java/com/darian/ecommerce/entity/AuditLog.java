@@ -1,5 +1,6 @@
 package com.darian.ecommerce.entity;
 
+import com.darian.ecommerce.enums.ActionType;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -19,8 +20,9 @@ public class AuditLog {
     private Long id;
 
     // Type of action (e.g., SEARCH_PRODUCTS, ADD_PRODUCT)
+    @Enumerated(EnumType.STRING)
     @Column(name = "action_type")
-    private String actionType;
+    private ActionType actionType;
 
     // ID of the user performing the action
     @ManyToOne

@@ -1,5 +1,6 @@
 package com.darian.ecommerce.entity;
 
+import com.darian.ecommerce.enums.*;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -17,8 +18,9 @@ public class PaymentTransaction {
     @Column(name = "transaction_id")
     private String transactionId;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "transaction_type")
-    private String transactionType;
+    private TransactionType transactionType;
 
     @OneToOne
     @JoinColumn(name = "order_id")
@@ -33,17 +35,19 @@ public class PaymentTransaction {
     @Column(name = "transaction_timestamp")
     private Date transactionDate;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "payment_method")
-    private String paymentMethod;
+    private PaymentMethod paymentMethod;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "payment_status")
-    private String paymentStatus;
+    private PaymentStatus paymentStatus;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "refund_status")
-    private String refundStatus;
+    private RefundStatus refundStatus;
 
     @Column(name = "refund_timestamp")
     private Date refundDate;
-
 
 }

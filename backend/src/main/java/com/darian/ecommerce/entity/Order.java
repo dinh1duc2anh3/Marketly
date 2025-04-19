@@ -7,6 +7,8 @@ import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
+import com.darian.ecommerce.enums.*;
+
 @Entity
 @Data
 @Getter
@@ -27,8 +29,9 @@ public class Order {
     private User user;
 
     // Status of the order (e.g., PENDING, SHIPPED)
+    @Enumerated(EnumType.STRING)
     @Column(name = "order_status")
-    private String orderStatus;
+    private OrderStatus orderStatus;
 
     @Column(name = "is_rush_order")
     private Boolean isRushOrder;
@@ -55,9 +58,11 @@ public class Order {
     // Discount applied to the order
     private Float discount;
 
-    // Status of the payment (e.g., PAID, REFUNDED , UNPAID , ... ) //need more check
+    // Status of the payment (e.g., PAID, REFUNDED , UNPAID , ... )
+    // Lưu tên enum như chuỗi (thay vì index)
+    @Enumerated(EnumType.STRING)
     @Column(name = "payment_status")
-    private String paymentStatus;
+    private PaymentStatus paymentStatus;
 
     // List of order items (1-* relationship)
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
@@ -81,6 +86,8 @@ public class Order {
     public Float getTotal(){
         return getSubtotal() + shippingFee - discount + getVAT();
     }
+
+
 
 
 }

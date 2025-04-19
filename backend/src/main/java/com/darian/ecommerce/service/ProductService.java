@@ -41,7 +41,7 @@ public interface ProductService {
     Integer checkProductQuantity(Long productId);
 
     // Validate conditions before deleting a product
-    void validateDeletion(Long productId, Integer userId);
+    Boolean validateDeletion(Long productId, Integer userId);
 
     // Check if the user has exceeded the deletion limit
     Boolean checkDeleteLimit(Integer userId);
