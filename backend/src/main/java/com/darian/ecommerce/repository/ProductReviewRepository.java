@@ -11,5 +11,5 @@ public interface ProductReviewRepository {
     ProductReview save(ProductReview review);
 
     // Find reviews by product ID
-    List<ProductReview> findByProductId(String productId);
+    List<ProductReview> findByProductId(Long productId);
 }

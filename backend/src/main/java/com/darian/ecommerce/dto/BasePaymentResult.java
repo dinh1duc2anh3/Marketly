@@ -9,7 +9,7 @@ import lombok.*;
 @AllArgsConstructor
 public class BasePaymentResult {
     private String transactionType;
-    private String orderId;
+    private Long orderId;
     private String transactionId;
     private String errorMessage;
 }

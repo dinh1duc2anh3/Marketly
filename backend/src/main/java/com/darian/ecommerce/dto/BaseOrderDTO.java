@@ -11,13 +11,13 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class BaseOrderDTO {
-    private String orderId;
-    private String customerId;
+    private Long orderId;
+    private Integer customerId;
     private List<OrderItemDTO> items;
     private String status;
     private DeliveryInfoDTO deliveryInfo;
-    private float subtotal;
-    private float shippingFee;
-    private float total;
+    private Float subtotal;
+    private Float shippingFee;
+    private Float total;
     private LocalDateTime createdDate;
 }

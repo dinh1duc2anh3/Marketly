@@ -11,7 +11,7 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PaymentResult extends BasePaymentResult {
-    private float totalAmount;
+    private Float totalAmount;
     private String transactionContent;
     private LocalDateTime transactionDate;
     private String paymentStatus;

@@ -18,7 +18,7 @@ public class VNPaySubsystemService {
     }
 
     // Execute payment via VNPayClient
-    public PaymentResult executePayment(String orderId, float amount, String transactionContent) {
+    public PaymentResult executePayment(Long orderId, Float amount, String transactionContent) {
         logger.info("Executing VNPay payment for order {}, amount {}", orderId, amount);
         PaymentResult result = vnPayClient.processPayment(orderId, amount, transactionContent);
         logger.info("Payment executed for order {}: status {}", orderId, result.getPaymentStatus());
@@ -26,7 +26,7 @@ public class VNPaySubsystemService {
     }
 
     // Execute refund via VNPayClient
-    public RefundResult executeRefund(String orderId) {
+    public RefundResult executeRefund(Long orderId) {
         logger.info("Executing VNPay refund for order {}", orderId);
         RefundResult result = vnPayClient.processRefund(orderId);
         logger.info("Refund executed for order {}: status {}", orderId, result.getRefundStatus());

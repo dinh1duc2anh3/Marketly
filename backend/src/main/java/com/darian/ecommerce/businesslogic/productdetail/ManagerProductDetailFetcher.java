@@ -17,7 +17,7 @@ public class ManagerProductDetailFetcher implements ProductDetailFetcher{
 
     // Fetch product details by product ID for Manager role, returning ManagerProductDTO
     @Override
-    public <T extends ProductDTO> T fetchProductDetails(String productId) {
+    public <T extends ProductDTO> T fetchProductDetails(Long productId) {
         Optional<Product> optionalProduct = productRepository.findById(productId);
         if (optionalProduct.isEmpty()) {
             throw new IllegalArgumentException("Product not found: " + productId);

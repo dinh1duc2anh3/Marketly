@@ -10,9 +10,9 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ManagerProductDTO  extends ProductDTO{
-    private float value;
+    private Float value;
     private String barcode;
-    private int stockQuantity;
+    private Integer stockQuantity;
     private Date warehouseEntryDate;
     private List<ProductEditHistoryDTO> editHistory;
 }

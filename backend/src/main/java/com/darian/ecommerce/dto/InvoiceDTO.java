@@ -9,7 +9,7 @@ import lombok.*;
 @AllArgsConstructor
 public class InvoiceDTO {
 
-    private String orderId;
-    private float shippingFee;
-    private float total;
+    private Long orderId;
+    private Float shippingFee;
+    private Float total;
 }

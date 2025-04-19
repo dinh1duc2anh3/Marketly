@@ -39,21 +39,21 @@ public class Order {
     private DeliveryInfo deliveryInfo;
 
     // Subtotal of the order
-    private float subtotal;
+    private Float subtotal;
 
     // Shipping fee for the order
     @Column(name = "shipping_fee")
-    private float shippingFee;
+    private Float shippingFee;
 
     // Total amount (including shipping and discount)
-    private float total;
+    private Float total;
 
     // Date and time the order was created
     @Column(name = "created_timestamp")
     private LocalDateTime createdDate;
 
     // Discount applied to the order
-    private float discount;
+    private Float discount;
 
     // Status of the payment (e.g., PAID, REFUNDED , UNPAID , ... ) //need more check
     @Column(name = "payment_status")
@@ -68,17 +68,17 @@ public class Order {
     //getter + setter
 
     // Calculate subtotal (sum of line totals)
-    public float getSubtotal(){
-        return items != null ? (float) items.stream().mapToDouble(OrderItem::getLineTotal).sum() : 0;
+    public Float getSubtotal(){
+        return items != null ? (Float) items.stream().mapToDouble(OrderItem::getLineTotal).sum() : 0;
     }
 
     // Calculate VAT (example: 10% of subtotal)
-    public float getVAT(){
+    public Float getVAT(){
         return getSubtotal() * 0.1f;
     }
 
     // Calculate VAT (example: 10% of subtotal)
-    public float getTotal(){
+    public Float getTotal(){
         return getSubtotal() + shippingFee - discount + getVAT();
     }
 

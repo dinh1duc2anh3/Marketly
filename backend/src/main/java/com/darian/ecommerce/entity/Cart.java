@@ -27,17 +27,17 @@ public class Cart {
 
     // Total cost of the cart
     @Column(name = "total")
-    private float total;
+    private Float total;
 
     // Constructor for initializing with userId
-    public Cart(String userId) {
+    public Cart(Integer userId) {
         this.userId = userId;
         this.total = 0;
     }
 
     // Update total based on items
     public void updateTotal() {
-        this.total = (float) items.stream()
+        this.total = (Float) items.stream()
                 .mapToDouble(item -> item.getProductPrice() * item.getQuantity())
                 .sum();
     }

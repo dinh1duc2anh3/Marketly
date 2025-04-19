@@ -65,14 +65,14 @@ public class VNPayClient {
     }
 
     // Helper method to process payment
-    public PaymentResult processPayment(String orderId, float amount, String transactionContent) {
+    public PaymentResult processPayment(Long orderId, Float amount, String transactionContent) {
         VNPayRequest request = paymentConverter.toVNPayRequest(orderId, amount, transactionContent, "PAY");
         VNPayResponse response = sendPaymentRequest(request);
         return processPaymentResponse(response);
     }
 
     // Helper method to process refund
-    public RefundResult processRefund(String orderId) {
+    public RefundResult processRefund(Long orderId) {
         VNPayRequest request = paymentConverter.toVNPayRequest(orderId, 0, "Refund for " + orderId, "REFUND");
         VNPayResponse response = sendRefundRequest(request);
         return processRefundResponse(response);

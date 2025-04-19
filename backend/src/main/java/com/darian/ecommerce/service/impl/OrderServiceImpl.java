@@ -88,7 +88,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public void cancelOrder(String orderId) {
+    public void cancelOrder(Long orderId) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new IllegalArgumentException("Order not found"));
         order.setStatus("CANCELLED");
@@ -99,7 +99,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public OrderDTO getOrderDetails(String orderId) {
+    public OrderDTO getOrderDetails(Long orderId) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new IllegalArgumentException("Order not found"));
         return mapToOrderDTO(order);
@@ -118,7 +118,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public OrderDTO setDeliveryInfo(String orderId, DeliveryInfoDTO deliveryInfoDTO) {
+    public OrderDTO setDeliveryInfo(Long orderId, DeliveryInfoDTO deliveryInfoDTO) {
         if (!validateDeliveryInfo(deliveryInfoDTO)) {
             throw new IllegalArgumentException("Invalid delivery info");
         }
@@ -130,14 +130,14 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public Boolean isRushOrder(String orderId) {
+    public Boolean isRushOrder(Long orderId) {
         return orderRepository.findById(orderId)
                 .map(order -> "RUSH_PLACED".equals(order.getStatus()))
                 .orElse(false);
     }
 
     @Override
-    public void setPending(String orderId) {
+    public void setPending(Long orderId) {
         orderRepository.updateOrderStatus(orderId, "PENDING");
     }
 
@@ -148,12 +148,12 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public Boolean checkRushProductEligibility(String cartId) {
-        return cartService.checkRushEligibility(cartId); // Delegate to CartService
+    public Boolean checkRushProductEligibility(Integer userId) {
+        return cartService.checkRushEligibility(userId); // Delegate to CartService
     }
 
     @Override
-    public InvoiceDTO getInvoice(String orderId) {
+    public InvoiceDTO getInvoice(Long orderId) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new IllegalArgumentException("Order not found"));
         InvoiceDTO invoice = new InvoiceDTO();
@@ -164,12 +164,12 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public void updatePaymentStatus(String orderId, String status) {
+    public void updatePaymentStatus(Long orderId, String status) {
         orderRepository.updateOrderStatus(orderId, status);
     }
 
     @Override
-    public List<OrderDTO> getOrderHistory(String customerId) {
+    public List<OrderDTO> getOrderHistory(Integer customerId) {
         return orderRepository.findByCustomerId(customerId).stream()
                 .map(this::mapToOrderDTO)
                 .collect(Collectors.toList());
@@ -183,9 +183,9 @@ public class OrderServiceImpl implements OrderService {
         dto.setItems(order.getItems().stream().map(this::mapToOrderItemDTO).collect(Collectors.toList()));
         dto.setStatus(order.getStatus());
         dto.setDeliveryInfo(mapToDeliveryInfoDTO(order.getDeliveryInfo()));
-        dto.setSubtotal((int) order.getSubtotal());
-        dto.setShippingFee((int) order.getShippingFee());
-        dto.setTotal((int) order.getTotal());
+        dto.setSubtotal((Integer) order.getSubtotal());
+        dto.setShippingFee((Integer) order.getShippingFee());
+        dto.setTotal((Integer) order.getTotal());
         dto.setCreatedDate(java.util.Date.from(order.getCreatedDate().atZone(java.time.ZoneId.systemDefault()).toInstant()));
         return dto;
     }
@@ -197,9 +197,9 @@ public class OrderServiceImpl implements OrderService {
         dto.setItems(order.getItems().stream().map(this::mapToOrderItemDTO).collect(Collectors.toList()));
         dto.setStatus(order.getStatus());
         dto.setDeliveryInfo(mapToDeliveryInfoDTO(order.getDeliveryInfo()));
-        dto.setSubtotal((int) order.getSubtotal());
-        dto.setShippingFee((int) order.getShippingFee());
-        dto.setTotal((int) order.getTotal());
+        dto.setSubtotal((Integer) order.getSubtotal());
+        dto.setShippingFee((Integer) order.getShippingFee());
+        dto.setTotal((Integer) order.getTotal());
         dto.setCreatedDate(java.util.Date.from(order.getCreatedDate().atZone(java.time.ZoneId.systemDefault()).toInstant()));
         dto.setRushDeliveryTime(rushDeliveryTime);
         return dto;

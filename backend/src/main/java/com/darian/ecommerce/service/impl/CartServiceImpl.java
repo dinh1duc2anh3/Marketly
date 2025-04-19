@@ -31,7 +31,7 @@ public class CartServiceImpl implements CartService {
 
 
     @Override
-    public CartDTO addProductToCart(String userId, String productId, int quantity) {
+    public CartDTO addProductToCart(Integer userId, Long productId, Integer quantity) {
         logger.info("Adding product {} with quantity {} to cart for user {}", productId, quantity, userId);
         if (productService.checkProductQuantity(productId) <= 0) {
             logger.warn("Product {} is not available for user {}", productId, userId);
@@ -59,7 +59,7 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
-    public CartDTO viewCart(String userId) {
+    public CartDTO viewCart(Integer userId) {
         logger.info("Viewing cart for user {}", userId);
         Cart cart = cartRepository.findByUserId(userId)
                 .orElseThrow(() -> new IllegalArgumentException("Cart not found for user: " + userId));
@@ -67,7 +67,7 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
-    public CartDTO updateCart(String userId, String productId, int quantity) {
+    public CartDTO updateCart(Integer userId, Long productId, Integer quantity) {
         logger.info("Updating cart for user {}: product {}, quantity {}", userId, productId, quantity);
         Cart cart = cartRepository.findByUserId(userId)
                 .orElseThrow(() -> new IllegalArgumentException("Cart not found for user: " + userId));
@@ -83,7 +83,7 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
-    public CartDTO removeFromCart(String userId, String productId) {
+    public CartDTO removeFromCart(Integer userId, Long productId) {
         logger.info("Removing product {} from cart for user {}", productId, userId);
         Cart cart = cartRepository.findByUserId(userId)
                 .orElseThrow(() -> new IllegalArgumentException("Cart not found for user: " + userId));
@@ -95,7 +95,7 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
-    public void emptyCart(String userId) {
+    public void emptyCart(Integer userId) {
         logger.info("Emptying cart for user {}", userId);
         Cart cart = cartRepository.findByUserId(userId)
                 .orElseThrow(() -> new IllegalArgumentException("Cart not found for user: " + userId));
@@ -106,15 +106,7 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
-    public String getUserId(String cartId) {
-        logger.info("Getting user ID for cart {}", cartId);
-        //need more check
-        // Assuming cartId is userId in this simple design
-        return cartId; // Adjust if cartId differs from userId
-    }
-
-    @Override
-    public List<CartItemDTO> getCartItems(String userId) {
+    public List<CartItemDTO> getCartItems(Integer userId) {
         logger.info("Getting cart items for user {}", userId);
         Cart cart = cartRepository.findByUserId(userId)
                 .orElseThrow(() -> new IllegalArgumentException("Cart not found for user: " + userId));

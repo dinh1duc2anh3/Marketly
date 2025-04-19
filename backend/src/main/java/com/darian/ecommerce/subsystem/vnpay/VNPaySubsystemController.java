@@ -14,12 +14,12 @@ public class VNPaySubsystemController  {
     }
 
     // Process payment through subsystem
-    public PaymentResult processPayment(String orderId, float amount, String transactionContent) {
+    public PaymentResult processPayment(Long orderId, Float amount, String transactionContent) {
         return vnPaySubsystemService.executePayment(orderId, amount, transactionContent);
     }
 
     // Process refund through subsystem
-    public RefundResult processRefund(String orderId) {
+    public RefundResult processRefund(Long orderId) {
         return vnPaySubsystemService.executeRefund(orderId);
     }
 }

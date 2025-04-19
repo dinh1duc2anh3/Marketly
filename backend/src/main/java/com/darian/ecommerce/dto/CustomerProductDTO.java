@@ -16,7 +16,7 @@ public class CustomerProductDTO extends ProductDTO {
     private List<ProductDTO> relatedProducts;
 
     // Constructor
-    public CustomerProductDTO(String productId, String name, String description, float price, String specifications,
+    public CustomerProductDTO(Long productId, String name, String description, Float price, String specifications,
                               String availability, List<ProductImage> productImages, List<ProductDTO> relatedProducts) {
         super(productId, name, description, price, specifications);
         this.availability = availability;

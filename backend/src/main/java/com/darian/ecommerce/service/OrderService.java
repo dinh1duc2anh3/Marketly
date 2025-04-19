@@ -13,27 +13,27 @@ public interface OrderService {
 
     RushOrderDTO placeRushOrder(RushOrderDTO rushOrderDTO);
 
-    void cancelOrder(String orderId);
+    void cancelOrder(Long orderId);
 
-    OrderDTO getOrderDetails(String orderId);
+    OrderDTO getOrderDetails(Long orderId);
 
     Boolean checkAvailability(CartDTO cartDTO);
 
     Boolean validateDeliveryInfo(DeliveryInfoDTO deliveryInfoDTO);
 
-    OrderDTO setDeliveryInfo(String orderId, DeliveryInfoDTO deliveryInfoDTO);
+    OrderDTO setDeliveryInfo(Long orderId, DeliveryInfoDTO deliveryInfoDTO);
 
-    Boolean isRushOrder(String orderId);
+    Boolean isRushOrder(Long orderId);
 
-    void setPending(String orderId);
+    void setPending(Long orderId);
 
     Boolean checkRushDeliveryAddress(String address);
 
-    Boolean checkRushProductEligibility(String cartId);
+    Boolean checkRushProductEligibility(String Long productId);
 
-    InvoiceDTO getInvoice(String orderId);
+    InvoiceDTO getInvoice(Long orderId);
 
-    void updatePaymentStatus(String orderId, String status);
+    void updatePaymentStatus(Long orderId, String status);
 
-    List<OrderDTO> getOrderHistory(String customerId);
+    List<OrderDTO> getOrderHistory(Integer customerId);
 }

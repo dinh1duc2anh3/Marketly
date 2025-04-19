@@ -10,7 +10,7 @@ import lombok.*;
 @AllArgsConstructor
 public class Invoice {
     @Id
-    private String orderId;
-    private float amount;
+    private Long orderId;
+    private Float amount;
     private String content;
 }

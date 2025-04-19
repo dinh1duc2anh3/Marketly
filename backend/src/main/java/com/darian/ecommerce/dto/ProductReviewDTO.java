@@ -9,9 +9,9 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ProductReviewDTO {
-    private String productId;
-    private String customerId;
-    private int rating;
+    private Long productId;
+    private Integer customerId;
+    private Integer rating;
     private String comment;
     private Date createdDate;
 }

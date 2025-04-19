@@ -7,28 +7,28 @@ import org.springframework.stereotype.Service;
 public interface AuditLogService {
 
     // Log a search action performed by a user
-    void logSearchAction(String userId, String keyword, String role);
+    void logSearchAction(Integer userId, String keyword, String role);
 
     // Log a product view action by a user
-    void logViewProduct(String productId, String userId, String role);
+    void logViewProduct(Long productId, Integer userId, String role);
 
     // Log an add product action, return true if successful
-    Boolean logAddAction(String userId, String productId, String role);
+    Boolean logAddAction(Integer userId, Long productId, String role);
 
     // Log a delete product action, return true if successful
-    Boolean logDeleteAction(String userId, String productId, String role);
+    Boolean logDeleteAction(Integer userId, Long productId, String role);
 
     // Check if the user has exceeded the delete limit
-    Boolean checkDeleteLimit(String userId);
+    Boolean checkDeleteLimit(Integer userId);
 
     //count delete by specific user
-    int countDeletesByUserId(String userId);
+    Integer countDeletesByUserId(Integer userId);
 
     // Log an update product action, return true if successful
-    Boolean logUpdateAction(String userId, String productId, String role);
+    Boolean logUpdateAction(Integer userId, Long productId, String role);
 
     // Log an order-related action, return true if successful
-    Boolean logOrderAction(String userId, String orderId, String role,String action);
+    Boolean logOrderAction(Integer userId, Long orderId, String role,String action);
 
     // Log a payment transaction
     void logPayment(BasePaymentResult paymentResult);

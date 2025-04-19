@@ -25,7 +25,7 @@ public class PaymentTransaction {
     private Order order;
 
     @Column(name = "total_amount")
-    private float totalAmount;
+    private Float totalAmount;
 
     @Column(name = "transaction_content")
     private String transactionContent;

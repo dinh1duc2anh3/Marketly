@@ -8,11 +8,11 @@ import org.springframework.stereotype.Service;
 public class VNPaySubsystemService {
     private VNPayClient vnpayClient;
 
-    public PaymentResult executePayment(String orderId, float amount, String transactionContent){
+    public PaymentResult executePayment(Long orderId, Float amount, String transactionContent){
 
     }
 
-    public RefundResult executeRefund (String orderId){
+    public RefundResult executeRefund (Long orderId){
 
     }
 }

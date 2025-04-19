@@ -28,17 +28,17 @@ public class OrderItem {
     private Product product;
 
     // Quantity of the product
-    private int quantity;
+    private Integer quantity;
 
     // Unit price of the product
     @Column(name = "unit_price")
-    private float unitPrice;
+    private Float unitPrice;
 
 
 
 
     // Calculate line total (quantity * unitPrice)
-    public float getLineTotal(){
+    public Float getLineTotal(){
         return quantity * unitPrice;
     }
 }

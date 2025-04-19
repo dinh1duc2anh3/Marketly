@@ -24,7 +24,7 @@ public class PaymentController {
 
     // Process payment for an order
     @PostMapping("/{orderId}/pay")
-    public ResponseEntity<PaymentResult> payOrder(@PathVariable String orderId,
+    public ResponseEntity<PaymentResult> payOrder(@PathVariable Long orderId,
                                                   @RequestParam String paymentMethod) {
         logger.info("Initiating payment for order {} with method {}", orderId, paymentMethod);
         PaymentResult result = paymentService.payOrder(orderId, paymentMethod);
@@ -34,7 +34,7 @@ public class PaymentController {
 
     // Process refund for an order
     @PostMapping("/{orderId}/refund")
-    public ResponseEntity<RefundResult> processRefund(@PathVariable String orderId) {
+    public ResponseEntity<RefundResult> processRefund(@PathVariable Long orderId) {
         logger.info("Initiating refund for order {}", orderId);
         RefundResult result = paymentService.processRefund(orderId);
         logger.info("Refund completed for order {}: status {}", orderId, result.getRefundStatus());

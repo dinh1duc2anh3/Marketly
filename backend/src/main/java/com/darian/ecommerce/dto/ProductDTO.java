@@ -7,9 +7,9 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ProductDTO {
-    private String productId;
+    private Long productId;
     private String name;
     private String description;
-    private float price;
+    private Float price;
     private String specifications;
 }

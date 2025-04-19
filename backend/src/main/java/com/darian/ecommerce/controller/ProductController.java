@@ -15,11 +15,11 @@ public class ProductController {
 
     }
 
-    public ResponseEntity<? extends ProductDTO> getProductDetails(String userId, String productId, String role){
+    public ResponseEntity<? extends ProductDTO> getProductDetails(Integer userId, Long productId, String role){
 
     }
 
-    public ResponseEntity<? extends ProductDTO> searchProducts(String userId, String keyword, String role){
+    public ResponseEntity<? extends ProductDTO> searchProducts(Integer userId, String keyword, String role){
 
     }
 
@@ -27,15 +27,15 @@ public class ProductController {
 
     }
 
-    public ResponseEntity<Void> deleteProduct(String productId,String userId){
+    public ResponseEntity<Void> deleteProduct(Long productId,Integer userId){
 
     }
 
-    public ResponseEntity<ManagerProductDTO> updateProduct(String productId, ProductDTO productDTO){
+    public ResponseEntity<ManagerProductDTO> updateProduct(Long productId, ProductDTO productDTO){
 
     }
 
-    public ResponseEntity<List<ProductDTO>> getRelaetedProducts(String productId){
+    public ResponseEntity<List<ProductDTO>> getRelaetedProducts(Long productId){
 
     }
 

@@ -24,10 +24,10 @@ public class CartItem {
     private Product product;
 
     // Quantity of the product
-    private int quantity;
+    private Integer quantity;
 
     // Price of the product at the time of adding to cart
     @Column(name = "product_price")
-    private float productPrice;
+    private Float productPrice;
 
 }

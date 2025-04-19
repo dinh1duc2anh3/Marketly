@@ -9,8 +9,8 @@ import lombok.*;
 @AllArgsConstructor
 public class CartItemDTO {
     // ID of the product
-    private String productId;
+    private Long productId;
 
     // Quantity of the product in the cart
-    private int quantity;
+    private Integer quantity;
 }

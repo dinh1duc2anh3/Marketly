@@ -11,7 +11,7 @@ import java.util.List;
 @AllArgsConstructor
 public class CartDTO {
     // ID of the user owning the cart
-    private String userId;
+    private Integer userId;
 
     // List of items in the cart
     private List<CartItemDTO>  items;

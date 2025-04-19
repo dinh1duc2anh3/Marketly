@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class VNPayConverter {
     // Convert payment details to VNPayRequest
-    public VNPayRequest toVNPayRequest(String orderId, float amount, String transactionContent, String transactionType) {
+    public VNPayRequest toVNPayRequest(Long orderId, Float amount, String transactionContent, String transactionType) {
         VNPayRequest request = new VNPayRequest();
         request.setOrderId(orderId);
         request.setAmount(amount);

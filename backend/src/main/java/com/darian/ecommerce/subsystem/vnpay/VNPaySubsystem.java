@@ -14,12 +14,12 @@ public class VNPaySubsystem implements PaymentInterface {
     }
 
     @Override
-    public PaymentResult processPayment(String orderId, float amount, String transactionContent) {
+    public PaymentResult processPayment(Long orderId, Float amount, String transactionContent) {
         return controller.processPayment(orderId, amount, transactionContent);
     }
 
     @Override
-    public RefundResult processRefund(String orderId) {
+    public RefundResult processRefund(Long orderId) {
         return controller.processRefund(orderId);
     }
 

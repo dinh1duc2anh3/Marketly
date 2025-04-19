@@ -65,7 +65,7 @@ public class ProductServiceImpl implements ProductService {
 
     // Fetch product details using Factory Pattern based on role
     @Override
-    public <T extends ProductDTO> T getProductDetails(String userId, String productId, String role) {
+    public <T extends ProductDTO> T getProductDetails(Integer userId, Long productId, String role) {
         logger.info("Fetching product details for productId: {}, role: {}, userId: {}", productId, role, userId);
         T productDTO = productDetailFetcherFactory.getFetcher(role).fetchProductDetails(productId);
         auditLogService.logViewProduct(userId, "VIEW_PRODUCT_DETAILS", "Viewed product: " + productId);
@@ -74,7 +74,7 @@ public class ProductServiceImpl implements ProductService {
 
     // Search products using Factory Pattern based on role
     @Override
-    public <T extends ProductDTO> List<T> searchProducts(String userId, String keyword, String role) {
+    public <T extends ProductDTO> List<T> searchProducts(Integer userId, String keyword, String role) {
         logger.info("Searching products with keyword: {}, role: {}, userId: {}", keyword, role, userId);
         List<T> results = productSearchFetcherFactory.getFetcher(role).searchProducts(keyword);
         auditLogService.logSearchAction(userId, "SEARCH_PRODUCTS", "Searched with keyword: " + keyword);
@@ -83,7 +83,7 @@ public class ProductServiceImpl implements ProductService {
 
     // Advanced search with filters, directly querying repository
     @Override
-    public List<ProductDTO> findByFilters(String keyword, float minPrice, float maxPrice, String category) {
+    public List<ProductDTO> findByFilters(String keyword, Float minPrice, Float maxPrice, String category) {
         logger.info("Finding products with filters - keyword: {}, minPrice: {}, maxPrice: {}, category: {}",
                 keyword, minPrice, maxPrice, category);
         return productRepository.findByFilters(keyword, minPrice, maxPrice, category);
@@ -91,7 +91,7 @@ public class ProductServiceImpl implements ProductService {
 
     // Suggest related products based on product ID
     @Override
-    public List<ProductDTO> suggestRelatedProducts(String productId) {
+    public List<ProductDTO> suggestRelatedProducts(Long productId) {
         logger.info("Suggesting related products for productId: {}", productId);
         List<Product> relatedProducts = productRepository.findRelatedProducts(productId);
         return relatedProducts.stream().map(this::mapToBaseDTO).toList(); //?
@@ -128,7 +128,7 @@ public class ProductServiceImpl implements ProductService {
 
     // Update an existing product (Manager only)
     @Override
-    public ManagerProductDTO updateProduct(String productId, ProductDTO productDTO) {
+    public ManagerProductDTO updateProduct(Long productId, ProductDTO productDTO) {
         logger.info("Updating product: {}", productId);
         Optional<Product> optionalProduct = productRepository.findById(productId);
         if (optionalProduct.isEmpty()){
@@ -162,7 +162,7 @@ public class ProductServiceImpl implements ProductService {
 
     // Delete a product by ID (Manager only)
     @Override
-    public void deleteProduct(String productId, String userId) {
+    public void deleteProduct(Long productId, Integer userId) {
         logger.info("Attempting to delete product: {}", productId);
         validateDeletion(productId,userId);
         productRepository.deleteById(productId);
@@ -182,7 +182,7 @@ public class ProductServiceImpl implements ProductService {
 
 
     @Override
-    public int checkProductQuantity(String productId) {
+    public Integer checkProductQuantity(Long productId) {
         logger.info("Checking quantity for product: {}", productId);
         return productRepository.findById(productId)
                 .map(Product::getStockQuantity)
@@ -191,7 +191,7 @@ public class ProductServiceImpl implements ProductService {
 
     // Validate general conditions before deleting a product
     @Override
-    public void validateDeletion(String productId,String userId) {
+    public void validateDeletion(Long productId,Integer userId) {
         logger.info("Validating deletion for product {} by user {}", productId,userId);
 
         //check if quantity of available product is > 0
@@ -214,23 +214,23 @@ public class ProductServiceImpl implements ProductService {
 
     // Check if the user has exceeded the deletion limit
     @Override
-    public Boolean checkDeleteLimit(String userId) {
+    public Boolean checkDeleteLimit(Integer userId) {
         logger.info("Checking delete limit for user: {}", userId);
-        int deleteCount = auditLogService.countDeletesByUserId(userId);
+        Integer deleteCount = auditLogService.countDeletesByUserId(userId);
         return deleteCount < 30;  //check again if the delete limit is 30 or else
     }
 
     // Check constraints that might prevent deletion
     @Override
-    public Boolean checkDeletionConstraints(String productId) {
+    public Boolean checkDeletionConstraints(Long productId) {
         logger.info("Checking deletion constraints for product: {}", productId);
-        int stock = checkProductQuantity(productId);
+        Integer stock = checkProductQuantity(productId);
         return stock > 0; //Can only delete if stock is above 0
     }
 
     // Check if deleting a product affects any orders
     @Override
-    public Boolean checkOrdersAffected(String productId) {
+    public Boolean checkOrdersAffected(Long productId) {
         logger.info("Checking if orders are affected for product: {}", productId);
         //logic to check if any order affected ?
 
@@ -258,7 +258,7 @@ public class ProductServiceImpl implements ProductService {
 
     // Add a review for a product
     @Override
-    public ProductReviewDTO addReview(String productId, ProductReviewDTO reviewDTO) {
+    public ProductReviewDTO addReview(Long productId, ProductReviewDTO reviewDTO) {
         logger.info("Adding review for product: {}", productId);
         if (productRepository.findById(productId) == null) {
             logger.warn("Product not found for review: {}", productId);
@@ -280,7 +280,7 @@ public class ProductServiceImpl implements ProductService {
 
     // Get all reviews for a product
     @Override
-    public List<ProductReviewDTO> getReviews(String productId) {
+    public List<ProductReviewDTO> getReviews(Long productId) {
         logger.info("Fetching reviews for product: {}", productId);
         List<ProductReview> reviews = productReviewRepository.findByProductId(productId);
         //what does this do ?

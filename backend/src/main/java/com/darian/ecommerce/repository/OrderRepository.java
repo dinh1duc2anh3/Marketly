@@ -10,22 +10,22 @@ import java.util.Optional;
 @Repository
 public interface OrderRepository extends JpaRepository<Order, String> {
     // Find order by ID
-    Optional<Order> findById(String orderId);
+    Optional<Order> findById(Long orderId);
 
     // Find orders by status
     List<Order> findByStatus(String status);
 
     // Find orders by customer ID
-    List<Order> findByCustomerId(String customerId);
+    List<Order> findByCustomerId(Integer customerId);
 
-    // Save an order (returns Order, but UML specifies int, adjusted to entity)
+    // Save an order (returns Order, but UML specifies Integer, adjusted to entity)
     Order save(Order order);
 
     // Delete an order by ID
-    void deleteById(String orderId);
+    void deleteById(Long orderId);
 
     // Update order status
-    default void updateOrderStatus(String orderId, String status) {
+    default void updateOrderStatus(Long orderId, String status) {
         findById(orderId).ifPresent(order -> {
             order.setStatus(status);
             save(order);
@@ -33,7 +33,7 @@ public interface OrderRepository extends JpaRepository<Order, String> {
     }
 
     // Update shipping fee
-    default void updateShippingFee(String orderId, int fees) {
+    default void updateShippingFee(Long orderId, Integer fees) {
         findById(orderId).ifPresent(order -> {
             order.setShippingFee(fees);
             save(order);

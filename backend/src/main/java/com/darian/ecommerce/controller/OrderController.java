@@ -30,32 +30,32 @@ public class OrderController {
     }
 
     @PostMapping("/{orderId}/cancel")
-    public ResponseEntity<Void> cancelOrder(@PathVariable String orderId) {
+    public ResponseEntity<Void> cancelOrder(@PathVariable Long orderId) {
         orderService.cancelOrder(orderId);
         return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/{orderId}")
-    public ResponseEntity<OrderDTO> getOrderDetails(@PathVariable String orderId) {
+    public ResponseEntity<OrderDTO> getOrderDetails(@PathVariable Long orderId) {
         OrderDTO result = orderService.getOrderDetails(orderId);
         return ResponseEntity.ok(result);
     }
 
     @PutMapping("/{orderId}/delivery-info")
-    public ResponseEntity<OrderDTO> setDeliveryInfo(@PathVariable String orderId,
+    public ResponseEntity<OrderDTO> setDeliveryInfo(@PathVariable Long orderId,
                                                     @RequestBody DeliveryInfoDTO deliveryInfoDTO) {
         OrderDTO result = orderService.setDeliveryInfo(orderId, deliveryInfoDTO);
         return ResponseEntity.ok(result);
     }
 
     @GetMapping("/{orderId}/invoice")
-    public ResponseEntity<InvoiceDTO> getInvoice(@PathVariable String orderId) {
+    public ResponseEntity<InvoiceDTO> getInvoice(@PathVariable Long orderId) {
         InvoiceDTO result = orderService.getInvoice(orderId);
         return ResponseEntity.ok(result);
     }
 
     @PostMapping("/{orderId}/pay")
-    public ResponseEntity<String> initiatePayment(@PathVariable String orderId,
+    public ResponseEntity<String> initiatePayment(@PathVariable Long orderId,
                                                   @RequestParam String paymentMethod) {
         // Placeholder for payment initiation
         return ResponseEntity.ok("Payment initiated for order: " + orderId);

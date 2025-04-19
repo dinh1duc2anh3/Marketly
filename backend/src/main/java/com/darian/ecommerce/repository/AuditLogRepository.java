@@ -10,5 +10,5 @@ public interface AuditLogRepository extends JpaRepository<AuditLog, Long> {
     AuditLog save(AuditLog auditLog);
 
     // Count the number of delete actions by a user
-    int countDeletesByUserId(String userId);
+    Integer countDeletesByUserId(Integer userId);
 }

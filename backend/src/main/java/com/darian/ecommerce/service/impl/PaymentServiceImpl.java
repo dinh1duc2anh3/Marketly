@@ -33,7 +33,7 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
-    public PaymentResult payOrder(String orderId, String paymentMethod) {
+    public PaymentResult payOrder(Long orderId, String paymentMethod) {
         logger.info("Processing payment for order {} with method {}", orderId, paymentMethod);
         if (!validatePayment(orderId)) {
             logger.error("Payment validation failed for order {}", orderId);
@@ -51,7 +51,7 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
-    public Boolean validatePayment(String orderId) {
+    public Boolean validatePayment(Long orderId) {
         logger.info("Validating payment for order {}", orderId);
         //need more check
         // Example validation: check if order exists and is in a payable state
@@ -59,7 +59,7 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
-    public RefundResult processRefund(String orderId) {
+    public RefundResult processRefund(Long orderId) {
         logger.info("Processing refund for order {}", orderId);
         if (!checkCancellationValidity(orderId)) {
             logger.error("Refund not valid for order {}", orderId);
@@ -77,7 +77,7 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
-    public Boolean checkCancellationValidity(String orderId) {
+    public Boolean checkCancellationValidity(Long orderId) {
         logger.info("Checking cancellation validity for order {}", orderId);
         return orderService.checkCancellationValidity(orderId); // Delegate to OrderService
     }

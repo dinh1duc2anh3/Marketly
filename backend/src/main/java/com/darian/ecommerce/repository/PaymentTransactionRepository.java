@@ -11,7 +11,7 @@ public interface PaymentTransactionRepository {
 
     }
 
-    public Optional<PaymentTransaction> findByOrderId(String orderId){
+    public Optional<PaymentTransaction> findByOrderId(Long orderId){
 
     }
 

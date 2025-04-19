@@ -16,7 +16,7 @@ public interface ProductRepository extends JpaRepository<Product,String> {
     List<Product> findAll();
 
     // Find product by ID (inherited from JpaRepository)
-    Optional<Product> findById(String productId);
+    Optional<Product> findById(Long productId);
 
     // Find products by keyword (custom query)
     @Query("SELECT p FROM Product p WHERE p.name LIKE %:keyword% OR p.description LIKE %:keyword%")
@@ -28,16 +28,16 @@ public interface ProductRepository extends JpaRepository<Product,String> {
             "(p.name LIKE %:keyword% OR p.description LIKE %:keyword% OR :keyword IS NULL) " +
             "AND p.price BETWEEN :minPrice AND :maxPrice " +
             "AND (p.category.name = :category OR :category IS NULL)")
-    List<ProductDTO> findByFilters(String keyword, float minPrice, float maxPrice, String category);
+    List<ProductDTO> findByFilters(String keyword, Float minPrice, Float maxPrice, String category);
 
     // Find related products (custom query via RelatedProduct)
     @Query("SELECT p.relatedProduct FROM RelatedProduct p WHERE p.product.productId = :productId")
-    List<Product> findRelatedProducts(String productId);
+    List<Product> findRelatedProducts(Long productId);
 
     // Save a product (inherited from JpaRepository)
     Product save(Product product);
 
     // Delete a product by ID (inherited from JpaRepository)
-    void deleteById(String productId);
+    void deleteById(Long productId);
 
 }

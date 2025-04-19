@@ -25,7 +25,7 @@ public class AuditLogServiceImpl implements AuditLogService {
 
     // Log a search action performed by a user
     @Override
-    public void logSearchAction(String userId, String keyword, String role) {
+    public void logSearchAction(Integer userId, String keyword, String role) {
         logger.info("User {} (role: {}) searched with keyword: {}", userId, role, keyword);
         //create audit log entity
         AuditLog log = new AuditLog();
@@ -40,7 +40,7 @@ public class AuditLogServiceImpl implements AuditLogService {
 
     // Log a product view action by a user
     @Override
-    public void logViewProduct(String productId, String userId, String role) {
+    public void logViewProduct(Long productId, Integer userId, String role) {
         logger.info("User {} (role: {}) viewed product: {}", userId, role, productId);
         //create audit log entity
         AuditLog log = new AuditLog();
@@ -55,7 +55,7 @@ public class AuditLogServiceImpl implements AuditLogService {
 
     // Log an add product action, return true if successful
     @Override
-    public Boolean logAddAction(String userId, String productId, String role) {
+    public Boolean logAddAction(Integer userId, Long productId, String role) {
         try {
             logger.info("User {} (role: {}) added product: {}", userId, role, productId);
             //create audit log entity
@@ -76,7 +76,7 @@ public class AuditLogServiceImpl implements AuditLogService {
 
     // Log a delete product action, return true if successful
     @Override
-    public Boolean logDeleteAction(String userId, String productId, String role) {
+    public Boolean logDeleteAction(Integer userId, Long productId, String role) {
         try {
             logger.info("User {} (role: {}) deleted product: {}", userId, role, productId);
             AuditLog log = new AuditLog();
@@ -95,23 +95,23 @@ public class AuditLogServiceImpl implements AuditLogService {
 
     // Check if the user has exceeded the delete limit
     @Override
-    public Boolean checkDeleteLimit(String userId) {
+    public Boolean checkDeleteLimit(Integer userId) {
         logger.info("Checking delete limit for user: {}", userId);
         // Example: Limit is 30 deletions per user
-        int deleteCount = countDeletesByUserId(userId);
+        Integer deleteCount = countDeletesByUserId(userId);
         boolean withinLimit = deleteCount < 30;
         logger.info("User {} has {} deletions, limit check: {}", userId, deleteCount, withinLimit);
         return withinLimit;
     }
 
     @Override
-    public int countDeletesByUserId(String userId) {
+    public Integer countDeletesByUserId(Integer userId) {
         return auditLogRepository.countDeletesByUserId(userId);
     }
 
     // Log an update product action, return true if successful
     @Override
-    public Boolean logUpdateAction(String userId, String productId, String role) {
+    public Boolean logUpdateAction(Integer userId, Long productId, String role) {
         try {
             logger.info("User {} (role: {}) updated product: {}", userId, role, productId);
             AuditLog log = new AuditLog();
@@ -130,7 +130,7 @@ public class AuditLogServiceImpl implements AuditLogService {
 
     // Log an order-related action, return true if successful
     @Override
-    public Boolean logOrderAction(String userId, String orderId, String role) {
+    public Boolean logOrderAction(Integer userId, Long orderId, String role) {
         try {
             logger.info("User {} (role: {}) performed order action: {}", userId, role, orderId);
             AuditLog log = new AuditLog();

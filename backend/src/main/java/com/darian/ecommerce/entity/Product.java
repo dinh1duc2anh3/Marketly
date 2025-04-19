@@ -34,11 +34,11 @@ public class Product {
 
     // Price of the product
     @Column(name = "product_price")
-    private float price;
+    private Float price;
 
     // Value (could be cost or another metric)
     @Column(name = "product_value")
-    private float value;
+    private Float value;
 
     // Barcode of the product
     @Column(name = "product_barcode")
@@ -54,7 +54,7 @@ public class Product {
 
     // Quantity in stock
     @Column(name = "stock_quantity")
-    private int stockQuantity;
+    private Integer stockQuantity;
 
     // Date the product entered the warehouse
     @Column(name = "warehouse_entry_timestamp")

@@ -8,9 +8,9 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class VNPayRequest {
-    private float amount;
+    private Float amount;
     private String transactionContent;
-    private String orderId;
+    private Long orderId;
     private String returnUrl;
     private String transactionType;
 }

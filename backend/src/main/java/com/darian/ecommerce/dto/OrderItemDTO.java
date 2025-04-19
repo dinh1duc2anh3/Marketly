@@ -8,8 +8,8 @@ import lombok.*;
 @AllArgsConstructor
 @Data
 public class OrderItemDTO {
-    private String productId;
-    private int quantity;
-    private float unitPrice;
-    private float lineTotal;
+    private Long productId;
+    private Integer quantity;
+    private Float unitPrice;
+    private Float lineTotal;
 }
