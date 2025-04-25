@@ -10,15 +10,18 @@ import com.darian.ecommerce.dto.ProductReviewDTO;
 import com.darian.ecommerce.entity.Product;
 import com.darian.ecommerce.entity.Category;
 import com.darian.ecommerce.entity.ProductReview;
+import com.darian.ecommerce.entity.User;
 import com.darian.ecommerce.repository.CategoryRepository;
 import com.darian.ecommerce.repository.ProductRepository;
 import com.darian.ecommerce.repository.ProductReviewRepository;
 import com.darian.ecommerce.service.AuditLogService;
 import com.darian.ecommerce.service.OrderService;
 import com.darian.ecommerce.service.ProductService;
+import com.darian.ecommerce.service.UserService;
 import org.slf4j.*;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -33,9 +36,11 @@ public class ProductServiceImpl implements ProductService {
     private final ProductDetailFetcherFactory productDetailFetcherFactory;
     private final ProductSearchFetcherFactory productSearchFetcherFactory;
     private final AuditLogService auditLogService;
+    private final UserService userService;
     private final CategoryRepository categoryRepository;
     private final OrderService orderService;
     private final ProductReviewRepository productReviewRepository;
+
 
     // Constructor for dependency injection
     public ProductServiceImpl(ProductRepository productRepository,
@@ -43,6 +48,7 @@ public class ProductServiceImpl implements ProductService {
                               ProductDetailFetcherFactory productDetailFetcherFactory,
                               ProductSearchFetcherFactory productSearchFetcherFactory,
                               AuditLogService auditLogService,
+                              UserService userService,
                               CategoryRepository categoryRepository,
                               OrderService orderService,
                               ProductReviewRepository productReviewRepository) {
@@ -51,6 +57,7 @@ public class ProductServiceImpl implements ProductService {
         this.productDetailFetcherFactory = productDetailFetcherFactory;
         this.productSearchFetcherFactory = productSearchFetcherFactory;
         this.auditLogService = auditLogService;
+        this.userService = userService;
         this.categoryRepository = categoryRepository;
         this.orderService = orderService;
         this.productReviewRepository = productReviewRepository;
@@ -266,28 +273,14 @@ public class ProductServiceImpl implements ProductService {
     // Add a review for a product
     @Override
     public ProductReviewDTO addReview(ProductReviewDTO reviewDTO) {
-        Long productId = reviewDTO.getProductId();
-
-        //find product in db from productId
-        Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new IllegalArgumentException("Product not found"));
-
         //create new productReview Entity
-        ProductReview review = new ProductReview();
-        review.setProduct(product); // set đối tượng Product thay vì chỉ ID
-        review.setRating(reviewDTO.getRating());
-        review.setComment(reviewDTO.getComment());
+        ProductReview review = mapToReviewEntity(reviewDTO);
 
         //save productReview
         ProductReview savedReview = productReviewRepository.save(review);
-        logger.info("Review added for product: {}", productId);
+        logger.info("Review added for product: {}", savedReview.getProduct().getProductId());
 
-        //change saved productReview into DTO to return
-        //is it necessary to return savedDTO or just simply return saveReview?
-        ProductReviewDTO savedDTO = new ProductReviewDTO();
-        savedDTO.setRating(savedReview.getRating());
-        savedDTO.setComment(savedReview.getComment());
-        return savedDTO;
+        return mapToReviewDTO(savedReview);
     }
 
     // Get all reviews for a product
@@ -335,28 +328,27 @@ public class ProductServiceImpl implements ProductService {
     // Chuyển từ DTO sang Entity
     private ProductReview mapToReviewEntity(ProductReviewDTO reviewDTO) {
 
-        ProductReview review = new ProductReview();
-
         //find product from productId
         Product product = productRepository.findById(reviewDTO.getProductId())
                 .orElseThrow(() -> new IllegalArgumentException("Product not found"));
 
         //find user from customerId
-        User user = userRepository.findById(reviewDTO.getCustomerId())
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+        User user = userService.getUserById(reviewDTO.getCustomerId());
 
-        review.setProduct(productRepository.findById(reviewDTO.getProductId())
-                .orElseThrow(() -> new IllegalArgumentException("Product not found")));
+        //autofill id + createDate when first creating an object of productReview
+        ProductReview review = new ProductReview();
+        review.setProduct(product);
+        review.setUser(user);
         review.setRating(reviewDTO.getRating());
         review.setComment(reviewDTO.getComment());
-        review.setCreatedDate(LocalDateTime.now());
         return review;
     }
 
     // Chuyển từ Entity sang DTO
     private ProductReviewDTO mapToReviewDTO(ProductReview review) {
         ProductReviewDTO reviewDTO = new ProductReviewDTO();
-        reviewDTO.setProductId(review.getProduct().getId());
+        reviewDTO.setProductId(review.getProduct().getProductId());
+        reviewDTO.setCustomerId(review.getUser().getId());
         reviewDTO.setRating(review.getRating());
         reviewDTO.setComment(review.getComment());
         reviewDTO.setCreatedDate(review.getCreatedDate());

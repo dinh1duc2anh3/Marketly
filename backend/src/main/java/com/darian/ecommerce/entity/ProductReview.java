@@ -38,4 +38,10 @@ public class ProductReview {
     // Date and time the review was created
     @Column(name = "review_timestamp")
     private LocalDateTime createdDate;
+
+    // Auto-set createdDate
+    @PrePersist
+    protected void onCreate() {
+        this.createdDate = LocalDateTime.now();
+    }
 }

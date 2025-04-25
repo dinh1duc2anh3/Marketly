@@ -2,6 +2,7 @@ package com.darian.ecommerce.dto;
 
 import lombok.*;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Data
@@ -12,5 +13,5 @@ public class ProductReviewDTO {
     private Integer customerId;
     private Integer rating;
     private String comment;
-    private Date createdDate;
+    private LocalDateTime createdDate;
 }
