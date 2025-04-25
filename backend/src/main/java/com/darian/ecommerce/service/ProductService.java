@@ -59,7 +59,7 @@ public interface ProductService {
     CategoryDTO saveCategory(CategoryDTO category);
 
     // Add a review for a product
-    ProductReviewDTO addReview(Long productId, ProductReviewDTO reviewDTO);
+    ProductReviewDTO addReview(ProductReviewDTO reviewDTO);
 
     // Get all reviews for a product
     List<ProductReviewDTO> getReviews(Long productId);

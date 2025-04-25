@@ -13,11 +13,12 @@ import java.util.List;
 public class BaseOrderDTO {
     private Long orderId;
     private Integer customerId;
-    private List<OrderItemDTO> items;
-    private String status;
+
+    private String orderStatus;
     private DeliveryInfoDTO deliveryInfo;
     private Float subtotal;
     private Float shippingFee;
     private Float total;
     private LocalDateTime createdDate;
+    private List<OrderItemDTO> items;
 }

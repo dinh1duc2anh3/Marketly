@@ -193,7 +193,7 @@ public class OrderServiceImpl implements OrderService {
     private RushOrderDTO mapToRushOrderDTO(Order order, java.util.Date rushDeliveryTime) {
         RushOrderDTO dto = new RushOrderDTO();
         dto.setOrderId(order.getOrderId());
-        dto.setCustomerId(order.getCustomerId());
+        dto.setCustomerId(order.getUser().getId());
         dto.setItems(order.getItems().stream().map(this::mapToOrderItemDTO).collect(Collectors.toList()));
         dto.setStatus(order.getStatus());
         dto.setDeliveryInfo(mapToDeliveryInfoDTO(order.getDeliveryInfo()));

@@ -73,8 +73,8 @@ public class Order {
     //getter + setter
 
     // Calculate subtotal (sum of line totals)
-    public Float getSubtotal(){
-        return items != null ? (Float) items.stream().mapToDouble(OrderItem::getLineTotal).sum() : 0;
+    public float getSubtotal(){
+        return items != null ? (float) items.stream().mapToDouble(OrderItem::getLineTotal).sum() : 0;
     }
 
     // Calculate VAT (example: 10% of subtotal)

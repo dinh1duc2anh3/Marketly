@@ -19,19 +19,29 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false,
+            unique = true,
+            length = 30)
     private String username;
 
-    @Column(nullable = false)
+    @Column(nullable = false,
+            length = 50)
     private String password;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private UserRole role;
 
-    @Column(nullable = false)
+    @Column(nullable = false,
+            length = 100)
     private String email;
 
-    @Column(name= "create_at", nullable = false)
+    @Column(name= "create_at",
+            nullable = false)
     private LocalDateTime createdAt;
+
+    @PrePersist
+    protected void onCreate(){
+        this.createdAt = LocalDateTime.now();
+    }
 }

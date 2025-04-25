@@ -265,19 +265,24 @@ public class ProductServiceImpl implements ProductService {
 
     // Add a review for a product
     @Override
-    public ProductReviewDTO addReview(Long productId, ProductReviewDTO reviewDTO) {
-        logger.info("Adding review for product: {}", productId);
-        if (productRepository.findById(productId) == null) {
-            logger.warn("Product not found for review: {}", productId);
-            throw new IllegalArgumentException("Product not found");
-        }
+    public ProductReviewDTO addReview(ProductReviewDTO reviewDTO) {
+        Long productId = reviewDTO.getProductId();
+
+        //find product in db from productId
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new IllegalArgumentException("Product not found"));
+
+        //create new productReview Entity
         ProductReview review = new ProductReview();
-        review.setProductId(productId);
+        review.setProduct(product); // set đối tượng Product thay vì chỉ ID
         review.setRating(reviewDTO.getRating());
         review.setComment(reviewDTO.getComment());
+
+        //save productReview
         ProductReview savedReview = productReviewRepository.save(review);
         logger.info("Review added for product: {}", productId);
 
+        //change saved productReview into DTO to return
         //is it necessary to return savedDTO or just simply return saveReview?
         ProductReviewDTO savedDTO = new ProductReviewDTO();
         savedDTO.setRating(savedReview.getRating());
@@ -325,5 +330,36 @@ public class ProductServiceImpl implements ProductService {
         category.setName(dto.getName());
         category.setDescription(dto.getDescription());
         return category;
+    }
+
+    // Chuyển từ DTO sang Entity
+    private ProductReview mapToReview(ProductReviewDTO reviewDTO) {
+
+        ProductReview review = new ProductReview();
+
+        //find product from productId
+        Product product = productRepository.findById(reviewDTO.getProductId())
+                .orElseThrow(() -> new IllegalArgumentException("Product not found"));
+
+        //find user from customerId
+        User user = userRepository.findById(reviewDTO.getCustomerId())
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+        review.setProduct(productRepository.findById(reviewDTO.getProductId())
+                .orElseThrow(() -> new IllegalArgumentException("Product not found")));
+        review.setRating(reviewDTO.getRating());
+        review.setComment(reviewDTO.getComment());
+        review.setCreatedDate(LocalDateTime.now());
+        return review;
+    }
+
+    // Chuyển từ Entity sang DTO
+    private ProductReviewDTO mapToReviewDTO(ProductReview review) {
+        ProductReviewDTO reviewDTO = new ProductReviewDTO();
+        reviewDTO.setProductId(review.getProduct().getId());
+        reviewDTO.setRating(review.getRating());
+        reviewDTO.setComment(review.getComment());
+        reviewDTO.setCreatedDate(review.getCreatedDate());
+        return reviewDTO;
     }
 }
