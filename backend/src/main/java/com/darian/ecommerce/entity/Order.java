@@ -10,7 +10,6 @@ import java.util.List;
 import com.darian.ecommerce.enums.*;
 
 @Entity
-@Data
 @Getter
 @Setter
 @NoArgsConstructor

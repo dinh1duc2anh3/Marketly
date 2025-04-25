@@ -6,11 +6,9 @@ import java.time.LocalDateTime;
 import java.util.Date;
 
 
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Data
 public class RushOrderDTO extends BaseOrderDTO {
     private LocalDateTime rushDeliveryTime;
 }

@@ -258,7 +258,7 @@ public class ProductServiceImpl implements ProductService {
     public CategoryDTO saveCategory(CategoryDTO category) {
         //- check again saveCategory , check if the input is category or categoryDTO
         logger.info("Saving category: {}", category.getName());
-        Category savedCategory = categoryRepository.save(mapToCategory(category));
+        Category savedCategory = categoryRepository.save(mapToCategoryEntity(category));
         logger.info("Category saved: {}", savedCategory.getId());
         return category;
     }
@@ -324,7 +324,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     // Private method to map CategoryDTO to Category entity
-    private Category mapToCategory(CategoryDTO dto) {
+    private Category mapToCategoryEntity(CategoryDTO dto) {
         Category category = new Category();
         category.setId(dto.getId());
         category.setName(dto.getName());
@@ -333,7 +333,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     // Chuyển từ DTO sang Entity
-    private ProductReview mapToReview(ProductReviewDTO reviewDTO) {
+    private ProductReview mapToReviewEntity(ProductReviewDTO reviewDTO) {
 
         ProductReview review = new ProductReview();
 

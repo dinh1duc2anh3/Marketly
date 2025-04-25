@@ -7,7 +7,6 @@ import java.util.Date;
 import java.util.List;
 
 @Entity
-@Data
 @Getter
 @Setter
 @NoArgsConstructor

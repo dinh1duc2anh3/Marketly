@@ -11,7 +11,6 @@ import java.util.Date;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Data
 @Table(name = "product_review")
 public class ProductReview {
     // Primary key

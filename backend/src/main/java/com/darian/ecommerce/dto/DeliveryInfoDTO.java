@@ -2,11 +2,9 @@ package com.darian.ecommerce.dto;
 
 import lombok.*;
 
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Data
 public class DeliveryInfoDTO {
     private String recipientName;
     private String phoneNumber;

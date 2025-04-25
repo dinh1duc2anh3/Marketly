@@ -6,8 +6,7 @@ import lombok.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class CustomerProductDTO extends ProductDTO {

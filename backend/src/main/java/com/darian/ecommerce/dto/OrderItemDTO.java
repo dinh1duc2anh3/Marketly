@@ -2,11 +2,9 @@ package com.darian.ecommerce.dto;
 
 import lombok.*;
 
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Data
 public class OrderItemDTO {
     private Long productId;
     private Integer quantity;
