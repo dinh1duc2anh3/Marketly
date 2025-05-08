@@ -1,13 +1,17 @@
 package com.darian.ecommerce.dto;
 
+import com.darian.ecommerce.enums.PaymentStatus;
+import com.darian.ecommerce.enums.TransactionType;
+import com.darian.ecommerce.enums.VNPayResponseStatus;
 import lombok.*;
 
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class VNPayResponse {
-    private String status;
+    private VNPayResponseStatus status;
     private String transactionId;
     private String errorMessage;
-    private String transactionType;
+    private TransactionType transactionType;
 }

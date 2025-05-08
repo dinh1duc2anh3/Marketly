@@ -1,5 +1,6 @@
 package com.darian.ecommerce.entity;
 
+import com.darian.ecommerce.id.CartItemId;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -10,14 +11,18 @@ import lombok.*;
 @AllArgsConstructor
 @Table(name = "cart_item")
 public class CartItem {
+
     // Primary key
-    @Id
+    @EmbeddedId
+    private CartItemId id;
+
+
+    // ID of the cart
     @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    @JoinColumn(name = "cart_id", nullable = false)
+    private Cart cart ;
 
     // ID of the product
-    @Id
     @ManyToOne
     @JoinColumn(name = "product_id")
     private Product product;

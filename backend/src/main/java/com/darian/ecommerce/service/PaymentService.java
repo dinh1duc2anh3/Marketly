@@ -13,8 +13,8 @@ public interface PaymentService {
     public Boolean validatePayment(Long orderId);
 
     // Process refund for an order
-    public RefundResult processRefund(Long orderId);
+//    public RefundResult processRefund(Long orderId);
 
     // Check if cancellation is valid for an order
-    public Boolean checkCancellationValidity(Long orderId);
+//    public Boolean checkCancellationValidity(Long orderId);
 }

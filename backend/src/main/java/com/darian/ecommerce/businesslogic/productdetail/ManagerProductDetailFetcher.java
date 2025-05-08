@@ -17,12 +17,12 @@ public class ManagerProductDetailFetcher implements ProductDetailFetcher{
 
     // Fetch product details by product ID for Manager role, returning ManagerProductDTO
     @Override
-    public <T extends ProductDTO> T fetchProductDetails(Long productId) {
+    public ManagerProductDTO fetchProductDetails(Long productId) {
         Optional<Product> optionalProduct = productRepository.findById(productId);
         if (optionalProduct.isEmpty()) {
             throw new IllegalArgumentException("Product not found: " + productId);
         }
-        return (T) mapToManagerDTO(optionalProduct.get());
+        return mapToManagerDTO(optionalProduct.get());
     }
 
     // Private method to map Product entity to ManagerProductDTO

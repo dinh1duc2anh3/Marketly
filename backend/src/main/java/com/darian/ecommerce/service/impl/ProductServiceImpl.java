@@ -11,6 +11,7 @@ import com.darian.ecommerce.entity.Product;
 import com.darian.ecommerce.entity.Category;
 import com.darian.ecommerce.entity.ProductReview;
 import com.darian.ecommerce.entity.User;
+import com.darian.ecommerce.enums.UserRole;
 import com.darian.ecommerce.repository.CategoryRepository;
 import com.darian.ecommerce.repository.ProductRepository;
 import com.darian.ecommerce.repository.ProductReviewRepository;
@@ -21,8 +22,8 @@ import com.darian.ecommerce.service.UserService;
 import org.slf4j.*;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ProductServiceImpl implements ProductService {
@@ -65,26 +66,31 @@ public class ProductServiceImpl implements ProductService {
 
     // Fetch product list using Factory Pattern based on role
     @Override
-    public <T extends ProductDTO> List<T> getProductList(String role) {
+    public <T extends ProductDTO> List<T> getProductList(UserRole role) {
         logger.info("Fetching product list for role: {}", role);
-        return productListFetcherFactory.getFetcher(role).fetchProductList();
+        return productListFetcherFactory.getFetcher(role.toString()).fetchProductList();
     }
 
     // Fetch product details using Factory Pattern based on role
     @Override
-    public <T extends ProductDTO> T getProductDetails(Integer userId, Long productId, String role) {
+    public <T extends ProductDTO> T getProductDetails(Integer userId, Long productId, UserRole role) {
         logger.info("Fetching product details for productId: {}, role: {}, userId: {}", productId, role, userId);
-        T productDTO = productDetailFetcherFactory.getFetcher(role).fetchProductDetails(productId);
-        auditLogService.logViewProduct(userId, "VIEW_PRODUCT_DETAILS", "Viewed product: " + productId);
+        T productDTO = productDetailFetcherFactory.getFetcher(role.toString()).fetchProductDetails(productId);
+        auditLogService.logViewProduct(productId,userId, UserRole.CUSTOMER);
         return productDTO;
+    }
+
+    @Override
+    public Optional<Product> getProductById(Long productId) {
+        return productRepository.findById(productId);
     }
 
     // Search products using Factory Pattern based on role
     @Override
-    public <T extends ProductDTO> List<T> searchProducts(Integer userId, String keyword, String role) {
+    public <T extends ProductDTO> List<T> searchProducts(Integer userId, String keyword, UserRole role) {
         logger.info("Searching products with keyword: {}, role: {}, userId: {}", keyword, role, userId);
-        List<T> results = productSearchFetcherFactory.getFetcher(role).searchProducts(keyword);
-        auditLogService.logSearchAction(userId, "SEARCH_PRODUCTS", "Searched with keyword: " + keyword);
+        List<T> results = productSearchFetcherFactory.getFetcher(role.toString()).searchProducts(keyword);
+        auditLogService.logSearchAction(userId, keyword,UserRole.CUSTOMER);
         return results;
     }
 
@@ -106,20 +112,20 @@ public class ProductServiceImpl implements ProductService {
 
     // Add a new product with validation (Manager only)
     @Override
-    public ManagerProductDTO addProduct(ProductDTO productDTO) {
+    public ManagerProductDTO addProduct(Integer userId, ProductDTO productDTO) {
         logger.info("Adding new product: {}", productDTO.getName());
         if (!validateProductDetails(productDTO)){
             logger.warn("Invalid product details: {}", productDTO);
             throw new IllegalArgumentException("Invalid product details");
         }
         Product product = new Product();
-        product.setProductId(); //stt ? hay laf "P" + System.currentTimeMillis()
+//        product.setProductId(); //stt ? hay laf "P" + System.currentTimeMillis()
         product.setName(productDTO.getName());
         product.setPrice(productDTO.getPrice());
         product.setDescription(productDTO.getDescription());
         Product savedProduct = productRepository.save(product);
         logger.info("Product added successfully: {}", savedProduct.getProductId());
-        auditLogService.logAddAction("MANAGER", "ADD_PRODUCT", "Added product: " + savedProduct.getProductId());
+        auditLogService.logAddAction(userId, productDTO.getProductId(),UserRole.MANAGER);
 
         //return managerDTO ? right or not ?
         ManagerProductDTO managerDTO = new ManagerProductDTO();
@@ -129,13 +135,11 @@ public class ProductServiceImpl implements ProductService {
         managerDTO.setDescription(savedProduct.getDescription());
         managerDTO.setStockQuantity(0); // Default stock
         return managerDTO;
-
-        return null;
     }
 
     // Update an existing product (Manager only)
     @Override
-    public ManagerProductDTO updateProduct(Long productId, ProductDTO productDTO) {
+    public ManagerProductDTO updateProduct(Integer userId, Long productId, ProductDTO productDTO) {
         logger.info("Updating product: {}", productId);
         Optional<Product> optionalProduct = productRepository.findById(productId);
         if (optionalProduct.isEmpty()){
@@ -154,7 +158,7 @@ public class ProductServiceImpl implements ProductService {
         product.setDescription(productDTO.getDescription());
         Product updatedProduct = productRepository.save(product);
         logger.info("Product updated successfully: {}", updatedProduct.getProductId());
-        auditLogService.logUpdateAction("MANAGER", "UPDATE_PRODUCT", "Updated product: " + productId);
+        auditLogService.logUpdateAction(userId,productId,UserRole.MANAGER);
 
 
         //return managerDTO ??? is this enough info here ?
@@ -176,7 +180,7 @@ public class ProductServiceImpl implements ProductService {
         //update database
         productRepository.deleteById(productId);
         logger.info("Product {} deleted successfully by {}", productId,userId);
-        auditLogService.logDeleteAction(userId ,productId,"MANAGER");
+        auditLogService.logDeleteAction(userId ,productId,UserRole.MANAGER);
 
     }
 
@@ -207,19 +211,16 @@ public class ProductServiceImpl implements ProductService {
         if (!checkDeletionConstraints(productId)) {
             logger.warn("Deletion constraints violated for product: {}", productId);
             throw new IllegalStateException("Cannot delete due to constraints");
-            return false;
         }
 
         if (checkOrdersAffected(productId)){
             logger.warn("Active orders affected by product deletion: {}", productId);
             throw new IllegalStateException("Cannot delete due to affected orders");
-            return false;
         }
 
         if (checkDeleteLimit(userId)){
             logger.warn("Active orders affected by product deletion: {}", productId);
             throw new IllegalStateException("Cannot delete due to affected orders");
-            return false;
         }
         return true;
 

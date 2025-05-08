@@ -5,6 +5,7 @@ import com.darian.ecommerce.dto.ProductDTO;
 import com.darian.ecommerce.entity.Product;
 import com.darian.ecommerce.repository.ProductRepository;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -18,7 +19,7 @@ public class CustomerProductListFetcher implements ProductListFetcher{
 
     // Fetch product list for Customer role, returning CustomerProductDTO
     @Override
-    public    <T extends ProductDTO> List<T>  fetchProductList() {
+    public    List<CustomerProductDTO>  fetchProductList() {
         //find all hay là find 1 số sản phẩm tiêu biểu thôi ? giữa customer và manager khi find all thì có khác gì nhau ko , kiểu có sản phẩm nào mà manager thì thấy còn custoemr thì ko thấy ko ?
         List<Product> products = productRepository.findAll();
         // logic map ntn là ntn ?
@@ -35,7 +36,10 @@ public class CustomerProductListFetcher implements ProductListFetcher{
         dto.setPrice(product.getPrice());
         dto.setDescription(product.getDescription());
         dto.setAvailability(product.getStockQuantity() > 0 ? "In Stock" : "Out of Stock");
-        dto.setImages("default-image.jpg"); // Example field for Customer
+        List<String> stringList = new ArrayList<>() ;
+        stringList.add("default-image1.jpg");
+        stringList.add("default-image2.jpg");
+        dto.setImages(stringList);
         return dto;
     }
 

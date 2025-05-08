@@ -2,7 +2,6 @@ package com.darian.ecommerce.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.data.annotation.Id;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,6 +15,11 @@ import java.util.List;
 public class Cart {
     // Primary key (userId acts as cartId)
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "cart_id")
+    private Long id;
+
+    // User owning the cart
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
@@ -28,19 +32,16 @@ public class Cart {
     @Column(name = "total")
     private Float total;
 
-    // Constructor for initializing with userId
-    public Cart(Integer userId) {
-        this.userId = userId;
-        this.total = 0;
-    }
-
     // Update total based on items
     public void updateTotal() {
-        this.total = (Float) items.stream()
+        this.total = (float) items.stream()
                 .mapToDouble(item -> item.getProductPrice() * item.getQuantity())
                 .sum();
     }
 
-
+    @PrePersist
+    protected void onCreate() {
+        this.total = 0f;
+    }
 
 }

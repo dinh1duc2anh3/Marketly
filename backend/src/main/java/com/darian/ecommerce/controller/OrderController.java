@@ -17,17 +17,17 @@ public class OrderController {
         this.orderService = orderService;
     }
 
-    @PostMapping("/place")
-    public ResponseEntity<OrderDTO> placeOrder(@RequestBody OrderDTO orderDTO) {
-        OrderDTO result = orderService.placeOrder(orderDTO);
-        return ResponseEntity.ok(result);
-    }
-
-    @PostMapping("/place-rush")
-    public ResponseEntity<RushOrderDTO> placeRushOrder(@RequestBody RushOrderDTO rushOrderDTO) {
-        RushOrderDTO result = orderService.placeRushOrder(rushOrderDTO);
-        return ResponseEntity.ok(result);
-    }
+//    @PostMapping("/place")
+//    public ResponseEntity<OrderDTO> placeOrder(@RequestBody OrderDTO orderDTO) {
+//        OrderDTO result = orderService.placeOrder(orderDTO);
+//        return ResponseEntity.ok(result);
+//    }
+//
+//    @PostMapping("/place-rush")
+//    public ResponseEntity<RushOrderDTO> placeRushOrder(@RequestBody RushOrderDTO rushOrderDTO) {
+//        RushOrderDTO result = orderService.placeRushOrder(rushOrderDTO);
+//        return ResponseEntity.ok(result);
+//    }
 
     @PostMapping("/{orderId}/cancel")
     public ResponseEntity<Void> cancelOrder(@PathVariable Long orderId) {

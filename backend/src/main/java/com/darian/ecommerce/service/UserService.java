@@ -8,7 +8,7 @@ public interface UserService {
     UserDTO register(UserDTO userDTO);
 
     // Load user by username (for authentication)
-    UserDTO loadUserByUsername(String username);
+//    UserDTO loadUserByUsername(String username);
 
     User getUserById(Integer customerId);
 

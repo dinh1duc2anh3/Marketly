@@ -6,6 +6,7 @@ import com.darian.ecommerce.entity.Product;
 import com.darian.ecommerce.repository.ProductRepository;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class ManagerProductSearchFetcher implements ProductSearchFetcher{
     private final ProductRepository productRepository;

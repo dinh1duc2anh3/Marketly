@@ -1,10 +1,10 @@
 package com.darian.ecommerce.service.impl;
 
-import com.darian.ecommerce.businesslogic.carthelper.CartHelper;
 import com.darian.ecommerce.dto.CartDTO;
 import com.darian.ecommerce.dto.CartItemDTO;
 import com.darian.ecommerce.entity.Cart;
 import com.darian.ecommerce.entity.CartItem;
+import com.darian.ecommerce.enums.UserRole;
 import com.darian.ecommerce.repository.CartRepository;
 import com.darian.ecommerce.service.CartService;
 import com.darian.ecommerce.service.ProductService;
@@ -37,18 +37,18 @@ public class CartServiceImpl implements CartService {
             logger.warn("Product {} is not available for user {}", productId, userId);
             throw new IllegalArgumentException("Product not available");
         }
-        Cart cart = cartRepository.findByUserId(userId).orElse(new Cart(userId));
+        Cart cart = cartRepository.findByUserId(userId).orElse(new Cart());
         Optional<CartItem> existingItem = cart.getItems().stream()
-                .filter(item -> item.getProductId().equals(productId))
+                .filter(item -> item.getProduct().getProductId().equals(productId))
                 .findFirst();
         if (existingItem.isPresent()) {
             existingItem.get().setQuantity(existingItem.get().getQuantity() + quantity);
         }
         else {
             CartItem newItem = new CartItem();
-            newItem.setProductId(productId);
+//            newItem.setProductId(productId);
             newItem.setQuantity(quantity);
-            newItem.setProductPrice(productService.getProductDetails(userId, productId, "CUSTOMER").getPrice());
+            newItem.setProductPrice(productService.getProductDetails(userId, productId, UserRole.CUSTOMER).getPrice());
             newItem.setCart(cart);
             cart.getItems().add(newItem);
         }
@@ -72,7 +72,7 @@ public class CartServiceImpl implements CartService {
         Cart cart = cartRepository.findByUserId(userId)
                 .orElseThrow(() -> new IllegalArgumentException("Cart not found for user: " + userId));
         CartItem item = cart.getItems().stream()
-                .filter(i -> i.getProductId().equals(productId))
+                .filter(i -> i.getProduct().getProductId().equals(productId))
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("Product not in cart"));
         item.setQuantity(quantity);
@@ -87,7 +87,7 @@ public class CartServiceImpl implements CartService {
         logger.info("Removing product {} from cart for user {}", productId, userId);
         Cart cart = cartRepository.findByUserId(userId)
                 .orElseThrow(() -> new IllegalArgumentException("Cart not found for user: " + userId));
-        cart.getItems().removeIf(item -> item.getProductId().equals(productId));
+        cart.getItems().removeIf(item -> item.getProduct().getProductId().equals(productId));
         cart.updateTotal();
         Cart savedCart = cartRepository.save(cart);
         logger.info("Product {} removed from cart for user {}", productId, userId);
@@ -100,7 +100,7 @@ public class CartServiceImpl implements CartService {
         Cart cart = cartRepository.findByUserId(userId)
                 .orElseThrow(() -> new IllegalArgumentException("Cart not found for user: " + userId));
         cart.getItems().clear();
-        cart.setTotal(0);
+        cart.setTotal(0F);
         cartRepository.save(cart);
         logger.info("Cart emptied for user {}", userId);
     }
@@ -116,14 +116,14 @@ public class CartServiceImpl implements CartService {
     // Mapping method
     private CartDTO mapToCartDTO(Cart cart) {
         CartDTO dto = new CartDTO();
-        dto.setUserId(cart.getUserId());
+        dto.setUserId(cart.getUser().getId());
         dto.setItems(cart.getItems().stream().map(this::mapToCartItemDTO).collect(Collectors.toList()));
         return dto;
     }
 
     private CartItemDTO mapToCartItemDTO(CartItem item) {
         CartItemDTO dto = new CartItemDTO();
-        dto.setProductId(item.getProductId());
+        dto.setProductId(item.getProduct().getProductId());
         dto.setQuantity(item.getQuantity());
         return dto;
     }

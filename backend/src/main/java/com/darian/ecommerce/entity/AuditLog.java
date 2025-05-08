@@ -1,6 +1,7 @@
 package com.darian.ecommerce.entity;
 
 import com.darian.ecommerce.enums.ActionType;
+import com.darian.ecommerce.enums.UserRole;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -37,8 +38,13 @@ public class AuditLog {
     private String keyword;
 
     // Role of the user (e.g., CUSTOMER, MANAGER)
-    private String role;
+    private UserRole role;
 
     // Timestamp of the action
     private LocalDateTime timestamp;
+
+    @PrePersist
+    protected void onCreate() {
+        this.timestamp = LocalDateTime.now();
+    }
 }

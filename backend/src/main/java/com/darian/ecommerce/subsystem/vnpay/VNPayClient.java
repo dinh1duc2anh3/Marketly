@@ -6,6 +6,7 @@ import com.darian.ecommerce.dto.PaymentResult;
 import com.darian.ecommerce.dto.RefundResult;
 import com.darian.ecommerce.dto.VNPayRequest;
 import com.darian.ecommerce.dto.VNPayResponse;
+import com.darian.ecommerce.enums.TransactionType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -66,14 +67,14 @@ public class VNPayClient {
 
     // Helper method to process payment
     public PaymentResult processPayment(Long orderId, Float amount, String transactionContent) {
-        VNPayRequest request = paymentConverter.toVNPayRequest(orderId, amount, transactionContent, "PAY");
+        VNPayRequest request = paymentConverter.toVNPayRequest(orderId, amount, transactionContent, TransactionType.PAYMENT);
         VNPayResponse response = sendPaymentRequest(request);
         return processPaymentResponse(response);
     }
 
     // Helper method to process refund
     public RefundResult processRefund(Long orderId) {
-        VNPayRequest request = paymentConverter.toVNPayRequest(orderId, 0, "Refund for " + orderId, "REFUND");
+        VNPayRequest request = paymentConverter.toVNPayRequest(orderId, 0F, "Refund for " + orderId, TransactionType.REFUND);
         VNPayResponse response = sendRefundRequest(request);
         return processRefundResponse(response);
     }

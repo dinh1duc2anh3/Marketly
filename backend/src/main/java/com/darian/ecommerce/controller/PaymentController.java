@@ -32,14 +32,14 @@ public class PaymentController {
         return ResponseEntity.ok(result);
     }
 
-    // Process refund for an order
-    @PostMapping("/{orderId}/refund")
-    public ResponseEntity<RefundResult> processRefund(@PathVariable Long orderId) {
-        logger.info("Initiating refund for order {}", orderId);
-        RefundResult result = paymentService.processRefund(orderId);
-        logger.info("Refund completed for order {}: status {}", orderId, result.getRefundStatus());
-        return ResponseEntity.ok(result);
-    }
+//    // Process refund for an order
+//    @PostMapping("/{orderId}/refund")
+//    public ResponseEntity<RefundResult> processRefund(@PathVariable Long orderId) {
+//        logger.info("Initiating refund for order {}", orderId);
+//        RefundResult result = paymentService.processRefund(orderId);
+//        logger.info("Refund completed for order {}: status {}", orderId, result.getRefundStatus());
+//        return ResponseEntity.ok(result);
+//    }
 
 
 }

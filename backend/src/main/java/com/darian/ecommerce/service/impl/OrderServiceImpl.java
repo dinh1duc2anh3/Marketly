@@ -2,20 +2,20 @@ package com.darian.ecommerce.service.impl;
 
 import com.darian.ecommerce.businesslogic.shippingfee.ShippingFeeCalculatorFactory;
 import com.darian.ecommerce.dto.*;
-import com.darian.ecommerce.entity.DeliveryInfo;
-import com.darian.ecommerce.entity.Order;
-import com.darian.ecommerce.entity.OrderItem;
+import com.darian.ecommerce.entity.*;
+import com.darian.ecommerce.enums.ActionType;
+import com.darian.ecommerce.enums.OrderStatus;
+import com.darian.ecommerce.enums.PaymentStatus;
+import com.darian.ecommerce.enums.UserRole;
 import com.darian.ecommerce.repository.OrderRepository;
-import com.darian.ecommerce.service.AuditLogService;
-import com.darian.ecommerce.service.CartService;
-import com.darian.ecommerce.service.OrderService;
-import com.darian.ecommerce.service.PaymentService;
+import com.darian.ecommerce.service.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -24,78 +24,85 @@ public class OrderServiceImpl implements OrderService {
 
     private final OrderRepository orderRepository;
     private final PaymentService paymentService;
+    private final ProductService productService;
     private final ShippingFeeCalculatorFactory calculatorFactory;
     private final CartService cartService;
+    private final UserService userService;
     private final AuditLogService auditLogService;
 
     public OrderServiceImpl(OrderRepository orderRepository,
                             PaymentService paymentService,
+                            ProductService productService,
                             ShippingFeeCalculatorFactory calculatorFactory,
                             CartService cartService,
+                            UserService userService,
                             AuditLogService auditLogService) {
         this.orderRepository = orderRepository;
         this.paymentService = paymentService;
+        this.productService = productService;
         this.calculatorFactory = calculatorFactory;
         this.cartService = cartService;
+        this.userService = userService;
         this.auditLogService = auditLogService;
     }
 
 
-    @Override
-    public OrderDTO createOrder(CartDTO cartDTO) {
-        if (!checkAvailability(cartDTO)) {
-            throw new IllegalStateException("Cart items not available");
-        }
-        Order order = new Order();
-        order.setOrderId("ORD-" + System.currentTimeMillis());
-        // need more checking + innovate cart service
-        order.setCustomerId(cartDTO.getUserId());
-        //check more
-        order.setItems(cartDTO.getItems());
-        order.setStatus("PENDING");
-        order.setCreatedDate(LocalDateTime.now());
-        Order savedOrder = orderRepository.save(order);
+//    @Override
+//    public OrderDTO createOrder(CartDTO cartDTO) {
+//        if (!checkAvailability(cartDTO)) {
+//            throw new IllegalStateException("Cart items not available");
+//        }
+//        Order order = new Order();
+////        order.setOrderId("ORD-" + System.currentTimeMillis());
+//        // need more checking + innovate cart service
+//        User user = userService.getUserById(cartDTO.getUserId())
+//        order.setUser(user);
+//        //check more
+////        order.setItems(cartDTO.getItems());
+//        order.setOrderStatus(OrderStatus.PENDING);
+//        order.setCreatedDate(LocalDateTime.now());
+//        Order savedOrder = orderRepository.save(order);
+//
+//        auditLogService.logOrderAction(order.getUser().getId(), order.getOrderId(), UserRole.CUSTOMER, ActionType.ORDER_ACTION);
+//        return mapToOrderDTO(savedOrder);
+//    }
 
-        auditLogService.logOrderAction(order.getCustomerId(), order.getOrderId(), "CUSTOMER");
-        return mapToOrderDTO(savedOrder);
-    }
 
-
-    @Override
-    public OrderDTO placeOrder(OrderDTO orderDTO) {
-        Order order = mapToOrderEntity(orderDTO);
-        order.setShippingFee(calculatorFactory.getCalculator(orderDTO).calculateShippingFee(orderDTO));
-        order.setStatus("PLACED");
-        Order savedOrder = orderRepository.save(order);
-        auditLogService.logOrderAction(order.getCustomerId(), order.getOrderId(), "CUSTOMER");
-        return mapToOrderDTO(savedOrder);
-    }
-
-    @Override
-    public RushOrderDTO placeRushOrder(RushOrderDTO rushOrderDTO) {
-        //cần xem lại logic của checkRushProductEligibility vì nó check từng item trong order chứ ko phải check userId
-        if (!checkRushProductEligibility(rushOrderDTO.getCustomerId()) ||
-                !checkRushDeliveryAddress(rushOrderDTO.getDeliveryInfo().getAddress())) {
-            throw new IllegalStateException("Rush order not eligible");
-        }
-        //need check
-        Order order = mapToOrderEntity(rushOrderDTO);
-        order.setShippingFee(calculatorFactory.getCalculator(rushOrderDTO).calculateShippingFee(rushOrderDTO));
-        order.setStatus("RUSH_PLACED");
-        Order savedOrder = orderRepository.save(order);
-        auditLogService.logOrderAction(order.getCustomerId(), order.getOrderId(), "CUSTOMER");
-        return mapToRushOrderDTO(savedOrder, rushOrderDTO.getRushDeliveryTime());
-    }
+//    @Override
+//    public OrderDTO placeOrder(OrderDTO orderDTO) {
+//        Order order = mapToOrderEntity(orderDTO);
+//        order.setShippingFee(calculatorFactory.getCalculator(orderDTO).calculateShippingFee(orderDTO));
+//        order.setOrderStatus(OrderStatus.PENDING);
+//        Order savedOrder = orderRepository.save(order);
+//        auditLogService.logOrderAction(order.getUser().getId(), order.getOrderId(), UserRole.CUSTOMER, ActionType.PLACE_ORDER);
+//        return mapToOrderDTO(savedOrder);
+//    }
+//
+//    @Override
+//    public RushOrderDTO placeRushOrder(RushOrderDTO rushOrderDTO) {
+//        //cần xem lại logic của checkRushProductEligibility vì nó check từng item trong order chứ ko phải check userId
+//        if (!checkRushProductEligibility(rushOrderDTO.getCustomerId()) ||
+//                !checkRushDeliveryAddress(rushOrderDTO.getDeliveryInfo().getAddress())) {
+//            throw new IllegalStateException("Rush order not eligible");
+//        }
+//        //need check
+//        Order order = mapToOrderEntity(rushOrderDTO);
+//        order.setShippingFee(calculatorFactory.getCalculator(rushOrderDTO).calculateShippingFee(rushOrderDTO));
+//        order.setOrderStatus(OrderStatus.PENDING);
+//        Order savedOrder = orderRepository.save(order);
+//        auditLogService.logOrderAction(order.getUser().getId(), order.getOrderId(), UserRole.CUSTOMER, ActionType.PLACE_ORDER);
+//        return mapToRushOrderDTO(savedOrder, rushOrderDTO.getRushDeliveryTime());
+//    }
 
     @Override
     public void cancelOrder(Long orderId) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new IllegalArgumentException("Order not found"));
-        order.setStatus("CANCELLED");
+        order.setOrderStatus(OrderStatus.CANCELLED);
         orderRepository.save(order);
 
         //need check
-        auditLogService.logOrderAction(order.getCustomerId(), orderId, "CUSTOMER");
+        auditLogService.logOrderAction(order.getUser().getId(), orderId, UserRole.CUSTOMER, ActionType.CANCEL_ORDER);
     }
 
     @Override
@@ -105,13 +112,13 @@ public class OrderServiceImpl implements OrderService {
         return mapToOrderDTO(order);
     }
 
-    @Override
-    public Boolean checkAvailability(CartDTO cartDTO) {
-        return cartService.checkAvailability(cartDTO);
-    }
+//    @Override
+//    public Boolean checkAvailability(CartDTO cartDTO) {
+//        return cartService.checkAvailability(cartDTO);
+//    }
 
     @Override
-    public Boolean validateDeliveryInfo(DeliveryInfoDTO deliveryInfoDTO) {\
+    public Boolean validateDeliveryInfo(DeliveryInfoDTO deliveryInfoDTO) {
         //need more conditions here
         return deliveryInfoDTO.getRecipientName() != null && !deliveryInfoDTO.getRecipientName().isBlank() &&
                 deliveryInfoDTO.getAddress() != null && !deliveryInfoDTO.getAddress().isBlank();
@@ -132,13 +139,13 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public Boolean isRushOrder(Long orderId) {
         return orderRepository.findById(orderId)
-                .map(order -> "RUSH_PLACED".equals(order.getStatus()))
+                .map(order -> "RUSH_PLACED".equals(order.getOrderStatus()))
                 .orElse(false);
     }
 
     @Override
     public void setPending(Long orderId) {
-        orderRepository.updateOrderStatus(orderId, "PENDING");
+        orderRepository.updateOrderStatus(orderId, OrderStatus.PENDING);
     }
 
     @Override
@@ -147,10 +154,12 @@ public class OrderServiceImpl implements OrderService {
         return address != null && address.contains("Hanoi"); //example
     }
 
-    @Override
-    public Boolean checkRushProductEligibility(Integer userId) {
-        return cartService.checkRushEligibility(userId); // Delegate to CartService
-    }
+
+
+//    @Override
+//    public Boolean checkRushProductEligibility(Long productId) {
+//        return cartService.checkRushEligibility(userId); // Delegate to CartService
+//    }
 
     @Override
     public InvoiceDTO getInvoice(Long orderId) {
@@ -164,8 +173,13 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public void updatePaymentStatus(Long orderId, String status) {
-        orderRepository.updateOrderStatus(orderId, status);
+    public Optional<Order> findOrderById(Long orderId) {
+        return orderRepository.findById(orderId);
+    }
+
+    @Override
+    public void updatePaymentStatus(Long orderId, PaymentStatus paymentStatus) {
+        orderRepository.updatePaymentStatus(orderId, paymentStatus);
     }
 
     @Override
@@ -179,35 +193,35 @@ public class OrderServiceImpl implements OrderService {
     private OrderDTO mapToOrderDTO(Order order) {
         OrderDTO dto = new OrderDTO();
         dto.setOrderId(order.getOrderId());
-        dto.setCustomerId(order.getCustomerId());
+        dto.setCustomerId(order.getUser().getId());
         dto.setItems(order.getItems().stream().map(this::mapToOrderItemDTO).collect(Collectors.toList()));
-        dto.setStatus(order.getStatus());
+        dto.setOrderStatus(order.getOrderStatus());
         dto.setDeliveryInfo(mapToDeliveryInfoDTO(order.getDeliveryInfo()));
-        dto.setSubtotal((Integer) order.getSubtotal());
-        dto.setShippingFee((Integer) order.getShippingFee());
-        dto.setTotal((Integer) order.getTotal());
-        dto.setCreatedDate(java.util.Date.from(order.getCreatedDate().atZone(java.time.ZoneId.systemDefault()).toInstant()));
+        dto.setSubtotal( order.getSubtotal());
+        dto.setShippingFee( order.getShippingFee());
+        dto.setTotal( order.getTotal());
+        dto.setCreatedDate(LocalDateTime.now());
         return dto;
     }
 
-    private RushOrderDTO mapToRushOrderDTO(Order order, java.util.Date rushDeliveryTime) {
+    private RushOrderDTO mapToRushOrderDTO(Order order, LocalDateTime rushDeliveryTime) {
         RushOrderDTO dto = new RushOrderDTO();
         dto.setOrderId(order.getOrderId());
         dto.setCustomerId(order.getUser().getId());
         dto.setItems(order.getItems().stream().map(this::mapToOrderItemDTO).collect(Collectors.toList()));
-        dto.setStatus(order.getStatus());
+        dto.setOrderStatus(order.getOrderStatus());
         dto.setDeliveryInfo(mapToDeliveryInfoDTO(order.getDeliveryInfo()));
-        dto.setSubtotal((Integer) order.getSubtotal());
-        dto.setShippingFee((Integer) order.getShippingFee());
-        dto.setTotal((Integer) order.getTotal());
-        dto.setCreatedDate(java.util.Date.from(order.getCreatedDate().atZone(java.time.ZoneId.systemDefault()).toInstant()));
+        dto.setSubtotal( order.getSubtotal());
+        dto.setShippingFee( order.getShippingFee());
+        dto.setTotal( order.getTotal());
+        dto.setCreatedDate(LocalDateTime.now());
         dto.setRushDeliveryTime(rushDeliveryTime);
         return dto;
     }
 
     private OrderItemDTO mapToOrderItemDTO(OrderItem item) {
         OrderItemDTO dto = new OrderItemDTO();
-        dto.setProductId(item.getProductId());
+        dto.setProductId(item.getProduct().getProductId());
         dto.setQuantity(item.getQuantity());
         dto.setUnitPrice(item.getUnitPrice());
         dto.setLineTotal(item.getLineTotal());
@@ -228,22 +242,23 @@ public class OrderServiceImpl implements OrderService {
     private Order mapToOrderEntity(BaseOrderDTO dto) {
         Order order = new Order();
         order.setOrderId(dto.getOrderId());
-        order.setCustomerId(dto.getCustomerId());
+        User user = userService.getUserById(dto.getCustomerId());
+        order.setUser(user);
         order.setItems(dto.getItems().stream().map(item -> {
             OrderItem entity = new OrderItem();
-            entity.setProductId(item.getProductId());
+            Optional<Product> product = productService.getProductById(item.getProductId());
+            if (product.isPresent()) entity.setProduct(product.get());
             entity.setQuantity(item.getQuantity());
             entity.setUnitPrice(item.getUnitPrice());
             entity.setOrder(order);
             return entity;
         }).collect(Collectors.toList()));
-        order.setStatus(dto.getStatus());
+        order.setOrderStatus(dto.getOrderStatus());
         order.setDeliveryInfo(mapToDeliveryInfoEntity(dto.getDeliveryInfo()));
         order.setSubtotal(dto.getSubtotal());
         order.setShippingFee(dto.getShippingFee());
         order.setTotal(dto.getTotal());
-        order.setCreatedDate(dto.getCreatedDate() != null ?
-                LocalDateTime.ofInstant(dto.getCreatedDate().toInstant(), java.time.ZoneId.systemDefault()) : LocalDateTime.now());
+        order.setCreatedDate(dto.getCreatedDate());
         return order;
     }
 

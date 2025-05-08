@@ -1,12 +1,14 @@
 package com.darian.ecommerce.dto;
 
+import com.darian.ecommerce.enums.TransactionType;
 import lombok.*;
 
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class BasePaymentResult {
-    private String transactionType;
+    private TransactionType transactionType;
     private Long orderId;
     private String transactionId;
     private String errorMessage;

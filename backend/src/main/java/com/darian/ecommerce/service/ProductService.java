@@ -4,20 +4,25 @@ import com.darian.ecommerce.dto.CategoryDTO;
 import com.darian.ecommerce.dto.ManagerProductDTO;
 import com.darian.ecommerce.dto.ProductDTO;
 import com.darian.ecommerce.dto.ProductReviewDTO;
+import com.darian.ecommerce.entity.Product;
+import com.darian.ecommerce.enums.UserRole;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public interface ProductService {
     // Get product list based on role (Customer or Manager)
-    <T extends ProductDTO> List<T> getProductList(String role);
+    <T extends ProductDTO> List<T> getProductList(UserRole role);
 
     // Get product details based on user ID, product ID, and role
-    <T extends ProductDTO> T getProductDetails(Integer userId, Long productId, String role);
+    <T extends ProductDTO> T getProductDetails(Integer userId, Long productId, UserRole role);
+
+    Optional<Product> getProductById(Long productId);
 
     // Search products by keyword and role
-    <T extends ProductDTO> List<T> searchProducts(Integer userId, String keyword, String role);
+    <T extends ProductDTO> List<T> searchProducts(Integer userId, String keyword, UserRole role);
 
     // Advanced search with filters (keyword, price range, category)
     List<ProductDTO> findByFilters(String keyword, Float minPrice, Float maxPrice, String category);
@@ -26,10 +31,10 @@ public interface ProductService {
     List<ProductDTO> suggestRelatedProducts(Long productId);
 
     // Add a new product (Manager only)
-    ManagerProductDTO addProduct(ProductDTO productDTO);
+    ManagerProductDTO addProduct(Integer userId,ProductDTO productDTO);
 
     // Update an existing product (Manager only)
-    ManagerProductDTO updateProduct(Long productId, ProductDTO productDTO);
+    ManagerProductDTO updateProduct(Integer userId,Long productId, ProductDTO productDTO);
 
     // Delete a product by ID (Manager only)
     void deleteProduct(Long productId, Integer userId);

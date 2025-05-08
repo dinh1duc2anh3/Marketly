@@ -5,6 +5,7 @@ import com.darian.ecommerce.dto.ProductDTO;
 import com.darian.ecommerce.entity.Product;
 import com.darian.ecommerce.repository.ProductRepository;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -34,7 +35,10 @@ public class CustomerProductSearchFetcher implements ProductSearchFetcher{
         dto.setPrice(product.getPrice());
         dto.setDescription(product.getDescription());
         dto.setAvailability(product.getStockQuantity() > 0 ? "In Stock" : "Out of Stock");
-        dto.setImages("default-image.jpg");
+        List<String> stringList = new ArrayList<>();
+        stringList.add("default-image1.jpg");
+        stringList.add("default-image2.jpg");
+        dto.setImages(stringList);
         return dto;
     }
 

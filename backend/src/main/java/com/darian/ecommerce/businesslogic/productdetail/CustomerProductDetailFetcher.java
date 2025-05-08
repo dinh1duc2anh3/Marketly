@@ -5,6 +5,8 @@ import com.darian.ecommerce.dto.ProductDTO;
 import com.darian.ecommerce.entity.Product;
 import com.darian.ecommerce.repository.ProductRepository;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 public class CustomerProductDetailFetcher implements ProductDetailFetcher {
@@ -17,12 +19,12 @@ public class CustomerProductDetailFetcher implements ProductDetailFetcher {
 
     // Fetch product details by product ID for Customer role, returning CustomerProductDTO
     @Override
-    public <T extends ProductDTO> T fetchProductDetails(Long productId) {
+    public CustomerProductDTO fetchProductDetails(Long productId) {
         Optional<Product> optionalProduct = productRepository.findById(productId);
         if (optionalProduct.isEmpty()) {
             throw new IllegalArgumentException("Product not found: " + productId);
         }
-        return (T) mapToCustomerDTO(optionalProduct.get());
+        return mapToCustomerDTO(optionalProduct.get());
     }
 
     // Private method to map Product entity to CustomerProductDTO
@@ -33,7 +35,10 @@ public class CustomerProductDetailFetcher implements ProductDetailFetcher {
         dto.setPrice(product.getPrice());
         dto.setDescription(product.getDescription());
         dto.setAvailability(product.getStockQuantity() > 0 ? "In Stock" : "Out of Stock");
-        dto.setImages("default-image.jpg");
+        List<String> stringList = new ArrayList<>() ;
+        stringList.add("default-image1.jpg");
+        stringList.add("default-image2.jpg");
+        dto.setImages(stringList);
         return dto;
     }
 }

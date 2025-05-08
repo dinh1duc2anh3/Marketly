@@ -1,5 +1,6 @@
 package com.darian.ecommerce.businesslogic.productlist;
 
+import com.darian.ecommerce.dto.CustomerProductDTO;
 import com.darian.ecommerce.dto.ManagerProductDTO;
 import com.darian.ecommerce.dto.ProductDTO;
 import com.darian.ecommerce.entity.Product;
@@ -18,7 +19,7 @@ public class ManagerProductListFetcher implements ProductListFetcher {
 
     // Fetch product list for Manager role, returning ManagerProductDTO
     @Override
-    public <T extends ProductDTO> List<T> fetchProductList() {
+    public List<ManagerProductDTO> fetchProductList() {
         List<Product> products = productRepository.findAll();
         return products.stream()
                 .map(this::mapToManagerDTO)

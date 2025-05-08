@@ -2,7 +2,8 @@ package com.darian.ecommerce.dto;
 
 import lombok.*;
 
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class CategoryDTO {

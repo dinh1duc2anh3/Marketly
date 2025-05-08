@@ -3,7 +3,8 @@ package com.darian.ecommerce.dto;
 import java.util.Date;
 import lombok.*;
 
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class ProductEditHistoryDTO {

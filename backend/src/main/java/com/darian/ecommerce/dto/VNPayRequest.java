@@ -1,8 +1,10 @@
 package com.darian.ecommerce.dto;
 
+import com.darian.ecommerce.enums.TransactionType;
 import lombok.*;
 
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class VNPayRequest {
@@ -10,5 +12,5 @@ public class VNPayRequest {
     private String transactionContent;
     private Long orderId;
     private String returnUrl;
-    private String transactionType;
+    private TransactionType transactionType;
 }

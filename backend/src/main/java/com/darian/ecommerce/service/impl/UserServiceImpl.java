@@ -29,13 +29,13 @@ public class UserServiceImpl implements UserService {
     }
 
     // Load user by username for authentication
-    @Override
-    public UserDTO loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
-
-        return mapToUserDTO(user);
-    }
+//    @Override
+//    public UserDTO loadUserByUsername(String username) throws UsernameNotFoundException {
+//        User user = userRepository.findByUsername(username)
+//                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+//
+//        return mapToUserDTO(user);
+//    }
 
     @Override
     public User getUserById(Integer customerId) {

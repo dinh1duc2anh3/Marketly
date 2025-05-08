@@ -2,41 +2,76 @@ package com.darian.ecommerce.controller;
 
 import com.darian.ecommerce.dto.ManagerProductDTO;
 import com.darian.ecommerce.dto.ProductDTO;
+import com.darian.ecommerce.enums.UserRole;
 import com.darian.ecommerce.service.ProductService;
 import com.darian.ecommerce.service.impl.ProductServiceImpl;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@RestController
+@RequestMapping("/products")
 public class ProductController {
-    private ProductService productService;
+    private final ProductService productService;
 
-    public ResponseEntity<List<ProductDTO>> getProductList(String role){
-
+    public ProductController(ProductService productService) {
+        this.productService = productService;
     }
 
-    public ResponseEntity<? extends ProductDTO> getProductDetails(Integer userId, Long productId, String role){
-
+    @GetMapping
+    public ResponseEntity<List<ProductDTO>> getProductList(@RequestParam UserRole  role) {
+        List<ProductDTO> products = productService.getProductList(role);
+        return ResponseEntity.ok(products);
     }
 
-    public ResponseEntity<? extends ProductDTO> searchProducts(Integer userId, String keyword, String role){
-
+    @GetMapping("/{productId}")
+    public ResponseEntity<? extends ProductDTO> getProductDetails(
+            @RequestParam Integer userId,
+            @PathVariable Long productId,
+            @RequestParam UserRole role) {
+        ProductDTO product = productService.getProductDetails(userId, productId, role);
+        return ResponseEntity.ok(product);
     }
 
-    public ResponseEntity<ManagerProductDTO> addProduct(ProductDTO productDTO){
-
+    @GetMapping("/search")
+    public ResponseEntity<List<? extends ProductDTO>> searchProducts(
+            @RequestParam Integer userId,
+            @RequestParam String keyword,
+            @RequestParam UserRole  role) {
+        List<ProductDTO> products = productService.searchProducts(userId, keyword, role);
+        return ResponseEntity.ok(products);
     }
 
-    public ResponseEntity<Void> deleteProduct(Long productId,Integer userId){
-
+    @PostMapping
+    public ResponseEntity<ManagerProductDTO> addProduct(
+            @RequestParam Integer userId,
+            @RequestBody ProductDTO productDTO) {
+        ManagerProductDTO createdProduct = productService.addProduct(userId, productDTO);
+        return ResponseEntity.ok(createdProduct);
     }
 
-    public ResponseEntity<ManagerProductDTO> updateProduct(Long productId, ProductDTO productDTO){
-
+    @DeleteMapping("/{productId}")
+    public ResponseEntity<Void> deleteProduct(
+            @PathVariable Long productId,
+            @RequestParam Integer userId) {
+        productService.deleteProduct(productId, userId);
+        return ResponseEntity.noContent().build();
     }
 
-    public ResponseEntity<List<ProductDTO>> getRelaetedProducts(Long productId){
+    @PutMapping("/{productId}")
+    public ResponseEntity<ManagerProductDTO> updateProduct(
+            @RequestParam Integer userId,
+            @PathVariable Long productId,
+            @RequestBody ProductDTO productDTO) {
+        ManagerProductDTO updatedProduct = productService.updateProduct(userId, productId, productDTO);
+        return ResponseEntity.ok(updatedProduct);
+    }
 
+    @GetMapping("/{productId}/related")
+    public ResponseEntity<List<ProductDTO>> getRelatedProducts(@PathVariable Long productId) {
+        List<ProductDTO> relatedProducts = productService.suggestRelatedProducts(productId);
+        return ResponseEntity.ok(relatedProducts);
     }
 
 }

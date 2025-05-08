@@ -6,6 +6,8 @@ public enum ActionType {
     CHANGE_PASSWORD,
     PLACE_ORDER,
     VIEW_ORDER,
+    PAY_ORDER,
+    CANCEL_ORDER,
     ORDER_ACTION,
     SEARCH_PRODUCTS,
     VIEW_PRODUCT,

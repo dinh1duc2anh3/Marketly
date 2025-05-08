@@ -1,6 +1,8 @@
 package com.darian.ecommerce.repository;
 
 import com.darian.ecommerce.entity.Order;
+import com.darian.ecommerce.enums.OrderStatus;
+import com.darian.ecommerce.enums.PaymentStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -25,15 +27,23 @@ public interface OrderRepository extends JpaRepository<Order, String> {
     void deleteById(Long orderId);
 
     // Update order status
-    default void updateOrderStatus(Long orderId, String status) {
+    default void updateOrderStatus(Long orderId, OrderStatus orderStatus) {
         findById(orderId).ifPresent(order -> {
-            order.setStatus(status);
+            order.setOrderStatus(orderStatus);
+            save(order);
+        });
+    }
+
+    // Update order status
+    default void updatePaymentStatus(Long orderId, PaymentStatus paymentStatus) {
+        findById(orderId).ifPresent(order -> {
+            order.setPaymentStatus(paymentStatus);
             save(order);
         });
     }
 
     // Update shipping fee
-    default void updateShippingFee(Long orderId, Integer fees) {
+    default void updateShippingFee(Long orderId, Float fees) {
         findById(orderId).ifPresent(order -> {
             order.setShippingFee(fees);
             save(order);
