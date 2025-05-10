@@ -2,9 +2,10 @@ package com.darian.ecommerce.controller;
 
 import com.darian.ecommerce.dto.ManagerProductDTO;
 import com.darian.ecommerce.dto.ProductDTO;
+import com.darian.ecommerce.dto.RelatedProductDTO;
 import com.darian.ecommerce.enums.UserRole;
 import com.darian.ecommerce.service.ProductService;
-import com.darian.ecommerce.service.impl.ProductServiceImpl;
+import com.darian.ecommerce.service.RelatedProductService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,9 +15,11 @@ import java.util.List;
 @RequestMapping("/products")
 public class ProductController {
     private final ProductService productService;
+    private final RelatedProductService relatedProductService;
 
-    public ProductController(ProductService productService) {
+    public ProductController(ProductService productService, RelatedProductService relatedProductService) {
         this.productService = productService;
+        this.relatedProductService = relatedProductService;
     }
 
     @GetMapping
@@ -69,8 +72,8 @@ public class ProductController {
     }
 
     @GetMapping("/{productId}/related")
-    public ResponseEntity<List<ProductDTO>> getRelatedProducts(@PathVariable Long productId) {
-        List<ProductDTO> relatedProducts = productService.suggestRelatedProducts(productId);
+    public ResponseEntity<List<RelatedProductDTO>> getRelatedProducts(@PathVariable Long productId) {
+        List<RelatedProductDTO> relatedProducts = relatedProductService.suggestRelatedProducts(productId);
         return ResponseEntity.ok(relatedProducts);
     }
 

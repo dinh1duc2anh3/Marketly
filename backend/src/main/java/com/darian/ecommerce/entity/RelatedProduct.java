@@ -1,10 +1,11 @@
 package com.darian.ecommerce.entity;
 
+import com.darian.ecommerce.enums.RelationType;
 import jakarta.persistence.*;
-import lombok.*;
-
-import java.util.Date;
-import java.util.List;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Getter
@@ -31,5 +32,6 @@ public class RelatedProduct {
 
     // Type of relation (e.g., "similar", "accessory")
     @Column(name = "relation_type")
-    private String relationType; // (Tùy chọn) Loại quan hệ: "SIMILAR", "FREQUENTLY_BOUGHT_TOGETHER", v.v.
+    @Enumerated(EnumType.STRING)
+    private RelationType relationType; // (Tùy chọn) Loại quan hệ: "SIMILAR", "FREQUENTLY_BOUGHT_TOGETHER", v.v.
 }

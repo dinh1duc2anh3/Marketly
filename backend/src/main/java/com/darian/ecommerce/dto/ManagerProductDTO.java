@@ -1,10 +1,15 @@
 package com.darian.ecommerce.dto;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 
+@SuperBuilder
 @Getter
 @Setter
 @NoArgsConstructor
@@ -13,6 +18,7 @@ public class ManagerProductDTO  extends ProductDTO{
     private Float value;
     private String barcode;
     private Integer stockQuantity;
-    private Date warehouseEntryDate;
+    private LocalDateTime warehouseEntryDate;
     private List<ProductEditHistoryDTO> editHistory;
+
 }

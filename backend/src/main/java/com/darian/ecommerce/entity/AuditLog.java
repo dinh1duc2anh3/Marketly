@@ -3,7 +3,10 @@ package com.darian.ecommerce.entity;
 import com.darian.ecommerce.enums.ActionType;
 import com.darian.ecommerce.enums.UserRole;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 

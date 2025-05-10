@@ -1,12 +1,14 @@
 package com.darian.ecommerce.entity;
 
 import jakarta.persistence.*;
-import lombok.*;
-import org.springframework.cglib.core.Local;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 @Entity
 @Getter
@@ -71,5 +73,21 @@ public class Product {
      */
     private List<ProductImage> images;
 
+    /**
+     * Auto-set entry date and barcode before first persist
+     */
+    @PrePersist
+    public void prePersist() {
+        if (this.warehouseEntryDate == null) {
+            this.warehouseEntryDate = LocalDateTime.now();
+        }
+        if (this.barcode == null || this.barcode.isBlank()) {
+            this.barcode = generateBarcode();
+        }
+    }
+
+    private String generateBarcode() {
+        return UUID.randomUUID().toString().replace("-", "").substring(0, 12).toUpperCase(); // Ví dụ 12 ký tự
+    }
 
 }

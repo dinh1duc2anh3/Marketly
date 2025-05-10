@@ -2,10 +2,12 @@ package com.darian.ecommerce.entity;
 
 import com.darian.ecommerce.enums.UserRole;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 
 @Entity
 @Getter
@@ -33,6 +35,7 @@ public class User {
     private UserRole role;
 
     @Column(nullable = false,
+            unique = true,
             length = 100)
     private String email;
 

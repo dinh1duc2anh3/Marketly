@@ -1,7 +1,6 @@
 package com.darian.ecommerce.businesslogic.productsearch;
 
 import com.darian.ecommerce.dto.ManagerProductDTO;
-import com.darian.ecommerce.dto.ProductDTO;
 import com.darian.ecommerce.entity.Product;
 import com.darian.ecommerce.repository.ProductRepository;
 
@@ -18,9 +17,9 @@ public class ManagerProductSearchFetcher implements ProductSearchFetcher{
 
     // Search products by keyword for Manager role, returning ManagerProductDTO
     @Override
-    public <T extends ProductDTO> List<T> searchProducts(String keyword) {
+    public  List<ManagerProductDTO> searchProducts(String keyword) {
         List<Product> products = productRepository.findByKeyword(keyword);
-        return (List<T>) products.stream()
+        return products.stream()
                 .map(this::mapToManagerDTO)
                 .collect(Collectors.toList());
     }

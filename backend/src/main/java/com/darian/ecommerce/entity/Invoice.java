@@ -1,7 +1,10 @@
 package com.darian.ecommerce.entity;
 
-import jakarta.persistence.*;
-import lombok.*;
+import jakarta.persistence.Id;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 //nay ko phai la mot entity duoc luu trong db
 @Getter

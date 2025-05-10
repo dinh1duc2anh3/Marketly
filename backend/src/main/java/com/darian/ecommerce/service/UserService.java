@@ -10,6 +10,10 @@ public interface UserService {
     // Load user by username (for authentication)
 //    UserDTO loadUserByUsername(String username);
 
+    Boolean existedByUsername(String username);
+
+    Boolean existedByEmail(String email);
+
     User getUserById(Integer customerId);
 
 

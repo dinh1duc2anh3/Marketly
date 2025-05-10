@@ -3,27 +3,21 @@ package com.darian.ecommerce.service.impl;
 import com.darian.ecommerce.businesslogic.productdetail.ProductDetailFetcherFactory;
 import com.darian.ecommerce.businesslogic.productlist.ProductListFetcherFactory;
 import com.darian.ecommerce.businesslogic.productsearch.ProductSearchFetcherFactory;
-import com.darian.ecommerce.dto.CategoryDTO;
 import com.darian.ecommerce.dto.ManagerProductDTO;
 import com.darian.ecommerce.dto.ProductDTO;
-import com.darian.ecommerce.dto.ProductReviewDTO;
 import com.darian.ecommerce.entity.Product;
-import com.darian.ecommerce.entity.Category;
-import com.darian.ecommerce.entity.ProductReview;
-import com.darian.ecommerce.entity.User;
+import com.darian.ecommerce.entity.ProductImage;
 import com.darian.ecommerce.enums.UserRole;
-import com.darian.ecommerce.repository.CategoryRepository;
 import com.darian.ecommerce.repository.ProductRepository;
-import com.darian.ecommerce.repository.ProductReviewRepository;
 import com.darian.ecommerce.service.AuditLogService;
-import com.darian.ecommerce.service.OrderService;
 import com.darian.ecommerce.service.ProductService;
-import com.darian.ecommerce.service.UserService;
-import org.slf4j.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class ProductServiceImpl implements ProductService {
@@ -37,10 +31,6 @@ public class ProductServiceImpl implements ProductService {
     private final ProductDetailFetcherFactory productDetailFetcherFactory;
     private final ProductSearchFetcherFactory productSearchFetcherFactory;
     private final AuditLogService auditLogService;
-    private final UserService userService;
-    private final CategoryRepository categoryRepository;
-    private final OrderService orderService;
-    private final ProductReviewRepository productReviewRepository;
 
 
     // Constructor for dependency injection
@@ -48,35 +38,28 @@ public class ProductServiceImpl implements ProductService {
                               ProductListFetcherFactory productListFetcherFactory,
                               ProductDetailFetcherFactory productDetailFetcherFactory,
                               ProductSearchFetcherFactory productSearchFetcherFactory,
-                              AuditLogService auditLogService,
-                              UserService userService,
-                              CategoryRepository categoryRepository,
-                              OrderService orderService,
-                              ProductReviewRepository productReviewRepository) {
+                              AuditLogService auditLogService) {
         this.productRepository = productRepository;
         this.productListFetcherFactory = productListFetcherFactory;
         this.productDetailFetcherFactory = productDetailFetcherFactory;
         this.productSearchFetcherFactory = productSearchFetcherFactory;
         this.auditLogService = auditLogService;
-        this.userService = userService;
-        this.categoryRepository = categoryRepository;
-        this.orderService = orderService;
-        this.productReviewRepository = productReviewRepository;
     }
 
     // Fetch product list using Factory Pattern based on role
     @Override
     public <T extends ProductDTO> List<T> getProductList(UserRole role) {
         logger.info("Fetching product list for role: {}", role);
-        return productListFetcherFactory.getFetcher(role.toString()).fetchProductList();
+        return productListFetcherFactory.getFetcher(role).fetchProductList();
+        // ko co log a?
     }
 
     // Fetch product details using Factory Pattern based on role
     @Override
     public <T extends ProductDTO> T getProductDetails(Integer userId, Long productId, UserRole role) {
         logger.info("Fetching product details for productId: {}, role: {}, userId: {}", productId, role, userId);
-        T productDTO = productDetailFetcherFactory.getFetcher(role.toString()).fetchProductDetails(productId);
-        auditLogService.logViewProduct(productId,userId, UserRole.CUSTOMER);
+        T productDTO = productDetailFetcherFactory.getFetcher(role).fetchProductDetails(productId);
+        auditLogService.logViewProduct(productId,userId, role);
         return productDTO;
     }
 
@@ -89,8 +72,8 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public <T extends ProductDTO> List<T> searchProducts(Integer userId, String keyword, UserRole role) {
         logger.info("Searching products with keyword: {}, role: {}, userId: {}", keyword, role, userId);
-        List<T> results = productSearchFetcherFactory.getFetcher(role.toString()).searchProducts(keyword);
-        auditLogService.logSearchAction(userId, keyword,UserRole.CUSTOMER);
+        List<T> results = productSearchFetcherFactory.getFetcher(role).searchProducts(keyword);
+        auditLogService.logSearchAction(userId, keyword,role);
         return results;
     }
 
@@ -102,13 +85,7 @@ public class ProductServiceImpl implements ProductService {
         return productRepository.findByFilters(keyword, minPrice, maxPrice, category);
     }
 
-    // Suggest related products based on product ID
-    @Override
-    public List<ProductDTO> suggestRelatedProducts(Long productId) {
-        logger.info("Suggesting related products for productId: {}", productId);
-        List<Product> relatedProducts = productRepository.findRelatedProducts(productId);
-        return relatedProducts.stream().map(this::mapToBaseDTO).toList(); //?
-    }
+
 
     // Add a new product with validation (Manager only)
     @Override
@@ -253,106 +230,20 @@ public class ProductServiceImpl implements ProductService {
 
     }
 
-    // Get all product categories
-    @Override
-    public List<CategoryDTO> findAllCategories() {
-        logger.info("Fetching all categories");
-        List<Category>  allCategory = categoryRepository.findAll();
-        return allCategory.stream().map(this::mapToCategoryDTO).toList();
-    }
-
-    // Save a new category
-    @Override
-    public CategoryDTO saveCategory(CategoryDTO category) {
-        //- check again saveCategory , check if the input is category or categoryDTO
-        logger.info("Saving category: {}", category.getName());
-        Category savedCategory = categoryRepository.save(mapToCategoryEntity(category));
-        logger.info("Category saved: {}", savedCategory.getId());
-        return category;
-    }
-
-    // Add a review for a product
-    @Override
-    public ProductReviewDTO addReview(ProductReviewDTO reviewDTO) {
-        //create new productReview Entity
-        ProductReview review = mapToReviewEntity(reviewDTO);
-
-        //save productReview
-        ProductReview savedReview = productReviewRepository.save(review);
-        logger.info("Review added for product: {}", savedReview.getProduct().getProductId());
-
-        return mapToReviewDTO(savedReview);
-    }
-
-    // Get all reviews for a product
-    @Override
-    public List<ProductReviewDTO> getReviews(Long productId) {
-        logger.info("Fetching reviews for product: {}", productId);
-        List<ProductReview> reviews = productReviewRepository.findByProductId(productId);
-        //what does this do ?
-        return reviews.stream().map(review -> {
-            ProductReviewDTO dto = new ProductReviewDTO();
-            dto.setRating(review.getRating());
-            dto.setComment(review.getComment());
-            return dto;
-        }).toList();
-    }
 
     // Private method to map Product entity to ProductDTO
-    private ProductDTO mapToBaseDTO(Product product) {
-        ProductDTO dto = new ProductDTO();
-        dto.setProductId(product.getProductId());
-        dto.setName(product.getName());
-        dto.setPrice(product.getPrice());
-        dto.setDescription(product.getDescription());
-        return dto;
+    private ProductDTO mapToProductDTO(Product product) {
+        return ProductDTO.builder()
+                .productId(product.getProductId())
+                .category(product.getCategory().getName())
+                .name(product.getName())
+                .description(product.getDescription())
+                .price(product.getPrice())
+                .specifications(product.getSpecifications())
+                .images(product.getImages().stream()
+                        .map(ProductImage::getUrl)
+                        .collect(Collectors.toList()))  //Chuyển đổi List<ProductImage> -> List<String>
+                .build();
     }
 
-    // Private method to map Category entity to CategoryDTO
-    private CategoryDTO mapToCategoryDTO(Category category) {
-        CategoryDTO dto = new CategoryDTO();
-        dto.setId(category.getId());
-        dto.setName(category.getName());
-        dto.setDescription(category.getDescription());
-        return dto;
-    }
-
-    // Private method to map CategoryDTO to Category entity
-    private Category mapToCategoryEntity(CategoryDTO dto) {
-        Category category = new Category();
-        category.setId(dto.getId());
-        category.setName(dto.getName());
-        category.setDescription(dto.getDescription());
-        return category;
-    }
-
-    // Chuyển từ DTO sang Entity
-    private ProductReview mapToReviewEntity(ProductReviewDTO reviewDTO) {
-
-        //find product from productId
-        Product product = productRepository.findById(reviewDTO.getProductId())
-                .orElseThrow(() -> new IllegalArgumentException("Product not found"));
-
-        //find user from customerId
-        User user = userService.getUserById(reviewDTO.getCustomerId());
-
-        //autofill id + createDate when first creating an object of productReview
-        ProductReview review = new ProductReview();
-        review.setProduct(product);
-        review.setUser(user);
-        review.setRating(reviewDTO.getRating());
-        review.setComment(reviewDTO.getComment());
-        return review;
-    }
-
-    // Chuyển từ Entity sang DTO
-    private ProductReviewDTO mapToReviewDTO(ProductReview review) {
-        ProductReviewDTO reviewDTO = new ProductReviewDTO();
-        reviewDTO.setProductId(review.getProduct().getProductId());
-        reviewDTO.setCustomerId(review.getUser().getId());
-        reviewDTO.setRating(review.getRating());
-        reviewDTO.setComment(review.getComment());
-        reviewDTO.setCreatedDate(review.getCreatedDate());
-        return reviewDTO;
-    }
 }

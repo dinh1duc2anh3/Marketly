@@ -11,6 +11,7 @@ import com.darian.ecommerce.repository.AuditLogRepository;
 import com.darian.ecommerce.service.AuditLogService;
 import com.darian.ecommerce.service.ProductService;
 import com.darian.ecommerce.service.UserService;
+import jakarta.persistence.EntityNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -55,15 +56,22 @@ public class AuditLogServiceImpl implements AuditLogService {
     @Override
     public void logViewProduct(Long productId, Integer userId, UserRole role) {
         logger.info("User {} (role: {}) viewed product: {}", userId, role, productId);
+
         //create audit log entity
         AuditLog log = new AuditLog();
+        log.setActionType(ActionType.VIEW_PRODUCT);
+
+        //fetch + set user
         User user = userService.getUserById(userId);
         log.setUser(user);
-        log.setActionType(ActionType.VIEW_PRODUCT);
-        Optional<Product> product = productService.getProductById(productId);
-        if (product.isPresent()) log.setProduct(product.get());
+
+        //fetch + set product
+        Product product = productService.getProductById(productId).orElseThrow(() -> new EntityNotFoundException("Product not found with ID: " + productId));
+        log.setProduct(product);
+        log.setKeyword(product.getName());
+
         log.setRole(role);
-        log.setTimestamp(LocalDateTime.now());
+
         //save audit log entity to db
         auditLogRepository.save(log);
     }

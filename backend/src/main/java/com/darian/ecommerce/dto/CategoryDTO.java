@@ -2,6 +2,7 @@ package com.darian.ecommerce.dto;
 
 import lombok.*;
 
+@Builder
 @Getter
 @Setter
 @NoArgsConstructor

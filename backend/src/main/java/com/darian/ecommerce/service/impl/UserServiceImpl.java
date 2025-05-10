@@ -19,8 +19,12 @@ public class UserServiceImpl implements UserService {
     // Register a new user
     @Override
     public UserDTO register(UserDTO userDTO) {
-        User user = mapToUserEntity(userDTO);
+        //validate info
+        // check if username, email existed
+        if (userRepository.existsByUsername(userDTO.getUsername())) throw new RuntimeException("Username already exists.");
+        if (userRepository.existsByEmail(userDTO.getEmail())) throw new RuntimeException("Email already exists.");
 
+        User user = mapToUserEntity(userDTO);
         // Save to DB
         User savedUser = userRepository.save(user);
 
@@ -28,14 +32,24 @@ public class UserServiceImpl implements UserService {
         return mapToUserDTO(savedUser);
     }
 
-    // Load user by username for authentication
-//    @Override
-//    public UserDTO loadUserByUsername(String username) throws UsernameNotFoundException {
-//        User user = userRepository.findByUsername(username)
-//                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
-//
-//        return mapToUserDTO(user);
-//    }
+    @Override
+    public Boolean existedByUsername(String username) {
+        return userRepository.existsByUsername(username);
+    }
+
+    @Override
+    public Boolean existedByEmail(String email) {
+        return userRepository.existsByEmail(email);
+    }
+
+    //     Load user by username for authentication
+    @Override
+    public UserDTO loadUserByUsername(String username) throws UsernameNotFoundException {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+
+        return mapToUserDTO(user);
+    }
 
     @Override
     public User getUserById(Integer customerId) {

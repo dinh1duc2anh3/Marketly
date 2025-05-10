@@ -1,20 +1,20 @@
 package com.darian.ecommerce.businesslogic.productdetail;
 
+import com.darian.ecommerce.businesslogic.mapper.ProductMapper;
 import com.darian.ecommerce.dto.CustomerProductDTO;
-import com.darian.ecommerce.dto.ProductDTO;
 import com.darian.ecommerce.entity.Product;
 import com.darian.ecommerce.repository.ProductRepository;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 public class CustomerProductDetailFetcher implements ProductDetailFetcher {
     private final ProductRepository productRepository;
+    private final ProductMapper productMapper;
 
     // Constructor injection for ProductRepository
-    public CustomerProductDetailFetcher(ProductRepository productRepository) {
+    public CustomerProductDetailFetcher(ProductRepository productRepository, ProductMapper productMapper) {
         this.productRepository = productRepository;
+        this.productMapper = productMapper;
     }
 
     // Fetch product details by product ID for Customer role, returning CustomerProductDTO
@@ -24,21 +24,7 @@ public class CustomerProductDetailFetcher implements ProductDetailFetcher {
         if (optionalProduct.isEmpty()) {
             throw new IllegalArgumentException("Product not found: " + productId);
         }
-        return mapToCustomerDTO(optionalProduct.get());
+        return productMapper.mapToCustomerDTO(optionalProduct.get());
     }
 
-    // Private method to map Product entity to CustomerProductDTO
-    private CustomerProductDTO mapToCustomerDTO(Product product) {
-        CustomerProductDTO dto = new CustomerProductDTO();
-        dto.setProductId(product.getProductId());
-        dto.setName(product.getName());
-        dto.setPrice(product.getPrice());
-        dto.setDescription(product.getDescription());
-        dto.setAvailability(product.getStockQuantity() > 0 ? "In Stock" : "Out of Stock");
-        List<String> stringList = new ArrayList<>() ;
-        stringList.add("default-image1.jpg");
-        stringList.add("default-image2.jpg");
-        dto.setImages(stringList);
-        return dto;
-    }
 }

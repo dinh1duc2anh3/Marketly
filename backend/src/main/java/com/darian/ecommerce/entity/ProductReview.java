@@ -4,9 +4,9 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 
 @Entity
+@Builder
 @Getter
 @Setter
 @NoArgsConstructor
@@ -37,8 +37,8 @@ public class ProductReview {
 
     // Date and time the review was created
     @Column(name = "review_timestamp")
-    private LocalDateTime createdDate;
 
+    private LocalDateTime createdDate;
     // Auto-set createdDate
     @PrePersist
     protected void onCreate() {

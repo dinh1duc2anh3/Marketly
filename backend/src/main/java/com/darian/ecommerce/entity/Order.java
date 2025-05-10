@@ -1,13 +1,15 @@
 package com.darian.ecommerce.entity;
 
+import com.darian.ecommerce.enums.OrderStatus;
+import com.darian.ecommerce.enums.PaymentStatus;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.List;
-
-import com.darian.ecommerce.enums.*;
 
 @Entity
 @Getter

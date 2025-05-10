@@ -1,8 +1,6 @@
 package com.darian.ecommerce.businesslogic.productlist;
 
-import com.darian.ecommerce.dto.CustomerProductDTO;
 import com.darian.ecommerce.dto.ManagerProductDTO;
-import com.darian.ecommerce.dto.ProductDTO;
 import com.darian.ecommerce.entity.Product;
 import com.darian.ecommerce.repository.ProductRepository;
 

@@ -1,7 +1,6 @@
 package com.darian.ecommerce.businesslogic.productdetail;
 
 import com.darian.ecommerce.dto.ManagerProductDTO;
-import com.darian.ecommerce.dto.ProductDTO;
 import com.darian.ecommerce.entity.Product;
 import com.darian.ecommerce.repository.ProductRepository;
 
@@ -27,13 +26,13 @@ public class ManagerProductDetailFetcher implements ProductDetailFetcher{
 
     // Private method to map Product entity to ManagerProductDTO
     private ManagerProductDTO mapToManagerDTO(Product product) {
-        ManagerProductDTO dto = new ManagerProductDTO();
-        dto.setProductId(product.getProductId());
-        dto.setName(product.getName());
-        dto.setPrice(product.getPrice());
-        dto.setDescription(product.getDescription());
-        dto.setStockQuantity(product.getStockQuantity());
-        dto.setBarcode("BAR-" + product.getProductId());
-        return dto;
+        return ManagerProductDTO.builder()
+                .productId(product.getProductId())
+                .name(product.getName())
+                .price(product.getPrice())
+                .description(product.getDescription())
+                .stockQuantity(product.getStockQuantity())
+                .barcode("BAR-" + product.getProductId())
+                .build();
     }
 }

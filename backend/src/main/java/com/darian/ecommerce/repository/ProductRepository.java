@@ -6,7 +6,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
-import java.nio.channels.FileChannel;
 import java.util.List;
 import java.util.Optional;
 
@@ -30,9 +29,6 @@ public interface ProductRepository extends JpaRepository<Product,String> {
             "AND (p.category.name = :category OR :category IS NULL)")
     List<ProductDTO> findByFilters(String keyword, Float minPrice, Float maxPrice, String category);
 
-    // Find related products (custom query via RelatedProduct)
-    @Query("SELECT p.relatedProduct FROM RelatedProduct p WHERE p.product.productId = :productId")
-    List<Product> findRelatedProducts(Long productId);
 
     // Save a product (inherited from JpaRepository)
     Product save(Product product);

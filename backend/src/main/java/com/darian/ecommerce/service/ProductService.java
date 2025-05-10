@@ -1,9 +1,7 @@
 package com.darian.ecommerce.service;
 
-import com.darian.ecommerce.dto.CategoryDTO;
 import com.darian.ecommerce.dto.ManagerProductDTO;
 import com.darian.ecommerce.dto.ProductDTO;
-import com.darian.ecommerce.dto.ProductReviewDTO;
 import com.darian.ecommerce.entity.Product;
 import com.darian.ecommerce.enums.UserRole;
 import org.springframework.stereotype.Service;
@@ -26,9 +24,6 @@ public interface ProductService {
 
     // Advanced search with filters (keyword, price range, category)
     List<ProductDTO> findByFilters(String keyword, Float minPrice, Float maxPrice, String category);
-
-    // Suggest related products based on a product ID
-    List<ProductDTO> suggestRelatedProducts(Long productId);
 
     // Add a new product (Manager only)
     ManagerProductDTO addProduct(Integer userId,ProductDTO productDTO);
@@ -57,15 +52,7 @@ public interface ProductService {
     // Check if deleting a product affects any orders
     Boolean checkOrdersAffected(Long productId);
 
-    // Get all product categories
-    List<CategoryDTO> findAllCategories();
 
-    // Save a new category
-    CategoryDTO saveCategory(CategoryDTO category);
 
-    // Add a review for a product
-    ProductReviewDTO addReview(ProductReviewDTO reviewDTO);
 
-    // Get all reviews for a product
-    List<ProductReviewDTO> getReviews(Long productId);
 }
