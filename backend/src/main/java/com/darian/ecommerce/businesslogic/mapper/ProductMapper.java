@@ -1,8 +1,11 @@
 package com.darian.ecommerce.businesslogic.mapper;
 
 import com.darian.ecommerce.dto.CustomerProductDTO;
+import com.darian.ecommerce.dto.ManagerProductDTO;
+import com.darian.ecommerce.dto.ProductEditHistoryDTO;
 import com.darian.ecommerce.dto.RelatedProductDTO;
 import com.darian.ecommerce.entity.Product;
+import com.darian.ecommerce.entity.ProductEditHistory;
 import com.darian.ecommerce.entity.ProductImage;
 import com.darian.ecommerce.enums.AvailabilityStatus;
 import com.darian.ecommerce.service.RelatedProductService;
@@ -14,9 +17,11 @@ import java.util.stream.Collectors;
 @Component
 public class ProductMapper {
     private final RelatedProductService relatedProductService;
+    private final ProductEditHistoryMapper productEditHistoryMapper;
 
-    public ProductMapper(RelatedProductService relatedProductService) {
+    public ProductMapper(RelatedProductService relatedProductService, ProductEditHistoryMapper productEditHistoryMapper) {
         this.relatedProductService = relatedProductService;
+        this.productEditHistoryMapper = productEditHistoryMapper;
     }
 
     // Private method to map Product entity to CustomerProductDTO
@@ -46,11 +51,37 @@ public class ProductMapper {
                 .specifications(product.getSpecifications())
                 .images(images)
                 .availabilityStatus(availabilityStatus)
-                //dang bi loi o day ne
                 .relatedProducts(relatedProductDTOS)
                 .build();
 
     }
 
+    // Private method to map Product entity to ManagerProductDTO
+    public ManagerProductDTO mapToManagerDTO(Product product) {
+        //get images url
+        List<String> images =  product.getImages().stream()
+                .map(ProductImage::getUrl)
+                .collect(Collectors.toList());
+
+        //get edit history
+        List<ProductEditHistoryDTO> editHistoryDTOS = product.getEditHistory().stream()
+                .map(productEditHistoryMapper::mapToProductEditHistoryDTO)
+                .toList();
+
+        return ManagerProductDTO.builder()
+                .productId(product.getProductId())
+                .category(product.getCategory().getName())
+                .name(product.getName())
+                .description(product.getDescription())
+                .price(product.getPrice())
+                .specifications(product.getSpecifications())
+                .images(images)
+                .value(product.getValue())
+                .barcode(product.getBarcode())
+                .stockQuantity(product.getStockQuantity())
+                .warehouseEntryDate(product.getWarehouseEntryDate())
+                .editHistory(editHistoryDTOS)
+                .build();
+    }
 
 }

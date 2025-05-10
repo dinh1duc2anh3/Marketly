@@ -1,5 +1,7 @@
 package com.darian.ecommerce.entity;
 
+import com.darian.ecommerce.enums.OrderStatus;
+import com.darian.ecommerce.enums.ProductStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -23,6 +25,11 @@ public class Product {
     @Column(name = "product_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long productId;
+
+    // Status of the product (e.g., ACTIVE, INACTIVE)
+    @Enumerated(EnumType.STRING)
+    @Column(name = "product_status")
+    private ProductStatus productStatus;
 
     // Category of the product (1-1 relationship)
     @JoinColumn(name = "category_id", nullable = false)

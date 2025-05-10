@@ -4,7 +4,7 @@ import com.darian.ecommerce.dto.ProductDTO;
 
 import java.util.List;
 
-public interface ProductListFetcher {
+public interface ProductListFetcher<T extends ProductDTO> {
     // Fetch a list of products, returning ProductDTO or its subtypes
-    <T extends ProductDTO> List<T> fetchProductList();
+     List<T> fetchProductList();
 }

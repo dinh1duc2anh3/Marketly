@@ -1,6 +1,7 @@
 package com.darian.ecommerce.businesslogic.productsearch;
 
 import com.darian.ecommerce.businesslogic.mapper.ProductMapper;
+import com.darian.ecommerce.dto.ProductDTO;
 import com.darian.ecommerce.enums.UserRole;
 import com.darian.ecommerce.repository.ProductRepository;
 import org.springframework.stereotype.Component;
@@ -17,13 +18,11 @@ public class ProductSearchFetcherFactory {
     }
 
     // Get the appropriate ProductSearchFetcher based on role
-    public ProductSearchFetcher getFetcher(UserRole role) {
-        if (role.equals(UserRole.CUSTOMER)) {
-            return new CustomerProductSearchFetcher(productRepository,productMapper);
-        } else if (role.equals(UserRole.MANAGER)) {
-            return new ManagerProductSearchFetcher(productRepository);
-        } else {
-            throw new IllegalArgumentException("Invalid role: " + role);
-        }
+    public ProductSearchFetcher<? extends ProductDTO> getFetcher(UserRole role) {
+        return switch (role){
+            case CUSTOMER -> new CustomerProductSearchFetcher(productRepository,productMapper);
+            case MANAGER -> new ManagerProductSearchFetcher(productRepository,productMapper);
+            default -> throw new IllegalArgumentException("Invalid role: " + role);
+        };
     }
 }

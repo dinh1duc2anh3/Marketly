@@ -8,7 +8,7 @@ import com.darian.ecommerce.repository.ProductRepository;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class CustomerProductListFetcher implements ProductListFetcher{
+public class CustomerProductListFetcher implements ProductListFetcher<CustomerProductDTO>{
     private final ProductRepository productRepository;
     private final ProductMapper productMapper;
 

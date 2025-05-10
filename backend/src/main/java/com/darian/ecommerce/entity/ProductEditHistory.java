@@ -38,5 +38,21 @@ public class ProductEditHistory {
     @Column(name = "changes_made")
     private String changes; // Nội dung chỉnh sửa
 
+    @PrePersist
+    public void prePersist() {
+        if (editDate == null) {
+            editDate = LocalDateTime.now();
+        }
 
+        if (changes == null || changes.trim().isEmpty()) {
+            changes = generateAutoChangesSummary();
+        }
+    }
+
+    private String generateAutoChangesSummary() {
+        // Bạn có thể tùy chỉnh logic này — ví dụ:
+        String productName = product != null ? product.getName() : "Unknown Product";
+        String editorName = editor != null ? editor.getUsername() : "Unknown Editor";
+        return "Edited by " + editorName + " on product: " + productName;
+    }
 }

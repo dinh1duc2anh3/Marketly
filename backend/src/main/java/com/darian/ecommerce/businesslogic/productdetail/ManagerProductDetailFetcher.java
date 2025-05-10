@@ -1,17 +1,20 @@
 package com.darian.ecommerce.businesslogic.productdetail;
 
+import com.darian.ecommerce.businesslogic.mapper.ProductMapper;
 import com.darian.ecommerce.dto.ManagerProductDTO;
 import com.darian.ecommerce.entity.Product;
 import com.darian.ecommerce.repository.ProductRepository;
 
 import java.util.Optional;
 
-public class ManagerProductDetailFetcher implements ProductDetailFetcher{
+public class ManagerProductDetailFetcher implements ProductDetailFetcher<ManagerProductDTO>{
     private final ProductRepository productRepository;
+    private final ProductMapper productMapper;
 
     // Constructor injection for ProductRepository
-    public ManagerProductDetailFetcher(ProductRepository productRepository) {
+    public ManagerProductDetailFetcher(ProductRepository productRepository, ProductMapper productMapper) {
         this.productRepository = productRepository;
+        this.productMapper = productMapper;
     }
 
     // Fetch product details by product ID for Manager role, returning ManagerProductDTO
@@ -21,18 +24,6 @@ public class ManagerProductDetailFetcher implements ProductDetailFetcher{
         if (optionalProduct.isEmpty()) {
             throw new IllegalArgumentException("Product not found: " + productId);
         }
-        return mapToManagerDTO(optionalProduct.get());
-    }
-
-    // Private method to map Product entity to ManagerProductDTO
-    private ManagerProductDTO mapToManagerDTO(Product product) {
-        return ManagerProductDTO.builder()
-                .productId(product.getProductId())
-                .name(product.getName())
-                .price(product.getPrice())
-                .description(product.getDescription())
-                .stockQuantity(product.getStockQuantity())
-                .barcode("BAR-" + product.getProductId())
-                .build();
+        return productMapper.mapToManagerDTO(optionalProduct.get());
     }
 }

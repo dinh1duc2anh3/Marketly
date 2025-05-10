@@ -7,7 +7,7 @@ import com.darian.ecommerce.repository.ProductRepository;
 
 import java.util.Optional;
 
-public class CustomerProductDetailFetcher implements ProductDetailFetcher {
+public class CustomerProductDetailFetcher implements ProductDetailFetcher<CustomerProductDTO> {
     private final ProductRepository productRepository;
     private final ProductMapper productMapper;
 

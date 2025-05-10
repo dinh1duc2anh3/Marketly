@@ -1,5 +1,7 @@
 package com.darian.ecommerce.controller;
 
+import com.darian.ecommerce.businesslogic.productdetail.CustomerProductDetailFetcher;
+import com.darian.ecommerce.dto.CustomerProductDTO;
 import com.darian.ecommerce.dto.ManagerProductDTO;
 import com.darian.ecommerce.dto.ProductDTO;
 import com.darian.ecommerce.dto.RelatedProductDTO;
@@ -8,6 +10,7 @@ import com.darian.ecommerce.service.ProductService;
 import com.darian.ecommerce.service.RelatedProductService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.resource.ResourceUrlProvider;
 
 import java.util.List;
 
@@ -16,10 +19,12 @@ import java.util.List;
 public class ProductController {
     private final ProductService productService;
     private final RelatedProductService relatedProductService;
+    private final ResourceUrlProvider resourceUrlProvider;
 
-    public ProductController(ProductService productService, RelatedProductService relatedProductService) {
+    public ProductController(ProductService productService, RelatedProductService relatedProductService, ResourceUrlProvider resourceUrlProvider) {
         this.productService = productService;
         this.relatedProductService = relatedProductService;
+        this.resourceUrlProvider = resourceUrlProvider;
     }
 
     @GetMapping
@@ -28,14 +33,22 @@ public class ProductController {
         return ResponseEntity.ok(products);
     }
 
-    @GetMapping("/{productId}")
-    public ResponseEntity<? extends ProductDTO> getProductDetails(
+    @GetMapping("/customer/{productId}")
+    public ResponseEntity<CustomerProductDTO> getCustomerProductDetails(
             @RequestParam Integer userId,
-            @PathVariable Long productId,
-            @RequestParam UserRole role) {
-        ProductDTO product = productService.getProductDetails(userId, productId, role);
-        return ResponseEntity.ok(product);
-    }
+            @RequestParam Long productId){
+        CustomerProductDTO dto = productService.getProductDetails(userId,productId,UserRole.CUSTOMER);
+        return ResponseEntity.ok(dto);
+    };
+
+    @GetMapping("/manager/{productId}")
+    public ResponseEntity<ManagerProductDTO> getManagerProductDetails(
+            @RequestParam Integer userId,
+            @RequestParam Long productId){
+        ManagerProductDTO dto = productService.getProductDetails(userId,productId,UserRole.MANAGER);
+        return ResponseEntity.ok(dto);
+    };
+
 
     @GetMapping("/search")
     public ResponseEntity<List<? extends ProductDTO>> searchProducts(

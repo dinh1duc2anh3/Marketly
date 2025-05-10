@@ -1,7 +1,10 @@
 package com.darian.ecommerce.service.impl;
 
+import com.darian.ecommerce.businesslogic.productdetail.ProductDetailFetcher;
 import com.darian.ecommerce.businesslogic.productdetail.ProductDetailFetcherFactory;
+import com.darian.ecommerce.businesslogic.productlist.ProductListFetcher;
 import com.darian.ecommerce.businesslogic.productlist.ProductListFetcherFactory;
+import com.darian.ecommerce.businesslogic.productsearch.ProductSearchFetcher;
 import com.darian.ecommerce.businesslogic.productsearch.ProductSearchFetcherFactory;
 import com.darian.ecommerce.dto.ManagerProductDTO;
 import com.darian.ecommerce.dto.ProductDTO;
@@ -48,17 +51,31 @@ public class ProductServiceImpl implements ProductService {
 
     // Fetch product list using Factory Pattern based on role
     @Override
+    // Safe cast: fetcher is guaranteed to return correct subtype based on role
+    @SuppressWarnings("unchecked")
     public <T extends ProductDTO> List<T> getProductList(UserRole role) {
         logger.info("Fetching product list for role: {}", role);
-        return productListFetcherFactory.getFetcher(role).fetchProductList();
-        // ko co log a?
+
+        //get fetcher
+        ProductListFetcher<T> fetcher = (ProductListFetcher<T>) productListFetcherFactory.getFetcher(role);
+
+        //get product list
+        return fetcher.fetchProductList();
     }
 
-    // Fetch product details using Factory Pattern based on role
+    // Fetch product details using Factory Pattern based on rol
     @Override
+    // Safe cast: fetcher is guaranteed to return correct subtype based on role
+    @SuppressWarnings("unchecked")
     public <T extends ProductDTO> T getProductDetails(Integer userId, Long productId, UserRole role) {
         logger.info("Fetching product details for productId: {}, role: {}, userId: {}", productId, role, userId);
-        T productDTO = productDetailFetcherFactory.getFetcher(role).fetchProductDetails(productId);
+
+        //get fetcher
+        ProductDetailFetcher<T> fetcher = (ProductDetailFetcher<T>) productDetailFetcherFactory.getFetcher(role);
+
+        //fetch product details
+        T productDTO = fetcher.fetchProductDetails(productId);
+
         auditLogService.logViewProduct(productId,userId, role);
         return productDTO;
     }
@@ -70,9 +87,17 @@ public class ProductServiceImpl implements ProductService {
 
     // Search products using Factory Pattern based on role
     @Override
+    // Safe cast: fetcher is guaranteed to return correct subtype based on role
+    @SuppressWarnings("unchecked")
     public <T extends ProductDTO> List<T> searchProducts(Integer userId, String keyword, UserRole role) {
         logger.info("Searching products with keyword: {}, role: {}, userId: {}", keyword, role, userId);
-        List<T> results = productSearchFetcherFactory.getFetcher(role).searchProducts(keyword);
+
+        //get fetcher
+        ProductSearchFetcher<T> fetcher = (ProductSearchFetcher<T>) productSearchFetcherFactory.getFetcher(role);
+
+        //search product
+        List<T> results = fetcher.searchProducts(keyword);
+
         auditLogService.logSearchAction(userId, keyword,role);
         return results;
     }

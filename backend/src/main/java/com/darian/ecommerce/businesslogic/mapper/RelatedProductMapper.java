@@ -2,7 +2,9 @@ package com.darian.ecommerce.businesslogic.mapper;
 
 import com.darian.ecommerce.dto.RelatedProductDTO;
 import com.darian.ecommerce.entity.Product;
+import org.springframework.stereotype.Component;
 
+@Component
 public class RelatedProductMapper {
 
     // Chuyển từ Product sang RelatedProductDTO

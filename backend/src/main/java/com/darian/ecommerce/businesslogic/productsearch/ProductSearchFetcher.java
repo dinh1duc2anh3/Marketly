@@ -4,7 +4,7 @@ import com.darian.ecommerce.dto.ProductDTO;
 
 import java.util.List;
 
-public interface ProductSearchFetcher {
+public interface ProductSearchFetcher <T extends ProductDTO> {
     // Search products by keyword, returning a list of ProductDTO or its subtypes
-    <T extends ProductDTO> List<T> searchProducts(String keyword);
+    List<T> searchProducts(String keyword);
 }
