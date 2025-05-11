@@ -2,6 +2,7 @@ package com.darian.ecommerce.service.impl;
 
 import com.darian.ecommerce.config.exception.payment.PaymentException;
 import com.darian.ecommerce.dto.PaymentResult;
+import com.darian.ecommerce.dto.RefundResult;
 import com.darian.ecommerce.entity.Order;
 import com.darian.ecommerce.enums.OrderStatus;
 import com.darian.ecommerce.enums.PaymentStatus;
@@ -74,27 +75,27 @@ public class PaymentServiceImpl implements PaymentService {
         return true;
     }
 
-//    @Override
-//    public RefundResult processRefund(Long orderId) {
-//        logger.info("Processing refund for order {}", orderId);
-//        if (!checkCancellationValidity(orderId)) {
-//            logger.error("Refund not valid for order {}", orderId);
-//            throw new PaymentException("Refund not allowed for order: " + orderId);
-//        }
-//        RefundResult result = vnPaySubsystem.processRefund(orderId);
-//        if ("SUCCESS".equals(result.getRefundStatus())) {
-//            orderService.updatePaymentStatus(orderId, PaymentStatus.REFUNDED);
-//            logger.info("Refund successful for order {}", orderId);
-//        } else {
-//            logger.warn("Refund failed for order {}: {}", orderId, result.getErrorMessage());
-//        }
-//        auditLogService.logPayment(result); // Assuming RefundResult is compatible with logPayment
-//        return result;
-//    }
+    @Override
+    public RefundResult processRefund(Long orderId) {
+        logger.info("Processing refund for order {}", orderId);
+        if (!checkCancellationValidity(orderId)) {
+            logger.error("Refund not valid for order {}", orderId);
+            throw new PaymentException("Refund not allowed for order: " + orderId);
+        }
+        RefundResult result = vnPaySubsystem.processRefund(orderId);
+        if ("SUCCESS".equals(result.getRefundStatus())) {
+            orderService.updatePaymentStatus(orderId, PaymentStatus.REFUNDED);
+            logger.info("Refund successful for order {}", orderId);
+        } else {
+            logger.warn("Refund failed for order {}: {}", orderId, result.getErrorMessage());
+        }
+        auditLogService.logPayment(result); // Assuming RefundResult is compatible with logPayment
+        return result;
+    }
 
-//    @Override
-//    public Boolean checkCancellationValidity(Long orderId) {
-//        logger.info("Checking cancellation validity for order {}", orderId);
-//        return orderService.checkCancellationValidity(orderId); // Delegate to OrderService
-//    }
+    @Override
+    public Boolean checkCancellationValidity(Long orderId) {
+        logger.info("Checking cancellation validity for order {}", orderId);
+        return orderService.checkCancellationValidity(orderId); // Delegate to OrderService
+    }
 }

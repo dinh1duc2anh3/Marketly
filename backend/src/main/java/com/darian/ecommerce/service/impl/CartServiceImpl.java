@@ -4,6 +4,7 @@ import com.darian.ecommerce.dto.CartDTO;
 import com.darian.ecommerce.dto.CartItemDTO;
 import com.darian.ecommerce.entity.Cart;
 import com.darian.ecommerce.entity.CartItem;
+import com.darian.ecommerce.entity.Product;
 import com.darian.ecommerce.enums.UserRole;
 import com.darian.ecommerce.repository.CartRepository;
 import com.darian.ecommerce.service.CartService;
@@ -33,11 +34,24 @@ public class CartServiceImpl implements CartService {
     @Override
     public CartDTO addProductToCart(Integer userId, Long productId, Integer quantity) {
         logger.info("Adding product {} with quantity {} to cart for user {}", productId, quantity, userId);
-        if (productService.checkProductQuantity(productId) <= 0) {
+
+        //get product
+        Product product = productService.getProductById(productId).orElseThrow(() -> new IllegalArgumentException("Product not found"));
+
+        //check able to add product to cart
+        if (product.getStockQuantity() <= 0){
             logger.warn("Product {} is not available for user {}", productId, userId);
             throw new IllegalArgumentException("Product not available");
         }
+//        if (productService.checkProductQuantity(productId) <= 0) {
+//            logger.warn("Product {} is not available for user {}", productId, userId);
+//            throw new IllegalArgumentException("Product not available");
+//        }
+
+        //find existed cart of user or create new cart
         Cart cart = cartRepository.findByUserId(userId).orElse(new Cart());
+
+        //check if cart already had product
         Optional<CartItem> existingItem = cart.getItems().stream()
                 .filter(item -> item.getProduct().getProductId().equals(productId))
                 .findFirst();
@@ -46,10 +60,11 @@ public class CartServiceImpl implements CartService {
         }
         else {
             CartItem newItem = new CartItem();
-//            newItem.setProductId(productId);
-            newItem.setQuantity(quantity);
-            newItem.setProductPrice(productService.getProductDetails(userId, productId, UserRole.CUSTOMER).getPrice());
             newItem.setCart(cart);
+            newItem.setProduct(product);
+            newItem.setQuantity(quantity);
+            newItem.setProductPrice(product.getPrice());
+
             cart.getItems().add(newItem);
         }
         cart.updateTotal();

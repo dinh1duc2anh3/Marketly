@@ -7,9 +7,9 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class VNPaySubsystem implements PaymentInterface {
-    private final VNPaySubsystemController controller;
+    private final VNPaySubsystemAdapter controller;
 
-    public VNPaySubsystem(VNPaySubsystemController controller) {
+    public VNPaySubsystem(VNPaySubsystemAdapter controller) {
         this.controller = controller;
     }
 

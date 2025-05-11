@@ -35,7 +35,7 @@ src/main/java/com/darian/ecommerce/
 │   │   ├── OrderController.java
 │   │   ├── PaymentController.java
 │   │   ├── ProductController.java
-│   │   └── VNPaySubsystemController.java
+│   │   └── VNPaySubsystemAdapter.java
 │   │
 │   ├── converter/
 │   │   └── VNPayConverter.java
@@ -110,7 +110,7 @@ src/main/java/com/darian/ecommerce/
 │   │       ├── VNPayClient.java
 │   │       ├── VNPayConverter.java
 │   │       ├── VNPaySubsystem.java
-│   │       ├── VNPaySubsystemController.java
+│   │       ├── VNPaySubsystemAdapter.java
 │   │       └── VNPaySubsystemService.java
 │   │
 │   ├── utils/

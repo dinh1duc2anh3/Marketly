@@ -1,11 +1,9 @@
 package com.darian.ecommerce.dto;
 
 import com.darian.ecommerce.enums.TransactionType;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
+@Builder
 @Getter
 @Setter
 @NoArgsConstructor

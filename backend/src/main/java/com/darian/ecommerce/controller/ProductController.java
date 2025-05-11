@@ -27,16 +27,22 @@ public class ProductController {
         this.resourceUrlProvider = resourceUrlProvider;
     }
 
-    @GetMapping
-    public ResponseEntity<List<ProductDTO>> getProductList(@RequestParam UserRole  role) {
-        List<ProductDTO> products = productService.getProductList(role);
+    @GetMapping("/customer")
+    public ResponseEntity<List<CustomerProductDTO>> getCustomerProductList() {
+        List<CustomerProductDTO> products = productService.getProductList(UserRole.CUSTOMER);
+        return ResponseEntity.ok(products);
+    }
+
+    @GetMapping("/manager")
+    public ResponseEntity<List<ManagerProductDTO>> getManagerProductList() {
+        List<ManagerProductDTO> products = productService.getProductList(UserRole.MANAGER);
         return ResponseEntity.ok(products);
     }
 
     @GetMapping("/customer/{productId}")
     public ResponseEntity<CustomerProductDTO> getCustomerProductDetails(
             @RequestParam Integer userId,
-            @RequestParam Long productId){
+            @PathVariable Long productId){
         CustomerProductDTO dto = productService.getProductDetails(userId,productId,UserRole.CUSTOMER);
         return ResponseEntity.ok(dto);
     };
@@ -44,20 +50,35 @@ public class ProductController {
     @GetMapping("/manager/{productId}")
     public ResponseEntity<ManagerProductDTO> getManagerProductDetails(
             @RequestParam Integer userId,
-            @RequestParam Long productId){
+            @PathVariable Long productId){
         ManagerProductDTO dto = productService.getProductDetails(userId,productId,UserRole.MANAGER);
         return ResponseEntity.ok(dto);
     };
 
-
-    @GetMapping("/search")
-    public ResponseEntity<List<? extends ProductDTO>> searchProducts(
+    @GetMapping("/customer/search")
+    public ResponseEntity<List<CustomerProductDTO>> searchProductsForCustomer(
             @RequestParam Integer userId,
-            @RequestParam String keyword,
-            @RequestParam UserRole  role) {
-        List<ProductDTO> products = productService.searchProducts(userId, keyword, role);
+            @RequestParam String keyword) {
+        List<CustomerProductDTO> products = productService.searchProducts(userId, keyword, UserRole.CUSTOMER);
         return ResponseEntity.ok(products);
     }
+
+    @GetMapping("/manager/search")
+    public ResponseEntity<List<ManagerProductDTO>> searchProductsForManager(
+            @RequestParam Integer userId,
+            @RequestParam String keyword) {
+        List<ManagerProductDTO> products = productService.searchProducts(userId, keyword, UserRole.MANAGER);
+        return ResponseEntity.ok(products);
+    }
+
+
+    @GetMapping("/{productId}/related")
+    public ResponseEntity<List<RelatedProductDTO>> getRelatedProducts(@PathVariable Long productId) {
+        List<RelatedProductDTO> relatedProducts = relatedProductService.suggestRelatedProducts(productId);
+        return ResponseEntity.ok(relatedProducts);
+    }
+
+
 
     @PostMapping
     public ResponseEntity<ManagerProductDTO> addProduct(
@@ -84,10 +105,5 @@ public class ProductController {
         return ResponseEntity.ok(updatedProduct);
     }
 
-    @GetMapping("/{productId}/related")
-    public ResponseEntity<List<RelatedProductDTO>> getRelatedProducts(@PathVariable Long productId) {
-        List<RelatedProductDTO> relatedProducts = relatedProductService.suggestRelatedProducts(productId);
-        return ResponseEntity.ok(relatedProducts);
-    }
 
 }

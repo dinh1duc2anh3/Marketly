@@ -199,9 +199,9 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public Integer checkProductQuantity(Long productId) {
         logger.info("Checking quantity for product: {}", productId);
-        return productRepository.findById(productId)
-                .map(Product::getStockQuantity)
-                .orElse(0);
+
+        Optional<Product> product = getProductById(productId) ;
+        return (product.isPresent()) ? product.get().getStockQuantity() : 0;
     }
 
     // Validate general conditions before deleting a product
@@ -253,22 +253,6 @@ public class ProductServiceImpl implements ProductService {
 
         return false; //assume that No orders affected for now
 
-    }
-
-
-    // Private method to map Product entity to ProductDTO
-    private ProductDTO mapToProductDTO(Product product) {
-        return ProductDTO.builder()
-                .productId(product.getProductId())
-                .category(product.getCategory().getName())
-                .name(product.getName())
-                .description(product.getDescription())
-                .price(product.getPrice())
-                .specifications(product.getSpecifications())
-                .images(product.getImages().stream()
-                        .map(ProductImage::getUrl)
-                        .collect(Collectors.toList()))  //Chuyển đổi List<ProductImage> -> List<String>
-                .build();
     }
 
 }

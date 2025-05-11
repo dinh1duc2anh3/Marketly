@@ -19,7 +19,6 @@ public class CartItem {
     @EmbeddedId
     private CartItemId id;
 
-
     // ID of the cart
     @ManyToOne
     @JoinColumn(name = "cart_id", nullable = false)

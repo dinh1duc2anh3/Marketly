@@ -20,7 +20,6 @@ public interface AuditLogService {
     // Log a delete product action, return true if successful
     Boolean logDeleteAction(Integer userId, Long productId, UserRole role);
 
-
     // Check if the user has exceeded the delete limit
     Boolean checkDeleteLimit(Integer userId);
 

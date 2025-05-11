@@ -1,9 +1,6 @@
 package com.darian.ecommerce.businesslogic.mapper;
 
-import com.darian.ecommerce.dto.CustomerProductDTO;
-import com.darian.ecommerce.dto.ManagerProductDTO;
-import com.darian.ecommerce.dto.ProductEditHistoryDTO;
-import com.darian.ecommerce.dto.RelatedProductDTO;
+import com.darian.ecommerce.dto.*;
 import com.darian.ecommerce.entity.Product;
 import com.darian.ecommerce.entity.ProductEditHistory;
 import com.darian.ecommerce.entity.ProductImage;
@@ -81,6 +78,24 @@ public class ProductMapper {
                 .stockQuantity(product.getStockQuantity())
                 .warehouseEntryDate(product.getWarehouseEntryDate())
                 .editHistory(editHistoryDTOS)
+                .build();
+    }
+
+    // Private method to map Product entity to ProductDTO
+    private ProductDTO mapToProductDTO(Product product) {
+        //get images url
+        List<String> images =  product.getImages().stream()
+                .map(ProductImage::getUrl)
+                .collect(Collectors.toList());
+
+        return ManagerProductDTO.builder()
+                .productId(product.getProductId())
+                .category(product.getCategory().getName())
+                .name(product.getName())
+                .description(product.getDescription())
+                .price(product.getPrice())
+                .specifications(product.getSpecifications())
+                .images(images)
                 .build();
     }
 
