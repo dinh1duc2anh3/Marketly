@@ -96,6 +96,17 @@ Marketly is designed to operate 24/7 with high performance and reliability:
 - **Availability**: Hanoi inner city districts only
 - **Delivery time**: Within 2 hours
 
+## 🖼️ Demo Screenshots
+
+### 🏠 Homepage
+![Homepage](docs/images/demo-homepage.png)
+
+### 🛒 Cart Management
+![Product Page](docs/images/demo-cart.png)
+
+### 💵 Order Management
+![Order Page](docs/images/demo-place-order.png)
+
 ## 🚀 Getting Started
 
 ### Prerequisites
