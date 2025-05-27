@@ -1,6 +1,6 @@
 package com.darian.ecommerce.businesslogic.productsearch;
 
-import com.darian.ecommerce.businesslogic.mapper.ProductMapper;
+import com.darian.ecommerce.businesslogic.mapper.productmapper.ProductMapper;
 import com.darian.ecommerce.dto.CustomerProductDTO;
 import com.darian.ecommerce.entity.Product;
 import com.darian.ecommerce.repository.ProductRepository;
@@ -24,7 +24,7 @@ public class CustomerProductSearchFetcher implements ProductSearchFetcher<Custom
         // customer search thi phai log lai
         List<Product> products = productRepository.findByKeyword(keyword);
         return products.stream()
-                .map(productMapper::mapToCustomerDTO)
+                .map(productMapper::toCustomerDTO)
                 .collect(Collectors.toList());
     }
 

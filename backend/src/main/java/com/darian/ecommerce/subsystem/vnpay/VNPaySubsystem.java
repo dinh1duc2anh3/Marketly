@@ -7,20 +7,26 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class VNPaySubsystem implements PaymentInterface {
-    private final VNPaySubsystemAdapter controller;
+    // Cohesion: Functional Cohesion
+    // → Là entry-point chính của hệ thống thanh toán VNPay – chỉ delegate việc xử lý thanh toán/hoàn tiền.
 
-    public VNPaySubsystem(VNPaySubsystemAdapter controller) {
-        this.controller = controller;
+    // SRP: Không vi phạm
+    // → Class chịu trách nhiệm duy nhất là expose subsystem qua interface `PaymentInterface`.
+
+    private final VNPaySubsystemAdapter adapter;
+
+    public VNPaySubsystem(VNPaySubsystemAdapter adapter) {
+        this.adapter = adapter;
     }
 
     @Override
     public PaymentResult processPayment(Long orderId, Float amount, String transactionContent) {
-        return controller.processPayment(orderId, amount, transactionContent);
+        return adapter.processPayment(orderId, amount, transactionContent);
     }
 
     @Override
     public RefundResult processRefund(Long orderId) {
-        return controller.processRefund(orderId);
+        return adapter.processRefund(orderId);
     }
 
 }

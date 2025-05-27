@@ -81,6 +81,7 @@ public class AuditLogServiceImpl implements AuditLogService {
     public Boolean logAddAction(Integer userId, Long productId, UserRole role) {
         try {
             logger.info("User {} (role: {}) added product: {}", userId, role, productId);
+
             //create audit log entity
             AuditLog log = new AuditLog();
             User user = userService.getUserById(userId);
@@ -90,7 +91,7 @@ public class AuditLogServiceImpl implements AuditLogService {
             if (product.isPresent()) log.setProduct(product.get());
             log.setRole(role);
             log.setTimestamp(LocalDateTime.now());
-            //save audit log entity to db
+
             auditLogRepository.save(log);
             return true;
         } catch (Exception e) {

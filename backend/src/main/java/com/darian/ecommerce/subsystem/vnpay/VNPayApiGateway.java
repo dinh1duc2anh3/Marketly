@@ -10,7 +10,16 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class VNPayApiGateway {
-    private static final Logger logger = LoggerFactory.getLogger(VNPayClient.class);
+    // Cohesion: Functional Cohesion
+    // → Tất cả method đều hướng tới một chức năng duy nhất là gọi API (gửi payment/refund request).
+
+    // SRP: Không vi phạm
+    // → Class chỉ chịu trách nhiệm trung gian kết nối giữa hệ thống và VNPay (abstract API calls, thêm logging, xử lý connection error).
+
+    // Suggestion:
+    // → Có thể đổi tên thành `VNPayClientGateway` nếu sau này hỗ trợ nhiều nhà cung cấp (ZaloPay, Momo), để phù hợp vai trò Gateway Pattern.
+
+    private static final Logger logger = LoggerFactory.getLogger(VNPayApiGateway.class);
 
     private final VNPayAPI vnPayAPI;
 

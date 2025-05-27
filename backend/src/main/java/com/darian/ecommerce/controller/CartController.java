@@ -15,6 +15,16 @@ public class CartController {
         this.cartService = cartService;
     }
 
+    @RestController
+    @RequestMapping("/api/test")
+    public class TestController {
+
+        @GetMapping
+        public ResponseEntity<String> testEndpoint() {
+            return ResponseEntity.ok("Backend is working!");
+        }
+    }
+
     // Add a product to the user's cart
     @PostMapping("/{userId}/add")
     public ResponseEntity<CartDTO> addProductToCart(@PathVariable Integer userId,

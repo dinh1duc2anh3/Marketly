@@ -1,8 +1,6 @@
 package com.darian.ecommerce.service;
 
-import com.darian.ecommerce.dto.DeliveryInfoDTO;
-import com.darian.ecommerce.dto.InvoiceDTO;
-import com.darian.ecommerce.dto.OrderDTO;
+import com.darian.ecommerce.dto.*;
 import com.darian.ecommerce.entity.Order;
 import com.darian.ecommerce.enums.PaymentStatus;
 import org.springframework.stereotype.Service;
@@ -12,7 +10,7 @@ import java.util.Optional;
 
 @Service
 public interface OrderService {
-//    OrderDTO createOrder(CartDTO cartDTO);
+    OrderDTO createOrder(CartDTO cartDTO);
 
     OrderDTO getOrderDetails(Long orderId);
 
@@ -26,9 +24,9 @@ public interface OrderService {
 
     void setPending(Long orderId);
 
-//    OrderDTO placeOrder(OrderDTO orderDTO);
-//
-//    RushOrderDTO placeRushOrder(RushOrderDTO rushOrderDTO);
+    OrderDTO placeOrder(OrderDTO orderDTO);
+
+    RushOrderDTO placeRushOrder(RushOrderDTO rushOrderDTO);
 
     void cancelOrder(Long orderId);
 
@@ -36,13 +34,15 @@ public interface OrderService {
 
     Boolean isRushOrder(Long orderId);
 
-//    Boolean checkAvailability(CartDTO cartDTO);
+    Boolean checkAvailability(CartDTO cartDTO);
 
     Boolean validateDeliveryInfo(DeliveryInfoDTO deliveryInfoDTO);
 
     Boolean checkRushDeliveryAddress(String address);
 
-//    Boolean checkRushProductEligibility(Long productId);
+    Boolean checkCancellationValidity(Long orderId);
+
+    Boolean checkRushProductEligibility(Long productId);
 
 
 

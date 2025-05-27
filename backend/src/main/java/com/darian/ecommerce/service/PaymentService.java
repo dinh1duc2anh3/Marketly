@@ -6,11 +6,12 @@ import org.springframework.stereotype.Service;
 
 @Service
 public interface PaymentService {
-    // Functional Cohesion: Mọi hàm đều xử lý logic liên quan đến thanh toán/hoàn tiền
 
-    // Vi phạm nhẹ SRP:
-    // - Gộp cả xử lý thanh toán và hoàn tiền vào cùng một interface
-    // - Nên tách thành PaymentService và RefundService để phân tách rõ ràng hơn
+    // Cohesion: Functional Cohesion
+    // → Interface chỉ định nghĩa các hành vi liên quan đến thanh toán và hoàn tiền.
+
+    // SRP: Vi phạm nhẹ
+    // → Gộp xử lý thanh toán và hoàn tiền vào cùng interface. Có thể chia thành `PaymentService` và `RefundService` để rõ ràng hơn.
 
 
     // Process payment for an order with a specified payment method

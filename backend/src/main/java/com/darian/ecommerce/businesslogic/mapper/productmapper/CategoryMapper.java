@@ -1,0 +1,25 @@
+package com.darian.ecommerce.businesslogic.mapper.productmapper;
+
+import com.darian.ecommerce.dto.CategoryDTO;
+import com.darian.ecommerce.entity.Category;
+import org.springframework.stereotype.Component;
+
+@Component
+public class CategoryMapper {
+    public  CategoryDTO toDTO(Category category) {
+        return CategoryDTO.builder()
+                .id(category.getId())
+                .name(category.getName())
+                .description(category.getDescription())
+                .build();
+    }
+
+    public  Category toEntity(CategoryDTO dto) {
+        return Category.builder()
+                .id(dto.getId())
+                .name(dto.getName())
+                .description(dto.getDescription())
+                .build();
+    }
+
+}

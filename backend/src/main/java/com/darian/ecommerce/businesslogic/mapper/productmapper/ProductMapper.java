@@ -1,8 +1,7 @@
-package com.darian.ecommerce.businesslogic.mapper;
+package com.darian.ecommerce.businesslogic.mapper.productmapper;
 
 import com.darian.ecommerce.dto.*;
 import com.darian.ecommerce.entity.Product;
-import com.darian.ecommerce.entity.ProductEditHistory;
 import com.darian.ecommerce.entity.ProductImage;
 import com.darian.ecommerce.enums.AvailabilityStatus;
 import com.darian.ecommerce.service.RelatedProductService;
@@ -22,7 +21,7 @@ public class ProductMapper {
     }
 
     // Private method to map Product entity to CustomerProductDTO
-    public CustomerProductDTO mapToCustomerDTO(Product product) {
+    public CustomerProductDTO toCustomerDTO(Product product) {
         //get images url
         List<String> images =  product.getImages().stream()
                 .map(ProductImage::getUrl)
@@ -54,7 +53,7 @@ public class ProductMapper {
     }
 
     // Private method to map Product entity to ManagerProductDTO
-    public ManagerProductDTO mapToManagerDTO(Product product) {
+    public ManagerProductDTO toManagerDTO(Product product) {
         //get images url
         List<String> images =  product.getImages().stream()
                 .map(ProductImage::getUrl)
@@ -62,7 +61,7 @@ public class ProductMapper {
 
         //get edit history
         List<ProductEditHistoryDTO> editHistoryDTOS = product.getEditHistory().stream()
-                .map(productEditHistoryMapper::mapToProductEditHistoryDTO)
+                .map(productEditHistoryMapper::toDTO)
                 .toList();
 
         return ManagerProductDTO.builder()
@@ -82,7 +81,7 @@ public class ProductMapper {
     }
 
     // Private method to map Product entity to ProductDTO
-    private ProductDTO mapToProductDTO(Product product) {
+    private ProductDTO toProductDTO(Product product) {
         //get images url
         List<String> images =  product.getImages().stream()
                 .map(ProductImage::getUrl)

@@ -1,11 +1,13 @@
 package com.darian.ecommerce.service.impl;
 
+
+import com.darian.ecommerce.businesslogic.mapper.cartmapper.CartItemMapper;
+import com.darian.ecommerce.businesslogic.mapper.cartmapper.CartMapper;
 import com.darian.ecommerce.dto.CartDTO;
 import com.darian.ecommerce.dto.CartItemDTO;
 import com.darian.ecommerce.entity.Cart;
 import com.darian.ecommerce.entity.CartItem;
 import com.darian.ecommerce.entity.Product;
-import com.darian.ecommerce.enums.UserRole;
 import com.darian.ecommerce.repository.CartRepository;
 import com.darian.ecommerce.service.CartService;
 import com.darian.ecommerce.service.ProductService;
@@ -23,11 +25,15 @@ public class CartServiceImpl implements CartService {
 
     private final CartRepository cartRepository;
     private final ProductService productService;
+    private final CartItemMapper cartItemMapper;
+    private final CartMapper cartMapper;
 
     // Constructor injection for dependencies
-    public CartServiceImpl(CartRepository cartRepository, ProductService productService) {
+    public CartServiceImpl(CartRepository cartRepository, ProductService productService, CartItemMapper cartItemMapper, CartMapper cartMapper) {
         this.cartRepository = cartRepository;
         this.productService = productService;
+        this.cartItemMapper = cartItemMapper;
+        this.cartMapper = cartMapper;
     }
 
 
@@ -43,10 +49,10 @@ public class CartServiceImpl implements CartService {
             logger.warn("Product {} is not available for user {}", productId, userId);
             throw new IllegalArgumentException("Product not available");
         }
-//        if (productService.checkProductQuantity(productId) <= 0) {
-//            logger.warn("Product {} is not available for user {}", productId, userId);
-//            throw new IllegalArgumentException("Product not available");
-//        }
+        if (productService.checkProductQuantity(productId) <= 0) {
+            logger.warn("Product {} is not available for user {}", productId, userId);
+            throw new IllegalArgumentException("Product not available");
+        }
 
         //find existed cart of user or create new cart
         Cart cart = cartRepository.findByUserId(userId).orElse(new Cart());
@@ -70,7 +76,7 @@ public class CartServiceImpl implements CartService {
         cart.updateTotal();
         Cart savedCart = cartRepository.save(cart);
         logger.info("Product {} added to cart for user {}", productId, userId);
-        return mapToCartDTO(savedCart);
+        return cartMapper.toDTO(savedCart);
     }
 
     @Override
@@ -78,7 +84,7 @@ public class CartServiceImpl implements CartService {
         logger.info("Viewing cart for user {}", userId);
         Cart cart = cartRepository.findByUserId(userId)
                 .orElseThrow(() -> new IllegalArgumentException("Cart not found for user: " + userId));
-        return mapToCartDTO(cart);
+        return cartMapper.toDTO(cart);
     }
 
     @Override
@@ -94,7 +100,7 @@ public class CartServiceImpl implements CartService {
         cart.updateTotal();
         Cart savedCart = cartRepository.save(cart);
         logger.info("Cart updated for user {}", userId);
-        return mapToCartDTO(savedCart);
+        return cartMapper.toDTO(savedCart);
     }
 
     @Override
@@ -106,7 +112,7 @@ public class CartServiceImpl implements CartService {
         cart.updateTotal();
         Cart savedCart = cartRepository.save(cart);
         logger.info("Product {} removed from cart for user {}", productId, userId);
-        return mapToCartDTO(savedCart);
+        return cartMapper.toDTO(savedCart);
     }
 
     @Override
@@ -125,21 +131,7 @@ public class CartServiceImpl implements CartService {
         logger.info("Getting cart items for user {}", userId);
         Cart cart = cartRepository.findByUserId(userId)
                 .orElseThrow(() -> new IllegalArgumentException("Cart not found for user: " + userId));
-        return cart.getItems().stream().map(this::mapToCartItemDTO).collect(Collectors.toList());
+        return cart.getItems().stream().map(cartItemMapper::toDTO).collect(Collectors.toList());
     }
 
-    // Mapping method
-    private CartDTO mapToCartDTO(Cart cart) {
-        CartDTO dto = new CartDTO();
-        dto.setUserId(cart.getUser().getId());
-        dto.setItems(cart.getItems().stream().map(this::mapToCartItemDTO).collect(Collectors.toList()));
-        return dto;
-    }
-
-    private CartItemDTO mapToCartItemDTO(CartItem item) {
-        CartItemDTO dto = new CartItemDTO();
-        dto.setProductId(item.getProduct().getProductId());
-        dto.setQuantity(item.getQuantity());
-        return dto;
-    }
 }

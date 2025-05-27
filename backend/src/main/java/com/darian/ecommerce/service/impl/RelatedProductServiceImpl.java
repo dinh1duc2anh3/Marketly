@@ -1,6 +1,6 @@
 package com.darian.ecommerce.service.impl;
 
-import com.darian.ecommerce.businesslogic.mapper.RelatedProductMapper;
+import com.darian.ecommerce.businesslogic.mapper.productmapper.RelatedProductMapper;
 import com.darian.ecommerce.dto.RelatedProductDTO;
 import com.darian.ecommerce.entity.Product;
 import com.darian.ecommerce.repository.RelatedProductRepository;
@@ -29,7 +29,7 @@ public class RelatedProductServiceImpl implements RelatedProductService {
     public List<RelatedProductDTO> suggestRelatedProducts(Long productId) {
         logger.info("Suggesting related products for productId: {}", productId);
         List<Product> relatedProducts = relatedProductRepository.findRelatedProductsByProductId(productId);
-        return relatedProducts.stream().map(relatedProductMapper::mapToRelatedProductDTO).toList();
+        return relatedProducts.stream().map(relatedProductMapper::toDTO).toList();
 
     }
 

@@ -14,6 +14,12 @@ import java.time.LocalDateTime;
 
 @Component
 public class VNPayConverter {
+    // Cohesion: Functional Cohesion
+    // → Class này tập trung 100% vào việc tạo VNPayRequest từ dữ liệu domain, không làm nhiệm vụ nào khác.
+
+    // SRP: Không vi phạm
+    // → Lớp chỉ đảm nhiệm việc xây dựng request (builder cho transaction).
+
     // Convert payment details to VNPayRequest
     protected VNPayRequest buildPaymentRequest(Long orderId, Float amount, String content) {
         VNPayRequest request = new VNPayRequest();

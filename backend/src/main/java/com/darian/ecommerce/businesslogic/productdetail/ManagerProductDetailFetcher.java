@@ -1,6 +1,6 @@
 package com.darian.ecommerce.businesslogic.productdetail;
 
-import com.darian.ecommerce.businesslogic.mapper.ProductMapper;
+import com.darian.ecommerce.businesslogic.mapper.productmapper.ProductMapper;
 import com.darian.ecommerce.dto.ManagerProductDTO;
 import com.darian.ecommerce.entity.Product;
 import com.darian.ecommerce.repository.ProductRepository;
@@ -24,6 +24,6 @@ public class ManagerProductDetailFetcher implements ProductDetailFetcher<Manager
         if (optionalProduct.isEmpty()) {
             throw new IllegalArgumentException("Product not found: " + productId);
         }
-        return productMapper.mapToManagerDTO(optionalProduct.get());
+        return productMapper.toManagerDTO(optionalProduct.get());
     }
 }

@@ -1,5 +1,6 @@
 package com.darian.ecommerce.service.impl;
 
+import com.darian.ecommerce.businesslogic.mapper.productmapper.CategoryMapper;
 import com.darian.ecommerce.dto.CategoryDTO;
 import com.darian.ecommerce.entity.Category;
 import com.darian.ecommerce.repository.CategoryRepository;
@@ -11,15 +12,18 @@ import java.util.List;
 
 public class CategoryServiceImpl implements CategoryService {
     // Logger for logging actions and errors
-    private static final Logger logger = LoggerFactory.getLogger(ProductServiceImpl.class);
+    private static final Logger logger = LoggerFactory.getLogger(CategoryServiceImpl.class);
 
     // Dependencies injected via constructor
     private final CategoryRepository categoryRepository;
+    private final CategoryMapper categoryMapper;
+
 
 
     // Constructor for dependency injection
-    public CategoryServiceImpl(CategoryRepository categoryRepository) {
+    public CategoryServiceImpl(CategoryRepository categoryRepository, CategoryMapper categoryMapper) {
         this.categoryRepository = categoryRepository;
+        this.categoryMapper = categoryMapper;
     }
 
     // Get all product categories
@@ -28,7 +32,7 @@ public class CategoryServiceImpl implements CategoryService {
         logger.info("Fetching all categories");
         List<Category>  allCategory = categoryRepository.findAll();
 
-        return allCategory.stream().map(this::mapToCategoryDTO).toList();
+        return allCategory.stream().map(categoryMapper::toDTO).toList();
     }
 
     // Save a new category
@@ -36,26 +40,9 @@ public class CategoryServiceImpl implements CategoryService {
     public CategoryDTO saveCategory(CategoryDTO category) {
         //- check again saveCategory , check if the input is category or categoryDTO
         logger.info("Saving category: {}", category.getName());
-        Category savedCategory = categoryRepository.save(mapToCategoryEntity(category));
+        Category savedCategory = categoryRepository.save(categoryMapper.toEntity(category));
         logger.info("Category saved: {}", savedCategory.getId());
         return category;
     }
 
-    // Private method to map Category entity to CategoryDTO
-    private CategoryDTO mapToCategoryDTO(Category category) {
-        return CategoryDTO.builder()
-                .id(category.getId())
-                .name(category.getName())
-                .description(category.getDescription())
-                .build();
-    }
-
-    // Private method to map CategoryDTO to Category entity
-    private Category mapToCategoryEntity(CategoryDTO dto) {
-        return Category.builder()
-                .id(dto.getId())
-                .name(dto.getName())
-                .description(dto.getDescription())
-                .build();
-    }
 }

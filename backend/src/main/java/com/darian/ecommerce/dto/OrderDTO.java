@@ -1,10 +1,13 @@
 package com.darian.ecommerce.dto;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
+import lombok.experimental.SuperBuilder;
 
+@SuperBuilder
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class OrderDTO extends BaseOrderDTO{
     // Inherits all fields from BaseOrderDTO
 }

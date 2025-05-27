@@ -1,6 +1,6 @@
 package com.darian.ecommerce.businesslogic.productlist;
 
-import com.darian.ecommerce.businesslogic.mapper.ProductMapper;
+import com.darian.ecommerce.businesslogic.mapper.productmapper.ProductMapper;
 import com.darian.ecommerce.dto.CustomerProductDTO;
 import com.darian.ecommerce.entity.Product;
 import com.darian.ecommerce.repository.ProductRepository;
@@ -27,7 +27,7 @@ public class CustomerProductListFetcher implements ProductListFetcher<CustomerPr
 
         // logic map ntn là ntn ?
         return products.stream()
-                .map(productMapper::mapToCustomerDTO)
+                .map(productMapper::toCustomerDTO)
                 .collect(Collectors.toList());
     }
 

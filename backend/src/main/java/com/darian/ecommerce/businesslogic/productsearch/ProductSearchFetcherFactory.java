@@ -1,6 +1,6 @@
 package com.darian.ecommerce.businesslogic.productsearch;
 
-import com.darian.ecommerce.businesslogic.mapper.ProductMapper;
+import com.darian.ecommerce.businesslogic.mapper.productmapper.ProductMapper;
 import com.darian.ecommerce.dto.ProductDTO;
 import com.darian.ecommerce.enums.UserRole;
 import com.darian.ecommerce.repository.ProductRepository;

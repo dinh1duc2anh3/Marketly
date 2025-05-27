@@ -1,5 +1,7 @@
 package com.darian.ecommerce.service.impl;
 
+import com.darian.ecommerce.businesslogic.mapper.ordermapper.DeliveryInfoMapper;
+import com.darian.ecommerce.businesslogic.mapper.ordermapper.OrderMapper;
 import com.darian.ecommerce.businesslogic.shippingfee.ShippingFeeCalculatorFactory;
 import com.darian.ecommerce.dto.*;
 import com.darian.ecommerce.entity.*;
@@ -29,6 +31,8 @@ public class OrderServiceImpl implements OrderService {
     private final CartService cartService;
     private final UserService userService;
     private final AuditLogService auditLogService;
+    private final OrderMapper orderMapper;
+    private final DeliveryInfoMapper deliveryInfoMapper;
 
     public OrderServiceImpl(OrderRepository orderRepository,
                             PaymentService paymentService,
@@ -36,7 +40,7 @@ public class OrderServiceImpl implements OrderService {
                             ShippingFeeCalculatorFactory calculatorFactory,
                             CartService cartService,
                             UserService userService,
-                            AuditLogService auditLogService) {
+                            AuditLogService auditLogService, OrderMapper orderMapper, DeliveryInfoMapper deliveryInfoMapper) {
         this.orderRepository = orderRepository;
         this.paymentService = paymentService;
         this.productService = productService;
@@ -44,55 +48,57 @@ public class OrderServiceImpl implements OrderService {
         this.cartService = cartService;
         this.userService = userService;
         this.auditLogService = auditLogService;
+        this.orderMapper = orderMapper;
+        this.deliveryInfoMapper = deliveryInfoMapper;
     }
 
 
-//    @Override
-//    public OrderDTO createOrder(CartDTO cartDTO) {
-//        if (!checkAvailability(cartDTO)) {
-//            throw new IllegalStateException("Cart items not available");
-//        }
-//        Order order = new Order();
-////        order.setOrderId("ORD-" + System.currentTimeMillis());
-//        // need more checking + innovate cart service
-//        User user = userService.getUserById(cartDTO.getUserId())
-//        order.setUser(user);
-//        //check more
-////        order.setItems(cartDTO.getItems());
-//        order.setOrderStatus(OrderStatus.PENDING);
-//        order.setCreatedDate(LocalDateTime.now());
-//        Order savedOrder = orderRepository.save(order);
-//
-//        auditLogService.logOrderAction(order.getUser().getId(), order.getOrderId(), UserRole.CUSTOMER, ActionType.ORDER_ACTION);
-//        return mapToOrderDTO(savedOrder);
-//    }
+    @Override
+    public OrderDTO createOrder(CartDTO cartDTO) {
+        if (!checkAvailability(cartDTO)) {
+            throw new IllegalStateException("Cart items not available");
+        }
+        Order order = new Order();
+//        order.setOrderId("ORD-" + System.currentTimeMillis());
+        // need more checking + innovate cart service
+        User user = userService.getUserById(cartDTO.getUserId())
+        order.setUser(user);
+        //check more
+//        order.setItems(cartDTO.getItems());
+        order.setOrderStatus(OrderStatus.PENDING);
+        order.setCreatedDate(LocalDateTime.now());
+        Order savedOrder = orderRepository.save(order);
+
+        auditLogService.logOrderAction(order.getUser().getId(), order.getOrderId(), UserRole.CUSTOMER, ActionType.ORDER_ACTION);
+        return orderMapper.toOrderDTO(savedOrder);
+    }
 
 
-//    @Override
-//    public OrderDTO placeOrder(OrderDTO orderDTO) {
-//        Order order = mapToOrderEntity(orderDTO);
-//        order.setShippingFee(calculatorFactory.getCalculator(orderDTO).calculateShippingFee(orderDTO));
-//        order.setOrderStatus(OrderStatus.PENDING);
-//        Order savedOrder = orderRepository.save(order);
-//        auditLogService.logOrderAction(order.getUser().getId(), order.getOrderId(), UserRole.CUSTOMER, ActionType.PLACE_ORDER);
-//        return mapToOrderDTO(savedOrder);
-//    }
-//
-//    @Override
-//    public RushOrderDTO placeRushOrder(RushOrderDTO rushOrderDTO) {
-//        //cần xem lại logic của checkRushProductEligibility vì nó check từng item trong order chứ ko phải check userId
-//        if (!checkRushProductEligibility(rushOrderDTO.getCustomerId()) ||
-//                !checkRushDeliveryAddress(rushOrderDTO.getDeliveryInfo().getAddress())) {
-//            throw new IllegalStateException("Rush order not eligible");
-//        }
-//        //need check
-//        Order order = mapToOrderEntity(rushOrderDTO);
-//        order.setShippingFee(calculatorFactory.getCalculator(rushOrderDTO).calculateShippingFee(rushOrderDTO));
-//        order.setOrderStatus(OrderStatus.PENDING);
-//        Order savedOrder = orderRepository.save(order);
-//        auditLogService.logOrderAction(order.getUser().getId(), order.getOrderId(), UserRole.CUSTOMER, ActionType.PLACE_ORDER);
-//        return mapToRushOrderDTO(savedOrder, rushOrderDTO.getRushDeliveryTime());
-//    }
+    @Override
+    public OrderDTO placeOrder(OrderDTO orderDTO) {
+        Order order = orderMapper.toEntity(orderDTO,false);
+        order.setShippingFee(calculatorFactory.getCalculator(orderDTO).calculateShippingFee(orderDTO));
+        order.setOrderStatus(OrderStatus.PENDING);
+        Order savedOrder = orderRepository.save(order);
+        auditLogService.logOrderAction(order.getUser().getId(), order.getOrderId(), UserRole.CUSTOMER, ActionType.PLACE_ORDER);
+        return orderMapper.toOrderDTO(savedOrder);
+    }
+
+    @Override
+    public RushOrderDTO placeRushOrder(RushOrderDTO rushOrderDTO) {
+        //cần xem lại logic của checkRushProductEligibility vì nó check từng item trong order chứ ko phải check userId
+        if (!checkRushProductEligibility(rushOrderDTO.getCustomerId()) ||
+                !checkRushDeliveryAddress(rushOrderDTO.getDeliveryInfo().getAddress())) {
+            throw new IllegalStateException("Rush order not eligible");
+        }
+        //need check
+        Order order = orderMapper.toEntity(rushOrderDTO, true);
+        order.setShippingFee(calculatorFactory.getCalculator(rushOrderDTO).calculateShippingFee(rushOrderDTO));
+        order.setOrderStatus(OrderStatus.PENDING);
+        Order savedOrder = orderRepository.save(order);
+        auditLogService.logOrderAction(order.getUser().getId(), order.getOrderId(), UserRole.CUSTOMER, ActionType.PLACE_ORDER);
+        return mapToRushOrderDTO(savedOrder, rushOrderDTO.getRushDeliveryTime());
+    }
 
     @Override
     public void cancelOrder(Long orderId) {
@@ -109,7 +115,7 @@ public class OrderServiceImpl implements OrderService {
     public OrderDTO getOrderDetails(Long orderId) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new IllegalArgumentException("Order not found"));
-        return mapToOrderDTO(order);
+        return orderMapper.toOrderDTO(order);
     }
 
 //    @Override
@@ -131,9 +137,9 @@ public class OrderServiceImpl implements OrderService {
         }
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new IllegalArgumentException("Order not found"));
-        order.setDeliveryInfo(mapToDeliveryInfoEntity(deliveryInfoDTO));
+        order.setDeliveryInfo(deliveryInfoMapper.toEntity(deliveryInfoDTO));
         Order savedOrder = orderRepository.save(order);
-        return mapToOrderDTO(savedOrder);
+        return orderMapper.toOrderDTO(savedOrder);
     }
 
     @Override
@@ -154,6 +160,12 @@ public class OrderServiceImpl implements OrderService {
         return address != null && address.contains("Hanoi"); //example
     }
 
+
+    //need more check
+    @Override
+    public Boolean checkCancellationValidity(Long orderId) {
+        return true;
+    }
 
 
 //    @Override
@@ -185,91 +197,9 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public List<OrderDTO> getOrderHistory(Integer customerId) {
         return orderRepository.findByCustomerId(customerId).stream()
-                .map(this::mapToOrderDTO)
+                .map(orderMapper::toOrderDTO)
                 .collect(Collectors.toList());
     }
 
-    // Mapping methods
-    private OrderDTO mapToOrderDTO(Order order) {
-        OrderDTO dto = new OrderDTO();
-        dto.setOrderId(order.getOrderId());
-        dto.setCustomerId(order.getUser().getId());
-        dto.setItems(order.getItems().stream().map(this::mapToOrderItemDTO).collect(Collectors.toList()));
-        dto.setOrderStatus(order.getOrderStatus());
-        dto.setDeliveryInfo(mapToDeliveryInfoDTO(order.getDeliveryInfo()));
-        dto.setSubtotal( order.getSubtotal());
-        dto.setShippingFee( order.getShippingFee());
-        dto.setTotal( order.getTotal());
-        dto.setCreatedDate(LocalDateTime.now());
-        return dto;
-    }
 
-    private RushOrderDTO mapToRushOrderDTO(Order order, LocalDateTime rushDeliveryTime) {
-        RushOrderDTO dto = new RushOrderDTO();
-        dto.setOrderId(order.getOrderId());
-        dto.setCustomerId(order.getUser().getId());
-        dto.setItems(order.getItems().stream().map(this::mapToOrderItemDTO).collect(Collectors.toList()));
-        dto.setOrderStatus(order.getOrderStatus());
-        dto.setDeliveryInfo(mapToDeliveryInfoDTO(order.getDeliveryInfo()));
-        dto.setSubtotal( order.getSubtotal());
-        dto.setShippingFee( order.getShippingFee());
-        dto.setTotal( order.getTotal());
-        dto.setCreatedDate(LocalDateTime.now());
-        dto.setRushDeliveryTime(rushDeliveryTime);
-        return dto;
-    }
-
-    private OrderItemDTO mapToOrderItemDTO(OrderItem item) {
-        OrderItemDTO dto = new OrderItemDTO();
-        dto.setProductId(item.getProduct().getProductId());
-        dto.setQuantity(item.getQuantity());
-        dto.setUnitPrice(item.getUnitPrice());
-        dto.setLineTotal(item.getLineTotal());
-        return dto;
-    }
-
-    private DeliveryInfoDTO mapToDeliveryInfoDTO(DeliveryInfo info) {
-        DeliveryInfoDTO dto = new DeliveryInfoDTO();
-        dto.setRecipientName(info.getRecipientName());
-        dto.setPhoneNumber(info.getPhoneNumber());
-        dto.setEmail(info.getEmail());
-        dto.setProvinceCity(info.getProvinceCity());
-        dto.setAddress(info.getAddress());
-        dto.setShippingInstructions(info.getShippingInstructions());
-        return dto;
-    }
-
-    private Order mapToOrderEntity(BaseOrderDTO dto) {
-        Order order = new Order();
-        order.setOrderId(dto.getOrderId());
-        User user = userService.getUserById(dto.getCustomerId());
-        order.setUser(user);
-        order.setItems(dto.getItems().stream().map(item -> {
-            OrderItem entity = new OrderItem();
-            Optional<Product> product = productService.getProductById(item.getProductId());
-            if (product.isPresent()) entity.setProduct(product.get());
-            entity.setQuantity(item.getQuantity());
-            entity.setUnitPrice(item.getUnitPrice());
-            entity.setOrder(order);
-            return entity;
-        }).collect(Collectors.toList()));
-        order.setOrderStatus(dto.getOrderStatus());
-        order.setDeliveryInfo(mapToDeliveryInfoEntity(dto.getDeliveryInfo()));
-        order.setSubtotal(dto.getSubtotal());
-        order.setShippingFee(dto.getShippingFee());
-        order.setTotal(dto.getTotal());
-        order.setCreatedDate(dto.getCreatedDate());
-        return order;
-    }
-
-    private DeliveryInfo mapToDeliveryInfoEntity(DeliveryInfoDTO dto) {
-        DeliveryInfo info = new DeliveryInfo();
-        info.setRecipientName(dto.getRecipientName());
-        info.setPhoneNumber(dto.getPhoneNumber());
-        info.setEmail(dto.getEmail());
-        info.setProvinceCity(dto.getProvinceCity());
-        info.setAddress(dto.getAddress());
-        info.setShippingInstructions(dto.getShippingInstructions());
-        return info;
-    }
 }

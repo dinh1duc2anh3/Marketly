@@ -19,6 +19,14 @@ import java.util.Optional;
 
 @Service
 public class PaymentServiceImpl implements PaymentService {
+    // Cohesion: Functional Cohesion
+    // → Lớp này tập trung xử lý logic thanh toán và hoàn tiền (gọi subsystem, cập nhật trạng thái đơn hàng, log, validate...).
+
+    // SRP: Vi phạm nhẹ
+    // → Dù các method đều liên quan đến payment, nhưng gồm cả `validate`, `checkCancellationValidity`, `refund`, `pay`
+    // → có thể tách nhỏ thành PaymentProcessor, RefundProcessor nếu phức tạp tăng lên.
+
+
     private static final Logger logger = LoggerFactory.getLogger(PaymentServiceImpl.class);
 
     private final PaymentTransactionRepository paymentRepository;

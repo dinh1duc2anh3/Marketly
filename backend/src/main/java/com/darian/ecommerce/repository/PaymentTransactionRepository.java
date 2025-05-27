@@ -8,8 +8,11 @@ import java.util.Optional;
 
 @Repository
 public interface PaymentTransactionRepository extends JpaRepository<PaymentTransaction, Long> {
-    // Functional Cohesion: Chỉ cung cấp các method thao tác dữ liệu giao dịch thanh toán
-    // Không vi phạm SRP: Không xử lý logic nghiệp vụ, chỉ thao tác với DB
+    // Cohesion: Functional Cohesion
+    // → Chỉ xử lý các truy vấn dữ liệu liên quan đến giao dịch thanh toán.
+
+    // SRP: Không vi phạm
+    // → Không xử lý logic nghiệp vụ, chỉ thao tác với database.
 
     public PaymentTransaction save(PaymentTransaction payment);
 

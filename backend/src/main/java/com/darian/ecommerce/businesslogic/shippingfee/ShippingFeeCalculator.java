@@ -4,5 +4,5 @@ import com.darian.ecommerce.dto.BaseOrderDTO;
 
 public interface ShippingFeeCalculator {
     // Calculate shipping fee based on order details
-    Integer calculateShippingFee(BaseOrderDTO dto);
+    Float calculateShippingFee(BaseOrderDTO dto);
 }

@@ -12,7 +12,4 @@ public class RelatedProductDTO {
     private String name;
     private Float price;
     private String imageUrl;
-
-
-
 }

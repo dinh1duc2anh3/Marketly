@@ -1,8 +1,9 @@
 package com.darian.ecommerce.service.impl;
 
+import com.darian.ecommerce.businesslogic.mapper.usermapper.UserMapper;
+import com.darian.ecommerce.config.exception.user.UsernameNotFoundException;
 import com.darian.ecommerce.dto.UserDTO;
 import com.darian.ecommerce.entity.User;
-import com.darian.ecommerce.enums.UserRole;
 import com.darian.ecommerce.repository.UserRepository;
 import com.darian.ecommerce.service.UserService;
 import org.springframework.stereotype.Service;
@@ -11,9 +12,11 @@ import org.springframework.stereotype.Service;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
+    private final UserMapper userMapper;
 
-    public UserServiceImpl(UserRepository userRepository){
+    public UserServiceImpl(UserRepository userRepository, UserMapper userMapper){
         this.userRepository = userRepository;
+        this.userMapper = userMapper;
     }
 
     // Register a new user
@@ -24,12 +27,12 @@ public class UserServiceImpl implements UserService {
         if (userRepository.existsByUsername(userDTO.getUsername())) throw new RuntimeException("Username already exists.");
         if (userRepository.existsByEmail(userDTO.getEmail())) throw new RuntimeException("Email already exists.");
 
-        User user = mapToUserEntity(userDTO);
+        User user = userMapper.toEntity(userDTO);
         // Save to DB
         User savedUser = userRepository.save(user);
 
         // Return UserDTO with the saved data
-        return mapToUserDTO(savedUser);
+        return userMapper.toDTO(savedUser);
     }
 
     @Override
@@ -48,7 +51,7 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
-        return mapToUserDTO(user);
+        return userMapper.toDTO(user);
     }
 
     @Override
@@ -57,34 +60,5 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
     }
 
-    private UserDTO mapToUserDTO(User user) {
-        UserDTO dto = new UserDTO();
-        dto.setId(user.getId());
-        dto.setUsername(user.getUsername());
-        dto.setPassword(user.getPassword());
-        dto.setRole(user.getRole().toString());
-        dto.setEmail(user.getEmail());
-        dto.setCreatedAt(user.getCreatedAt());
-        return dto;
-    }
-
-    private User mapToUserEntity(UserDTO userDTO) {
-        User user = new User();
-
-        // Set ID nếu cần thiết (tùy use-case như update)
-        user.setId(userDTO.getId());
-
-        user.setUsername(userDTO.getUsername());
-        user.setPassword(userDTO.getPassword());
-        user.setEmail(userDTO.getEmail());
-
-        // Nếu userDTO.getRole() là String (ví dụ: "ADMIN"), thì cần convert về Enum
-        if (userDTO.getRole() != null) {
-            user.setRole(UserRole.valueOf(userDTO.getRole()));
-        }
-
-        user.setCreatedAt(userDTO.getCreatedAt());
-        return user;
-    }
 
 }

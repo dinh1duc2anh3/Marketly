@@ -12,12 +12,16 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/payments")
 public class PaymentController {
+    // Cohesion: Functional Cohesion
+    // → Class chỉ phục vụ xử lý HTTP request liên quan đến thanh toán (pay/refund), không chứa logic nghiệp vụ.
+
+    // SRP: Không vi phạm
+    // → Lớp này chỉ đóng vai trò cầu nối giữa HTTP request và service xử lý logic thanh toán.
+
+
     private static final Logger logger = LoggerFactory.getLogger(PaymentController.class);
 
     private final PaymentService paymentService;
-
-    //  Functional Cohesion: Class chỉ phục vụ duy nhất cho mục đích xử lý HTTP request liên quan đến thanh toán
-    //  Không vi phạm SRP: Chỉ đóng vai trò cầu nối giữa request và service, không chứa logic xử lý nghiệp vụ
 
     // Constructor injection for PaymentServiceImpl
     public PaymentController(PaymentService paymentService) {

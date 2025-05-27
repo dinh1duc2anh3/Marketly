@@ -15,6 +15,12 @@ import java.time.LocalDateTime;
 
 @Component
 public class VNPayResponseHandler {
+    // Cohesion: Functional Cohesion
+    // → Mọi method đều xử lý kết quả trả về từ VNPay (convert response → result object).
+
+    // SRP: Không vi phạm
+    // → Class này chỉ xử lý mapping giữa `VNPayResponse` và kết quả nghiệp vụ (PaymentResult, RefundResult).
+
 
     private static final Logger logger = LoggerFactory.getLogger(VNPayResponseHandler.class);
 

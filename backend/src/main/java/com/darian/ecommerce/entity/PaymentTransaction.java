@@ -20,10 +20,11 @@ import java.time.LocalDateTime;
 @Table(name = "payment_transaction")
 public class PaymentTransaction {
     // Cohesion: Functional Cohesion
-// → Class này chỉ tập trung mô tả thông tin của một giao dịch thanh toán.
+    // → Class mô tả đầy đủ thông tin một giao dịch thanh toán, các field đều thống nhất về mục đích.
 
     // SRP: Không vi phạm
-// → Class này chỉ làm một nhiệm vụ duy nhất: biểu diễn thực thể giao dịch thanh toán, không xử lý logic nghiệp vụ.
+    // → Chỉ biểu diễn dữ liệu, không chứa logic nghiệp vụ.
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "transaction_id")

@@ -11,6 +11,14 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class VNPaySubsystemService {
+    // Cohesion: Functional Cohesion
+    // → Các method đều xử lý một tác vụ cụ thể là "thực thi quy trình thanh toán hoặc hoàn tiền qua VNPay", từ build request → gửi → xử lý response.
+
+    // SRP: Không vi phạm
+    // → Lớp này đảm nhiệm một use case cụ thể (payment flow). Tuy chứa nhiều thành phần, nhưng tất cả đều phục vụ một mục đích duy nhất
+
+    // Suggestion:
+    // → Nếu logic ngày càng phức tạp, có thể tách `processPayment()` và `processRefund()` thành các Service riêng như `VNPayPaymentService` và `VNPayRefundService` để tăng modularity.
 
     private static final Logger logger = LoggerFactory.getLogger(VNPaySubsystemService.class);
 

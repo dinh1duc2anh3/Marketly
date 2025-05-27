@@ -1,4 +1,4 @@
-package com.darian.ecommerce.businesslogic.mapper;
+package com.darian.ecommerce.businesslogic.mapper.productmapper;
 
 import com.darian.ecommerce.dto.ProductEditHistoryDTO;
 import com.darian.ecommerce.entity.ProductEditHistory;
@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class ProductEditHistoryMapper {
-    public ProductEditHistoryDTO mapToProductEditHistoryDTO(ProductEditHistory history) {
+    public ProductEditHistoryDTO toDTO(ProductEditHistory history) {
         return ProductEditHistoryDTO.builder()
                 .productId(history.getProduct().getProductId())
                 .productName(history.getProduct().getName())

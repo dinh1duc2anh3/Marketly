@@ -2,14 +2,12 @@ package com.darian.ecommerce.entity;
 
 import com.darian.ecommerce.enums.UserRole;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
 @Entity
+@Builder
 @Getter
 @Setter
 @NoArgsConstructor
