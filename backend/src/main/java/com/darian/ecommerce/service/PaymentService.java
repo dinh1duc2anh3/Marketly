@@ -4,7 +4,6 @@ import com.darian.ecommerce.dto.PaymentResult;
 import com.darian.ecommerce.dto.RefundResult;
 import org.springframework.stereotype.Service;
 
-@Service
 public interface PaymentService {
 
     // Cohesion: Functional Cohesion

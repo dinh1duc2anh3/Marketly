@@ -10,15 +10,15 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface OrderRepository extends JpaRepository<Order, String> {
+public interface OrderRepository extends JpaRepository<Order, Long> {
     // Find order by ID
     Optional<Order> findById(Long orderId);
 
     // Find orders by status
-    List<Order> findByStatus(String status);
+    List<Order> findByOrderStatus(OrderStatus status);
 
     // Find orders by customer ID
-    List<Order> findByCustomerId(Integer customerId);
+    List<Order> findByUser_Id(Integer customerId);
 
     // Save an order (returns Order, but UML specifies Integer, adjusted to entity)
     Order save(Order order);

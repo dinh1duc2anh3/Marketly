@@ -14,6 +14,7 @@ import com.darian.ecommerce.service.UserService;
 import jakarta.persistence.EntityNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -30,7 +31,9 @@ public class AuditLogServiceImpl implements AuditLogService {
     private final ProductService productService;
 
     // Constructor for dependency injection
-    public AuditLogServiceImpl(AuditLogRepository auditLogRepository, UserService userService, ProductService productService) {
+    public AuditLogServiceImpl(AuditLogRepository auditLogRepository,
+                               UserService userService,
+                               @Lazy ProductService productService) {
         this.auditLogRepository = auditLogRepository;
         this.userService = userService;
         this.productService = productService;

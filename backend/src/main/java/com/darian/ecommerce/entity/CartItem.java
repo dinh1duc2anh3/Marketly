@@ -17,13 +17,9 @@ public class CartItem {
     @EmbeddedId
     private CartItemId id;
 
-    // ID of the cart
-    @ManyToOne
-    @JoinColumn(name = "cart_id", nullable = false)
-    private Cart cart ;
-
     // ID of the product
     @ManyToOne
+    @MapsId("productId")
     @JoinColumn(name = "product_id")
     private Product product;
 
@@ -34,4 +30,8 @@ public class CartItem {
     @Column(name = "product_price")
     private Float productPrice;
 
+    @ManyToOne
+    @MapsId("cartId")
+    @JoinColumn(name = "cart_id")
+    private Cart cart;
 }

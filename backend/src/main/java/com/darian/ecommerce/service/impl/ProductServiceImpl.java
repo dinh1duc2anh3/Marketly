@@ -11,12 +11,20 @@ import com.darian.ecommerce.dto.ProductDTO;
 import com.darian.ecommerce.entity.Product;
 import com.darian.ecommerce.entity.ProductImage;
 import com.darian.ecommerce.enums.UserRole;
+import com.darian.ecommerce.event.AddProductEvent;
+import com.darian.ecommerce.event.CheckDeleteLimitEvent;
+import com.darian.ecommerce.event.SearchProductEvent;
+import com.darian.ecommerce.event.ViewProductEvent;
 import com.darian.ecommerce.repository.ProductRepository;
 import com.darian.ecommerce.service.AuditLogService;
 import com.darian.ecommerce.service.ProductService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
+
+
 
 import java.util.List;
 import java.util.Optional;
@@ -24,10 +32,13 @@ import java.util.stream.Collectors;
 
 @Service
 public class ProductServiceImpl implements ProductService {
+
+
     // Logger for logging actions and errors
     private static final Logger logger = LoggerFactory.getLogger(ProductServiceImpl.class);
 
     // Dependencies injected via constructor
+    private final ApplicationEventPublisher eventPublisher;
 
     private final ProductRepository productRepository;
     private final ProductListFetcherFactory productListFetcherFactory;
@@ -35,18 +46,20 @@ public class ProductServiceImpl implements ProductService {
     private final ProductSearchFetcherFactory productSearchFetcherFactory;
     private final AuditLogService auditLogService;
 
-
     // Constructor for dependency injection
     public ProductServiceImpl(ProductRepository productRepository,
                               ProductListFetcherFactory productListFetcherFactory,
                               ProductDetailFetcherFactory productDetailFetcherFactory,
                               ProductSearchFetcherFactory productSearchFetcherFactory,
-                              AuditLogService auditLogService) {
+                              AuditLogService auditLogService,
+                              ApplicationEventPublisher eventPublisher
+    ) {
         this.productRepository = productRepository;
         this.productListFetcherFactory = productListFetcherFactory;
         this.productDetailFetcherFactory = productDetailFetcherFactory;
         this.productSearchFetcherFactory = productSearchFetcherFactory;
         this.auditLogService = auditLogService;
+        this.eventPublisher = eventPublisher;
     }
 
     // Fetch product list using Factory Pattern based on role
@@ -76,7 +89,7 @@ public class ProductServiceImpl implements ProductService {
         //fetch product details
         T productDTO = fetcher.fetchProductDetails(productId);
 
-        auditLogService.logViewProduct(productId,userId, role);
+        eventPublisher.publishEvent(new ViewProductEvent(this, productId, userId, role));
         return productDTO;
     }
 
@@ -97,8 +110,7 @@ public class ProductServiceImpl implements ProductService {
 
         //search product
         List<T> results = fetcher.searchProducts(keyword);
-
-        auditLogService.logSearchAction(userId, keyword,role);
+        eventPublisher.publishEvent(new SearchProductEvent(this, userId, keyword, role));
         return results;
     }
 
@@ -127,8 +139,10 @@ public class ProductServiceImpl implements ProductService {
         product.setDescription(productDTO.getDescription());
         Product savedProduct = productRepository.save(product);
         logger.info("Product added successfully: {}", savedProduct.getProductId());
-        auditLogService.logAddAction(userId, productDTO.getProductId(),UserRole.MANAGER);
+        eventPublisher.publishEvent(new AddProductEvent(this, userId, productDTO.getProductId(),UserRole.MANAGER));
 
+
+        //TODO: mapto function
         //return managerDTO ? right or not ?
         ManagerProductDTO managerDTO = new ManagerProductDTO();
         managerDTO.setProductId(savedProduct.getProductId());
@@ -160,7 +174,9 @@ public class ProductServiceImpl implements ProductService {
         product.setDescription(productDTO.getDescription());
         Product updatedProduct = productRepository.save(product);
         logger.info("Product updated successfully: {}", updatedProduct.getProductId());
-        auditLogService.logUpdateAction(userId,productId,UserRole.MANAGER);
+        eventPublisher.publishEvent(new ViewProductEvent(this, productId, userId, UserRole.MANAGER));
+
+
 
 
         //return managerDTO ??? is this enough info here ?
@@ -182,7 +198,7 @@ public class ProductServiceImpl implements ProductService {
         //update database
         productRepository.deleteById(productId);
         logger.info("Product {} deleted successfully by {}", productId,userId);
-        auditLogService.logDeleteAction(userId ,productId,UserRole.MANAGER);
+        eventPublisher.publishEvent(new ViewProductEvent(this, productId, userId, UserRole.MANAGER));
 
     }
 
@@ -231,10 +247,9 @@ public class ProductServiceImpl implements ProductService {
     // Check if the user has exceeded the deletion limit
     @Override
     public Boolean checkDeleteLimit(Integer userId) {
-        logger.info("Checking delete limit for user: {}", userId);
-        Integer deleteCount = auditLogService.countDeletesByUserId(userId);
-        return deleteCount < 30;
-        //need more check as daily limit is 30 , not permanent limit is 30
+        //for log
+        eventPublisher.publishEvent(new CheckDeleteLimitEvent(this, userId));
+        return auditLogService.checkDeleteLimit(userId);
     }
 
     // Check constraints that might prevent deletion

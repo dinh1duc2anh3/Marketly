@@ -150,14 +150,21 @@ function setupEventListeners() {
 // Product Management
 async function loadProducts() {
   try {
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    allProducts = mockProducts;
+    const response = await fetch(`${API_BASE_URL}/products`);
+    if (!response.ok) {
+      throw new Error('Failed to fetch products');
+    }
+    const data = await response.json();
+    allProducts = data;
     filteredProducts = allProducts;
     renderProducts();
   } catch (error) {
     console.error('Error loading products:', error);
-    showToast('Failed to load products', 'error');
+    showToast('Failed to load products. Using mock data instead.', 'error');
+    // Fallback to mock data if API fails
+    allProducts = mockProducts;
+    filteredProducts = allProducts;
+    renderProducts();
   }
 }
 
@@ -264,24 +271,33 @@ function applyFiltersAndSort() {
 }
 
 // Cart Functions
-function addToCart(productId) {
-  const product = allProducts.find(p => p.productId === productId);
-  if (!product) return;
-  
-  const existingItem = cart.items.find(item => item.productId === productId);
-  
-  if (existingItem) {
-    existingItem.quantity += 1;
-  } else {
-    cart.items.push({
-      productId: productId,
-      quantity: 1,
-      price: product.price
+async function addToCart(productId) {
+  try {
+    const response = await fetch(`${API_BASE_URL}/cart/add`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        userId: MOCK_USER_ID,
+        productId: productId,
+        quantity: 1
+      })
     });
+
+    if (!response.ok) {
+      throw new Error('Failed to add item to cart');
+    }
+
+    const updatedCart = await response.json();
+    cart = updatedCart;
+    updateCartCount();
+    showToast('Item added to cart');
+    saveCartToStorage();
+  } catch (error) {
+    console.error('Error adding to cart:', error);
+    showToast('Failed to add item to cart', 'error');
   }
-  
-  updateCartCount();
-  showToast(`${product.name} added to cart!`, 'success');
 }
 
 function removeFromCart(productId) {
@@ -423,71 +439,52 @@ function calculateDeliveryFee() {
 async function handleOrderSubmission(e) {
   e.preventDefault();
   
-  if (!cart.items.length) {
-    showToast('Your cart is empty!', 'error');
-    return;
-  }
-  
   const formData = new FormData(orderForm);
   const orderData = {
     userId: MOCK_USER_ID,
-    customerName: formData.get('customer-name') || document.getElementById('customer-name').value,
-    customerEmail: formData.get('customer-email') || document.getElementById('customer-email').value,
-    customerPhone: formData.get('customer-phone') || document.getElementById('customer-phone').value,
-    deliveryProvince: formData.get('delivery-province') || deliveryProvinceSelect.value,
-    deliveryAddress: formData.get('delivery-address') || document.getElementById('delivery-address').value,
-    deliveryMethod: deliveryMethod,
-    rushTime: deliveryMethod === 'rush' ? document.getElementById('rush-time').value : null,
-    deliveryInstructions: document.getElementById('delivery-instructions').value || '',
     items: cart.items,
-    subtotal: cart.items.reduce((total, item) => {
-      const product = allProducts.find(p => p.productId === item.productId);
-      return total + (product.price * item.quantity);
-    }, 0),
-    vat: cart.items.reduce((total, item) => {
-      const product = allProducts.find(p => p.productId === item.productId);
-      return total + (product.price * item.quantity);
-    }, 0) * 0.1,
-    deliveryFee: calculateDeliveryFee(),
-    total: 0
+    deliveryMethod: deliveryMethod,
+    shippingAddress: {
+      fullName: formData.get('fullName'),
+      phone: formData.get('phone'),
+      email: formData.get('email'),
+      address: formData.get('address'),
+      province: formData.get('province'),
+      notes: formData.get('notes')
+    },
+    paymentMethod: formData.get('paymentMethod')
   };
-  
-  orderData.total = orderData.subtotal + orderData.vat + orderData.deliveryFee;
-  
-  // Validate rush delivery
-  if (deliveryMethod === 'rush' && orderData.deliveryProvince !== 'hanoi') {
-    showToast('Rush delivery is only available in Hanoi inner city!', 'error');
-    return;
-  }
-  
+
   try {
-    // Simulate API call
-    showToast('Processing your order...', 'warning');
-    await new Promise(resolve => setTimeout(resolve, 2000));
+    const response = await fetch(`${API_BASE_URL}/orders`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(orderData)
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to create order');
+    }
+
+    const order = await response.json();
     
-    // Simulate successful order
-    showToast('Order placed successfully! Redirecting to payment...', 'success');
-    
-    // Clear cart
-    cart.items = [];
+    // Clear cart after successful order
+    cart = { userId: MOCK_USER_ID, items: [] };
+    saveCartToStorage();
     updateCartCount();
     closeCartModal();
     
-    // Reset form
-    orderForm.reset();
-    deliveryOptions.forEach(option => option.classList.remove('selected'));
-    deliveryOptions[0].classList.add('selected');
-    deliveryMethod = 'standard';
-    rushDeliveryInfo.classList.remove('show');
+    showToast('Order placed successfully!');
     
-    // Simulate redirect to VNPay
-    setTimeout(() => {
-      showToast('This would redirect to VNPay payment gateway in a real application', 'warning');
-    }, 2000);
-    
+    // If payment method is online, redirect to payment page
+    if (formData.get('paymentMethod') === 'online') {
+      window.location.href = `${API_BASE_URL}/payment/${order.orderId}`;
+    }
   } catch (error) {
-    console.error('Order submission error:', error);
-    showToast('Failed to place order. Please try again.', 'error');
+    console.error('Error submitting order:', error);
+    showToast('Failed to place order', 'error');
   }
 }
 

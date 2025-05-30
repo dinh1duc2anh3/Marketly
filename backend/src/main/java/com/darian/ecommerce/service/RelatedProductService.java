@@ -6,7 +6,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-@Service
 public interface RelatedProductService {
     // Suggest related products based on a product ID
     List<RelatedProductDTO> suggestRelatedProducts(Long productId);

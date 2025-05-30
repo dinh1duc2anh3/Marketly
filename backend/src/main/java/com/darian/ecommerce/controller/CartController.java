@@ -18,7 +18,6 @@ public class CartController {
     @RestController
     @RequestMapping("/api/test")
     public class TestController {
-
         @GetMapping
         public ResponseEntity<String> testEndpoint() {
             return ResponseEntity.ok("Backend is working!");

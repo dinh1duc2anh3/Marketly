@@ -5,7 +5,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-@Service
 public interface ProductReviewService {
     // Add a review for a product
     ProductReviewDTO addReview(ProductReviewDTO reviewDTO);

@@ -5,7 +5,6 @@ import com.darian.ecommerce.enums.ActionType;
 import com.darian.ecommerce.enums.UserRole;
 import org.springframework.stereotype.Service;
 
-@Service
 public interface AuditLogService {
 
     // Log a search action performed by a user

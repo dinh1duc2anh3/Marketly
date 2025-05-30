@@ -23,7 +23,8 @@ public class OrderMapper {
     }
 
     public  OrderDTO toOrderDTO(Order order) {
-        return OrderDTO.builder()
+        //TODO - check if cast suitable ?
+        return (OrderDTO) OrderDTO.builder()
                 .orderId(order.getOrderId())
                 .customerId(order.getUser().getId())
                 .items(orderItemMapper.toDTOList(order.getItems()))

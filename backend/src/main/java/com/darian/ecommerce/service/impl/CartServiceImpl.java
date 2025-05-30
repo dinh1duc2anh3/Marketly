@@ -55,7 +55,7 @@ public class CartServiceImpl implements CartService {
         }
 
         //find existed cart of user or create new cart
-        Cart cart = cartRepository.findByUserId(userId).orElse(new Cart());
+        Cart cart = cartRepository.findByUser_Id(userId).orElse(new Cart());
 
         //check if cart already had product
         Optional<CartItem> existingItem = cart.getItems().stream()
@@ -82,7 +82,7 @@ public class CartServiceImpl implements CartService {
     @Override
     public CartDTO viewCart(Integer userId) {
         logger.info("Viewing cart for user {}", userId);
-        Cart cart = cartRepository.findByUserId(userId)
+        Cart cart = cartRepository.findByUser_Id(userId)
                 .orElseThrow(() -> new IllegalArgumentException("Cart not found for user: " + userId));
         return cartMapper.toDTO(cart);
     }
@@ -90,7 +90,7 @@ public class CartServiceImpl implements CartService {
     @Override
     public CartDTO updateCart(Integer userId, Long productId, Integer quantity) {
         logger.info("Updating cart for user {}: product {}, quantity {}", userId, productId, quantity);
-        Cart cart = cartRepository.findByUserId(userId)
+        Cart cart = cartRepository.findByUser_Id(userId)
                 .orElseThrow(() -> new IllegalArgumentException("Cart not found for user: " + userId));
         CartItem item = cart.getItems().stream()
                 .filter(i -> i.getProduct().getProductId().equals(productId))
@@ -106,7 +106,7 @@ public class CartServiceImpl implements CartService {
     @Override
     public CartDTO removeFromCart(Integer userId, Long productId) {
         logger.info("Removing product {} from cart for user {}", productId, userId);
-        Cart cart = cartRepository.findByUserId(userId)
+        Cart cart = cartRepository.findByUser_Id(userId)
                 .orElseThrow(() -> new IllegalArgumentException("Cart not found for user: " + userId));
         cart.getItems().removeIf(item -> item.getProduct().getProductId().equals(productId));
         cart.updateTotal();
@@ -118,7 +118,7 @@ public class CartServiceImpl implements CartService {
     @Override
     public void emptyCart(Integer userId) {
         logger.info("Emptying cart for user {}", userId);
-        Cart cart = cartRepository.findByUserId(userId)
+        Cart cart = cartRepository.findByUser_Id(userId)
                 .orElseThrow(() -> new IllegalArgumentException("Cart not found for user: " + userId));
         cart.getItems().clear();
         cart.setTotal(0F);
@@ -129,7 +129,7 @@ public class CartServiceImpl implements CartService {
     @Override
     public List<CartItemDTO> getCartItems(Integer userId) {
         logger.info("Getting cart items for user {}", userId);
-        Cart cart = cartRepository.findByUserId(userId)
+        Cart cart = cartRepository.findByUser_Id(userId)
                 .orElseThrow(() -> new IllegalArgumentException("Cart not found for user: " + userId));
         return cart.getItems().stream().map(cartItemMapper::toDTO).collect(Collectors.toList());
     }

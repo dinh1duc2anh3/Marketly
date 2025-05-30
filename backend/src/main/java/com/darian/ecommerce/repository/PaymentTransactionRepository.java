@@ -16,7 +16,7 @@ public interface PaymentTransactionRepository extends JpaRepository<PaymentTrans
 
     public PaymentTransaction save(PaymentTransaction payment);
 
-    public Optional<PaymentTransaction> findByOrderId(Long orderId);
+    public Optional<PaymentTransaction> findByOrder_OrderId(Long orderId);
 
-    public PaymentTransaction findByTransaction(String transactionId);
+    public PaymentTransaction findByTransactionCode(String transactionId);
 }

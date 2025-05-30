@@ -76,11 +76,7 @@ public class PaymentServiceImpl implements PaymentService {
             return false;
         }
 
-        if (order.getPaymentStatus() != PaymentStatus.UNPAID) {
-            return false;
-        }
-
-        return true;
+        return order.getPaymentStatus() == PaymentStatus.UNPAID;
     }
 
     @Override

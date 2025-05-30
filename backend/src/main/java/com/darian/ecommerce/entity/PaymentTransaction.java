@@ -28,7 +28,10 @@ public class PaymentTransaction {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "transaction_id")
-    private String transactionId;
+    private Integer id;
+
+    @Column(name = "transaction_code")
+    private String transactionCode;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "transaction_type")

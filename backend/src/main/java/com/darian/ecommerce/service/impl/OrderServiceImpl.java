@@ -25,8 +25,6 @@ public class OrderServiceImpl implements OrderService {
     private static final Logger logger = LoggerFactory.getLogger(OrderServiceImpl.class);
 
     private final OrderRepository orderRepository;
-    private final PaymentService paymentService;
-    private final ProductService productService;
     private final ShippingFeeCalculatorFactory calculatorFactory;
     private final CartService cartService;
     private final UserService userService;
@@ -35,15 +33,11 @@ public class OrderServiceImpl implements OrderService {
     private final DeliveryInfoMapper deliveryInfoMapper;
 
     public OrderServiceImpl(OrderRepository orderRepository,
-                            PaymentService paymentService,
-                            ProductService productService,
                             ShippingFeeCalculatorFactory calculatorFactory,
                             CartService cartService,
                             UserService userService,
                             AuditLogService auditLogService, OrderMapper orderMapper, DeliveryInfoMapper deliveryInfoMapper) {
         this.orderRepository = orderRepository;
-        this.paymentService = paymentService;
-        this.productService = productService;
         this.calculatorFactory = calculatorFactory;
         this.cartService = cartService;
         this.userService = userService;
@@ -61,7 +55,7 @@ public class OrderServiceImpl implements OrderService {
         Order order = new Order();
 //        order.setOrderId("ORD-" + System.currentTimeMillis());
         // need more checking + innovate cart service
-        User user = userService.getUserById(cartDTO.getUserId())
+        User user = userService.getUserById(cartDTO.getUserId());
         order.setUser(user);
         //check more
 //        order.setItems(cartDTO.getItems());
@@ -86,8 +80,8 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public RushOrderDTO placeRushOrder(RushOrderDTO rushOrderDTO) {
-        //cần xem lại logic của checkRushProductEligibility vì nó check từng item trong order chứ ko phải check userId
-        if (!checkRushProductEligibility(rushOrderDTO.getCustomerId()) ||
+        //cần xem lại logic của checkRushProductEligibility vì nó check từng item trong order chứ have to  check userId
+        if (!checkRushProductEligibility(rushOrderDTO.getOrderId()) ||
                 !checkRushDeliveryAddress(rushOrderDTO.getDeliveryInfo().getAddress())) {
             throw new IllegalStateException("Rush order not eligible");
         }
@@ -97,7 +91,7 @@ public class OrderServiceImpl implements OrderService {
         order.setOrderStatus(OrderStatus.PENDING);
         Order savedOrder = orderRepository.save(order);
         auditLogService.logOrderAction(order.getUser().getId(), order.getOrderId(), UserRole.CUSTOMER, ActionType.PLACE_ORDER);
-        return mapToRushOrderDTO(savedOrder, rushOrderDTO.getRushDeliveryTime());
+        return orderMapper.toRushOrderDTO(savedOrder, rushOrderDTO.getRushDeliveryTime());
     }
 
     @Override
@@ -150,6 +144,11 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    public Boolean checkAvailability(CartDTO cartDTO) {
+        return null;
+    }
+
+    @Override
     public void setPending(Long orderId) {
         orderRepository.updateOrderStatus(orderId, OrderStatus.PENDING);
     }
@@ -164,6 +163,11 @@ public class OrderServiceImpl implements OrderService {
     //need more check
     @Override
     public Boolean checkCancellationValidity(Long orderId) {
+        return true;
+    }
+
+    @Override
+    public Boolean checkRushProductEligibility(Long productId) {
         return true;
     }
 
@@ -196,7 +200,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public List<OrderDTO> getOrderHistory(Integer customerId) {
-        return orderRepository.findByCustomerId(customerId).stream()
+        return orderRepository.findByUser_Id(customerId).stream()
                 .map(orderMapper::toOrderDTO)
                 .collect(Collectors.toList());
     }

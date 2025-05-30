@@ -6,7 +6,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-@Service
 public interface CartService {
     // Add a product to the user's cart
     CartDTO addProductToCart(Integer userId, Long productId, Integer quantity);
