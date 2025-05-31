@@ -34,4 +34,7 @@ public interface AuditLogService {
     // Log a payment transaction
     void logPayment(BasePaymentResult paymentResult);
 
+    //TODO: log refund transaction
+    // void logRefund(BasePaymentResult refundResult);
+
 }

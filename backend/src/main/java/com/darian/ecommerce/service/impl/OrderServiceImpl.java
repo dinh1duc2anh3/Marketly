@@ -3,6 +3,7 @@ package com.darian.ecommerce.service.impl;
 import com.darian.ecommerce.businesslogic.mapper.ordermapper.DeliveryInfoMapper;
 import com.darian.ecommerce.businesslogic.mapper.ordermapper.OrderMapper;
 import com.darian.ecommerce.businesslogic.shippingfee.ShippingFeeCalculatorFactory;
+import com.darian.ecommerce.config.exception.order.OrderNotFoundException;
 import com.darian.ecommerce.dto.*;
 import com.darian.ecommerce.entity.*;
 import com.darian.ecommerce.enums.ActionType;
@@ -11,6 +12,8 @@ import com.darian.ecommerce.enums.PaymentStatus;
 import com.darian.ecommerce.enums.UserRole;
 import com.darian.ecommerce.repository.OrderRepository;
 import com.darian.ecommerce.service.*;
+import com.darian.ecommerce.utils.ErrorMessages;
+import com.darian.ecommerce.utils.LoggerMessages;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -33,10 +36,12 @@ public class OrderServiceImpl implements OrderService {
     private final DeliveryInfoMapper deliveryInfoMapper;
 
     public OrderServiceImpl(OrderRepository orderRepository,
-                            ShippingFeeCalculatorFactory calculatorFactory,
-                            CartService cartService,
-                            UserService userService,
-                            AuditLogService auditLogService, OrderMapper orderMapper, DeliveryInfoMapper deliveryInfoMapper) {
+                          ShippingFeeCalculatorFactory calculatorFactory,
+                          CartService cartService,
+                          UserService userService,
+                          AuditLogService auditLogService,
+                          OrderMapper orderMapper,
+                          DeliveryInfoMapper deliveryInfoMapper) {
         this.orderRepository = orderRepository;
         this.calculatorFactory = calculatorFactory;
         this.cartService = cartService;
@@ -46,11 +51,10 @@ public class OrderServiceImpl implements OrderService {
         this.deliveryInfoMapper = deliveryInfoMapper;
     }
 
-
     @Override
     public OrderDTO createOrder(CartDTO cartDTO) {
         if (!checkAvailability(cartDTO)) {
-            throw new IllegalStateException("Cart items not available");
+            throw new IllegalStateException(String.format(ErrorMessages.VALIDATION_FAILED, "cart items not available"));
         }
         Order order = new Order();
 //        order.setOrderId("ORD-" + System.currentTimeMillis());
@@ -63,17 +67,19 @@ public class OrderServiceImpl implements OrderService {
         order.setCreatedDate(LocalDateTime.now());
         Order savedOrder = orderRepository.save(order);
 
+        logger.info(LoggerMessages.ORDER_CREATED, savedOrder.getOrderId());
         auditLogService.logOrderAction(order.getUser().getId(), order.getOrderId(), UserRole.CUSTOMER, ActionType.ORDER_ACTION);
         return orderMapper.toOrderDTO(savedOrder);
     }
 
-
     @Override
     public OrderDTO placeOrder(OrderDTO orderDTO) {
-        Order order = orderMapper.toEntity(orderDTO,false);
+        Order order = orderMapper.toEntity(orderDTO, false);
         order.setShippingFee(calculatorFactory.getCalculator(orderDTO).calculateShippingFee(orderDTO));
         order.setOrderStatus(OrderStatus.PENDING);
         Order savedOrder = orderRepository.save(order);
+        
+        logger.info(LoggerMessages.ORDER_CREATED, savedOrder.getOrderId());
         auditLogService.logOrderAction(order.getUser().getId(), order.getOrderId(), UserRole.CUSTOMER, ActionType.PLACE_ORDER);
         return orderMapper.toOrderDTO(savedOrder);
     }
@@ -83,45 +89,62 @@ public class OrderServiceImpl implements OrderService {
         //cần xem lại logic của checkRushProductEligibility vì nó check từng item trong order chứ have to  check userId
         if (!checkRushProductEligibility(rushOrderDTO.getOrderId()) ||
                 !checkRushDeliveryAddress(rushOrderDTO.getDeliveryInfo().getAddress())) {
-            throw new IllegalStateException("Rush order not eligible");
+            throw new IllegalStateException(String.format(ErrorMessages.VALIDATION_FAILED, "rush order not eligible"));
         }
         //need check
         Order order = orderMapper.toEntity(rushOrderDTO, true);
         order.setShippingFee(calculatorFactory.getCalculator(rushOrderDTO).calculateShippingFee(rushOrderDTO));
         order.setOrderStatus(OrderStatus.PENDING);
         Order savedOrder = orderRepository.save(order);
+        
+        logger.info(LoggerMessages.ORDER_CREATED, savedOrder.getOrderId());
         auditLogService.logOrderAction(order.getUser().getId(), order.getOrderId(), UserRole.CUSTOMER, ActionType.PLACE_ORDER);
         return orderMapper.toRushOrderDTO(savedOrder, rushOrderDTO.getRushDeliveryTime());
     }
 
     @Override
-    public void cancelOrder(Long orderId) {
+    public OrderDTO getOrderDetails(Long orderId) throws OrderNotFoundException {
         Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new IllegalArgumentException("Order not found"));
+                .orElseThrow(() -> new OrderNotFoundException(String.format(ErrorMessages.ORDER_NOT_FOUND, orderId)));
+        return orderMapper.toOrderDTO(order);
+    }
+
+    @Override
+    public InvoiceDTO getInvoice(Long orderId) throws OrderNotFoundException {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new OrderNotFoundException(String.format(ErrorMessages.ORDER_NOT_FOUND, orderId)));
+        InvoiceDTO invoice = new InvoiceDTO();
+        invoice.setOrderId(orderId);
+        invoice.setShippingFee(order.getShippingFee());
+        invoice.setTotal(order.getTotal());
+        return invoice;
+    }
+
+    @Override
+    public void cancelOrder(Long orderId) throws OrderNotFoundException {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new OrderNotFoundException(String.format(ErrorMessages.ORDER_NOT_FOUND, orderId)));
+                
+        if (order.getOrderStatus() == OrderStatus.CANCELLED) {
+            throw new IllegalStateException(String.format(ErrorMessages.ORDER_ALREADY_CANCELLED, orderId));
+        }
+        
+        if (!checkCancellationValidity(orderId)) {
+            throw new IllegalStateException(String.format(ErrorMessages.ORDER_CANNOT_BE_MODIFIED, orderId));
+        }
+        
         order.setOrderStatus(OrderStatus.CANCELLED);
         orderRepository.save(order);
-
-        //need check
+        logger.info(LoggerMessages.ORDER_STATUS_CHANGED, order.getOrderStatus(), OrderStatus.CANCELLED, orderId);
         auditLogService.logOrderAction(order.getUser().getId(), orderId, UserRole.CUSTOMER, ActionType.CANCEL_ORDER);
     }
 
     @Override
-    public OrderDTO getOrderDetails(Long orderId) {
-        Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new IllegalArgumentException("Order not found"));
-        return orderMapper.toOrderDTO(order);
-    }
-
-//    @Override
-//    public Boolean checkAvailability(CartDTO cartDTO) {
-//        return cartService.checkAvailability(cartDTO);
-//    }
-
-    @Override
     public Boolean validateDeliveryInfo(DeliveryInfoDTO deliveryInfoDTO) {
-        //need more conditions here
-        return deliveryInfoDTO.getRecipientName() != null && !deliveryInfoDTO.getRecipientName().isBlank() &&
-                deliveryInfoDTO.getAddress() != null && !deliveryInfoDTO.getAddress().isBlank();
+        //TODO: need more conditions here
+        // return deliveryInfoDTO.getRecipientName() != null && !deliveryInfoDTO.getRecipientName().isBlank() &&
+        //         deliveryInfoDTO.getAddress() != null && !deliveryInfoDTO.getAddress().isBlank();
+        return true;
     }
 
     @Override
@@ -145,7 +168,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public Boolean checkAvailability(CartDTO cartDTO) {
-        return null;
+        return cartService.checkAvailability(cartDTO);
     }
 
     @Override
@@ -155,37 +178,18 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public Boolean checkRushDeliveryAddress(String address) {
-        //need more check
-        return address != null && address.contains("Hanoi"); //example
+        return true; // TODO: Implement address validation logic
     }
 
-
-    //need more check
     @Override
     public Boolean checkCancellationValidity(Long orderId) {
-        return true;
+        return true; // TODO: Implement cancellation validation logic
     }
 
     @Override
     public Boolean checkRushProductEligibility(Long productId) {
-        return true;
-    }
-
-
-//    @Override
-//    public Boolean checkRushProductEligibility(Long productId) {
-//        return cartService.checkRushEligibility(userId); // Delegate to CartService
-//    }
-
-    @Override
-    public InvoiceDTO getInvoice(Long orderId) {
-        Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new IllegalArgumentException("Order not found"));
-        InvoiceDTO invoice = new InvoiceDTO();
-        invoice.setOrderId(orderId);
-        invoice.setShippingFee(order.getShippingFee());
-        invoice.setTotal(order.getTotal());
-        return invoice;
+        // return cartService.checkRushEligibility(userId); // Delegate to CartService
+        return true; // TODO: Implement rush eligibility check
     }
 
     @Override
@@ -199,11 +203,14 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    public void updateOrderStatus(Long orderId, OrderStatus orderStatus) {
+        orderRepository.updateOrderStatus(orderId, orderStatus);
+    }
+
+    @Override
     public List<OrderDTO> getOrderHistory(Integer customerId) {
         return orderRepository.findByUser_Id(customerId).stream()
                 .map(orderMapper::toOrderDTO)
                 .collect(Collectors.toList());
     }
-
-
 }

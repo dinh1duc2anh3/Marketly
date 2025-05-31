@@ -5,9 +5,15 @@ import com.darian.ecommerce.dto.RefundResult;
 import com.darian.ecommerce.dto.VNPayRequest;
 import com.darian.ecommerce.dto.VNPayResponse;
 import com.darian.ecommerce.enums.TransactionType;
+import com.darian.ecommerce.config.exception.payment.ConnectionException;
+import com.darian.ecommerce.utils.LoggerMessages;
+import com.darian.ecommerce.utils.ErrorMessages;
+import com.darian.ecommerce.utils.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
 
 @Component
 public class VNPaySubsystemService {
@@ -35,26 +41,23 @@ public class VNPaySubsystemService {
 
     // Execute payment via VNPay
     protected PaymentResult processPayment(Long orderId, Float amount, String content) {
-
-        logger.info("Executing VNPay payment for order {}, amount {}", orderId, amount);
+        logger.info(LoggerMessages.PAYMENT_PROCESSING, orderId, "VNPay");
         VNPayRequest request = converter.buildPaymentRequest(orderId, amount, content);
         VNPayResponse response = apiGateway.sendPaymentRequest(request);
         PaymentResult result = responseHandler.toPaymentResult(response);
         result.setTotalAmount(amount);
         result.setTransactionContent(content);
 
-        logger.info("Payment executed for order {}: status {}", orderId, result.getPaymentStatus());
+        logger.info(LoggerMessages.PAYMENT_COMPLETED, orderId, result.getPaymentStatus());
         return result;
     }
 
-
-
     // Execute refund via VNPay
     protected RefundResult processRefund(Long orderId) {
-        logger.info("Executing VNPay refund for order {}", orderId);
+        logger.info(LoggerMessages.REFUND_PROCESSING, orderId, "VNPay");
         VNPayRequest request = converter.buildRefundRequest(orderId);
         VNPayResponse response = apiGateway.sendRefundRequest(request);
-        logger.info("Refund executed for order {}: status {}", orderId, response.getStatus());
+        logger.info(LoggerMessages.REFUND_COMPLETED, orderId, response.getStatus());
         return responseHandler.toRefundResult(response);
     }
 }

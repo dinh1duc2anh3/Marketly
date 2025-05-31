@@ -5,6 +5,7 @@ import com.darian.ecommerce.dto.CategoryDTO;
 import com.darian.ecommerce.entity.Category;
 import com.darian.ecommerce.repository.CategoryRepository;
 import com.darian.ecommerce.service.CategoryService;
+import com.darian.ecommerce.utils.LoggerMessages;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -31,7 +32,7 @@ public class CategoryServiceImpl implements CategoryService {
     // Get all product categories
     @Override
     public List<CategoryDTO> findAllCategories() {
-        logger.info("Fetching all categories");
+        logger.info(LoggerMessages.CATEGORY_LIST_FETCH);
         List<Category>  allCategory = categoryRepository.findAll();
 
         return allCategory.stream().map(categoryMapper::toDTO).toList();
@@ -41,9 +42,9 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public CategoryDTO saveCategory(CategoryDTO category) {
         //- check again saveCategory , check if the input is category or categoryDTO
-        logger.info("Saving category: {}", category.getName());
+        logger.info(LoggerMessages.CATEGORY_SAVE, category.getName());
         Category savedCategory = categoryRepository.save(categoryMapper.toEntity(category));
-        logger.info("Category saved: {}", savedCategory.getId());
+        logger.info(LoggerMessages.CATEGORY_SAVED, savedCategory.getId());
         return category;
     }
 

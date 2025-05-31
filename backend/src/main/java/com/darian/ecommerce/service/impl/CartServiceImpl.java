@@ -1,6 +1,5 @@
 package com.darian.ecommerce.service.impl;
 
-
 import com.darian.ecommerce.businesslogic.mapper.cartmapper.CartItemMapper;
 import com.darian.ecommerce.businesslogic.mapper.cartmapper.CartMapper;
 import com.darian.ecommerce.dto.CartDTO;
@@ -11,6 +10,8 @@ import com.darian.ecommerce.entity.Product;
 import com.darian.ecommerce.repository.CartRepository;
 import com.darian.ecommerce.service.CartService;
 import com.darian.ecommerce.service.ProductService;
+import com.darian.ecommerce.utils.LoggerMessages;
+import com.darian.ecommerce.utils.ErrorMessages;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -36,102 +37,93 @@ public class CartServiceImpl implements CartService {
         this.cartMapper = cartMapper;
     }
 
-
     @Override
     public CartDTO addProductToCart(Integer userId, Long productId, Integer quantity) {
-        logger.info("Adding product {} with quantity {} to cart for user {}", productId, quantity, userId);
+        logger.info(LoggerMessages.CART_ADD_PRODUCT, productId, quantity, userId);
 
-        //get product
-        Product product = productService.getProductById(productId).orElseThrow(() -> new IllegalArgumentException("Product not found"));
+        Product product = productService.getProductById(productId)
+            .orElseThrow(() -> new IllegalArgumentException(String.format(ErrorMessages.PRODUCT_NOT_FOUND, productId)));
 
-        //check able to add product to cart
-        if (product.getStockQuantity() <= 0){
-            logger.warn("Product {} is not available for user {}", productId, userId);
-            throw new IllegalArgumentException("Product not available");
-        }
-        if (productService.checkProductQuantity(productId) <= 0) {
-            logger.warn("Product {} is not available for user {}", productId, userId);
-            throw new IllegalArgumentException("Product not available");
+        if (product.getStockQuantity() <= 0 || productService.checkProductQuantity(productId) <= 0) {
+            logger.warn(LoggerMessages.CART_PRODUCT_NOT_AVAILABLE, productId, userId);
+            throw new IllegalArgumentException(String.format(ErrorMessages.PRODUCT_NOT_AVAILABLE, productId));
         }
 
-        //find existed cart of user or create new cart
         Cart cart = cartRepository.findByUser_Id(userId).orElse(new Cart());
-
-        //check if cart already had product
         Optional<CartItem> existingItem = cart.getItems().stream()
                 .filter(item -> item.getProduct().getProductId().equals(productId))
                 .findFirst();
+
         if (existingItem.isPresent()) {
-            existingItem.get().setQuantity(existingItem.get().getQuantity() + quantity);
-        }
-        else {
+            CartItem item = existingItem.get();
+            item.setQuantity(item.getQuantity() + quantity);
+            logger.info(LoggerMessages.CART_UPDATE_QUANTITY, productId, item.getQuantity(), userId);
+        } else {
             CartItem newItem = new CartItem();
-            newItem.setCart(cart);
             newItem.setProduct(product);
             newItem.setQuantity(quantity);
-            newItem.setProductPrice(product.getPrice());
-
+            newItem.setCart(cart);
             cart.getItems().add(newItem);
         }
-        cart.updateTotal();
+
         Cart savedCart = cartRepository.save(cart);
-        logger.info("Product {} added to cart for user {}", productId, userId);
         return cartMapper.toDTO(savedCart);
     }
 
     @Override
     public CartDTO viewCart(Integer userId) {
-        logger.info("Viewing cart for user {}", userId);
-        Cart cart = cartRepository.findByUser_Id(userId)
-                .orElseThrow(() -> new IllegalArgumentException("Cart not found for user: " + userId));
+        logger.info(LoggerMessages.CART_VIEW, userId);
+        Cart cart = cartRepository.findByUser_Id(userId).orElse(new Cart());
         return cartMapper.toDTO(cart);
     }
 
     @Override
     public CartDTO updateCart(Integer userId, Long productId, Integer quantity) {
-        logger.info("Updating cart for user {}: product {}, quantity {}", userId, productId, quantity);
-        Cart cart = cartRepository.findByUser_Id(userId)
-                .orElseThrow(() -> new IllegalArgumentException("Cart not found for user: " + userId));
-        CartItem item = cart.getItems().stream()
-                .filter(i -> i.getProduct().getProductId().equals(productId))
+        logger.info(LoggerMessages.CART_UPDATE_QUANTITY, productId, quantity, userId);
+        Cart cart = cartRepository.findByUser_Id(userId).orElse(new Cart());
+        
+        cart.getItems().stream()
+                .filter(item -> item.getProduct().getProductId().equals(productId))
                 .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("Product not in cart"));
-        item.setQuantity(quantity);
-        cart.updateTotal();
+                .ifPresent(item -> item.setQuantity(quantity));
+
         Cart savedCart = cartRepository.save(cart);
-        logger.info("Cart updated for user {}", userId);
         return cartMapper.toDTO(savedCart);
     }
 
     @Override
     public CartDTO removeFromCart(Integer userId, Long productId) {
-        logger.info("Removing product {} from cart for user {}", productId, userId);
-        Cart cart = cartRepository.findByUser_Id(userId)
-                .orElseThrow(() -> new IllegalArgumentException("Cart not found for user: " + userId));
+        logger.info(LoggerMessages.CART_REMOVE_PRODUCT, productId, userId);
+        Cart cart = cartRepository.findByUser_Id(userId).orElse(new Cart());
+        
         cart.getItems().removeIf(item -> item.getProduct().getProductId().equals(productId));
-        cart.updateTotal();
         Cart savedCart = cartRepository.save(cart);
-        logger.info("Product {} removed from cart for user {}", productId, userId);
         return cartMapper.toDTO(savedCart);
     }
 
     @Override
     public void emptyCart(Integer userId) {
-        logger.info("Emptying cart for user {}", userId);
-        Cart cart = cartRepository.findByUser_Id(userId)
-                .orElseThrow(() -> new IllegalArgumentException("Cart not found for user: " + userId));
+        logger.info(LoggerMessages.CART_CLEAR, userId);
+        Cart cart = cartRepository.findByUser_Id(userId).orElse(new Cart());
         cart.getItems().clear();
-        cart.setTotal(0F);
         cartRepository.save(cart);
-        logger.info("Cart emptied for user {}", userId);
     }
 
     @Override
     public List<CartItemDTO> getCartItems(Integer userId) {
-        logger.info("Getting cart items for user {}", userId);
-        Cart cart = cartRepository.findByUser_Id(userId)
-                .orElseThrow(() -> new IllegalArgumentException("Cart not found for user: " + userId));
-        return cart.getItems().stream().map(cartItemMapper::toDTO).collect(Collectors.toList());
+        logger.info(LoggerMessages.CART_VIEW, userId);
+        Cart cart = cartRepository.findByUser_Id(userId).orElse(new Cart());
+        return cartItemMapper.toDTOList(cart.getItems()) ;
     }
 
+    @Override
+    public Boolean checkAvailability(CartDTO cartDTO) {
+        return cartDTO.getItems().stream()
+                .allMatch(item -> {
+                    Product product = productService.getProductById(item.getProductId())
+                            .orElseThrow(() -> new IllegalArgumentException(
+                                String.format(ErrorMessages.PRODUCT_NOT_FOUND, item.getProductId())));
+                    return product.getStockQuantity() >= item.getQuantity();
+                });
+    }
 }

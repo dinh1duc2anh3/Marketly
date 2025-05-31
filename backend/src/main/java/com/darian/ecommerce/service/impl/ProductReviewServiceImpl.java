@@ -7,6 +7,7 @@ import com.darian.ecommerce.repository.ProductReviewRepository;
 import com.darian.ecommerce.service.ProductReviewService;
 import com.darian.ecommerce.service.ProductService;
 import com.darian.ecommerce.service.UserService;
+import com.darian.ecommerce.utils.LoggerMessages;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -36,20 +37,17 @@ public class ProductReviewServiceImpl implements ProductReviewService {
     // Add a review for a product
     @Override
     public ProductReviewDTO addReview(ProductReviewDTO reviewDTO) {
-        //create new productReview Entity
+        logger.info(LoggerMessages.REVIEW_ADD, reviewDTO.getCustomerId(), reviewDTO.getProductId());
         ProductReview review = productReviewMapper.toEntity(reviewDTO);
-
-        //save productReview
         ProductReview savedReview = productReviewRepository.save(review);
-        logger.info("Review added for product: {}", savedReview.getProduct().getProductId());
-
+        logger.info(LoggerMessages.REVIEW_ADD_SUCCESS, savedReview.getProduct().getProductId(), reviewDTO.getCustomerId());
         return productReviewMapper.toDTO(savedReview);
     }
 
     // Get all reviews for a product
     @Override
     public List<ProductReviewDTO> getReviews(Long productId) {
-        logger.info("Fetching reviews for product: {}", productId);
+        logger.info(LoggerMessages.REVIEW_GET, productId);
         List<ProductReview> reviews = productReviewRepository.findByProduct_ProductId(productId);
         return reviews.stream().map(productReviewMapper::toDTO).toList();
     }

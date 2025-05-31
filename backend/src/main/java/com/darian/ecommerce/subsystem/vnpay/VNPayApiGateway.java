@@ -4,8 +4,13 @@ import com.darian.ecommerce.config.exception.payment.ConnectionException;
 import com.darian.ecommerce.dto.VNPayRequest;
 import com.darian.ecommerce.dto.VNPayResponse;
 import com.darian.ecommerce.enums.VNPayResponseStatus;
+import com.darian.ecommerce.utils.ApiEndpoints;
+import com.darian.ecommerce.utils.LoggerMessages;
+import com.darian.ecommerce.utils.ErrorMessages;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -27,28 +32,37 @@ public class VNPayApiGateway {
         this.vnPayAPI = vnPayAPI;
     }
 
-
-    protected VNPayResponse sendPaymentRequest(VNPayRequest request) {
-
-        logger.info("Sending payment request to VNPay for order {}", request.getOrderId());
+    @Retryable(
+        value = {ConnectionException.class},
+        maxAttempts = Constants.MAX_PAYMENT_RETRIES,
+        backoff = @Backoff(delay = Constants.PAYMENT_RETRY_DELAY_MS)
+    )
+    public VNPayResponse sendPaymentRequest(VNPayRequest request) {
+        logger.info(LoggerMessages.VNPAY_SENDING_REQUEST, request.getOrderId());
         try {
-            return vnPayAPI.simulatePayment(request);
+            VNPayResponse response = vnPayAPI.simulatePayment(request);
+            logger.info(LoggerMessages.VNPAY_PAYMENT_EXECUTED, request.getOrderId(), response.getStatus());
+            return response;
         } catch (Exception e) {
-            logger.error("Failed to connect to VNPay API: {}", e.getMessage());
-            throw new ConnectionException("Unable to connect to VNPay API");
+            logger.error(LoggerMessages.VNPAY_CONNECTION_ERROR, e.getMessage());
+            throw new ConnectionException(ErrorMessages.VNPAY_CONNECTION_ERROR);
         }
     }
 
-
-    // Send refund request to VNPay API
-    protected VNPayResponse sendRefundRequest(VNPayRequest request) {
-        logger.info("Sending refund request to VNPay for order {}", request.getOrderId());
+    @Retryable(
+        value = {ConnectionException.class},
+        maxAttempts = Constants.MAX_PAYMENT_RETRIES,
+        backoff = @Backoff(delay = Constants.PAYMENT_RETRY_DELAY_MS)
+    )
+    public VNPayResponse sendRefundRequest(VNPayRequest request) {
+        logger.info(LoggerMessages.VNPAY_SENDING_REQUEST, request.getOrderId());
         try {
-            return vnPayAPI.simulateRefund(request);
+            VNPayResponse response = vnPayAPI.simulateRefund(request);
+            logger.info(LoggerMessages.VNPAY_REFUND_EXECUTED, orderId, response.getStatus());
+            return response;
         } catch (Exception e) {
-            logger.error("Failed to connect to VNPay API: {}", e.getMessage());
-            throw new ConnectionException("Unable to connect to VNPay API");
+            logger.error(LoggerMessages.VNPAY_CONNECTION_ERROR, e.getMessage());
+            throw new ConnectionException(ErrorMessages.VNPAY_CONNECTION_ERROR);
         }
     }
-
 }

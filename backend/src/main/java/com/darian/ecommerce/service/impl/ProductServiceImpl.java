@@ -18,13 +18,13 @@ import com.darian.ecommerce.event.ViewProductEvent;
 import com.darian.ecommerce.repository.ProductRepository;
 import com.darian.ecommerce.service.AuditLogService;
 import com.darian.ecommerce.service.ProductService;
+import com.darian.ecommerce.utils.Constants;
+import com.darian.ecommerce.utils.LoggerMessages;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
-
-
 
 import java.util.List;
 import java.util.Optional;
@@ -32,7 +32,6 @@ import java.util.stream.Collectors;
 
 @Service
 public class ProductServiceImpl implements ProductService {
-
 
     // Logger for logging actions and errors
     private static final Logger logger = LoggerFactory.getLogger(ProductServiceImpl.class);
@@ -67,12 +66,8 @@ public class ProductServiceImpl implements ProductService {
     // Safe cast: fetcher is guaranteed to return correct subtype based on role
     @SuppressWarnings("unchecked")
     public <T extends ProductDTO> List<T> getProductList(UserRole role) {
-        logger.info("Fetching product list for role: {}", role);
-
-        //get fetcher
+        logger.info(LoggerMessages.PRODUCT_LIST_FETCH, role);
         ProductListFetcher<T> fetcher = (ProductListFetcher<T>) productListFetcherFactory.getFetcher(role);
-
-        //get product list
         return fetcher.fetchProductList();
     }
 
@@ -81,14 +76,9 @@ public class ProductServiceImpl implements ProductService {
     // Safe cast: fetcher is guaranteed to return correct subtype based on role
     @SuppressWarnings("unchecked")
     public <T extends ProductDTO> T getProductDetails(Integer userId, Long productId, UserRole role) {
-        logger.info("Fetching product details for productId: {}, role: {}, userId: {}", productId, role, userId);
-
-        //get fetcher
+        logger.info(LoggerMessages.PRODUCT_DETAILS_FETCH, productId, role, userId);
         ProductDetailFetcher<T> fetcher = (ProductDetailFetcher<T>) productDetailFetcherFactory.getFetcher(role);
-
-        //fetch product details
         T productDTO = fetcher.fetchProductDetails(productId);
-
         eventPublisher.publishEvent(new ViewProductEvent(this, productId, userId, role));
         return productDTO;
     }
@@ -103,12 +93,8 @@ public class ProductServiceImpl implements ProductService {
     // Safe cast: fetcher is guaranteed to return correct subtype based on role
     @SuppressWarnings("unchecked")
     public <T extends ProductDTO> List<T> searchProducts(Integer userId, String keyword, UserRole role) {
-        logger.info("Searching products with keyword: {}, role: {}, userId: {}", keyword, role, userId);
-
-        //get fetcher
+        logger.info(LoggerMessages.PRODUCT_SEARCH, keyword, role, userId);
         ProductSearchFetcher<T> fetcher = (ProductSearchFetcher<T>) productSearchFetcherFactory.getFetcher(role);
-
-        //search product
         List<T> results = fetcher.searchProducts(keyword);
         eventPublisher.publishEvent(new SearchProductEvent(this, userId, keyword, role));
         return results;
@@ -117,19 +103,16 @@ public class ProductServiceImpl implements ProductService {
     // Advanced search with filters, directly querying repository
     @Override
     public List<ProductDTO> findByFilters(String keyword, Float minPrice, Float maxPrice, String category) {
-        logger.info("Finding products with filters - keyword: {}, minPrice: {}, maxPrice: {}, category: {}",
-                keyword, minPrice, maxPrice, category);
+        logger.info(LoggerMessages.PRODUCT_FILTER_SEARCH, keyword, minPrice, maxPrice, category);
         return productRepository.findByFilters(keyword, minPrice, maxPrice, category);
     }
-
-
 
     // Add a new product with validation (Manager only)
     @Override
     public ManagerProductDTO addProduct(Integer userId, ProductDTO productDTO) {
-        logger.info("Adding new product: {}", productDTO.getName());
+        logger.info(LoggerMessages.PRODUCT_ADD, userId, productDTO.getName());
         if (!validateProductDetails(productDTO)){
-            logger.warn("Invalid product details: {}", productDTO);
+            logger.warn(LoggerMessages.PRODUCT_ADD_INVALID, productDTO);
             throw new IllegalArgumentException("Invalid product details");
         }
         Product product = new Product();
@@ -138,9 +121,8 @@ public class ProductServiceImpl implements ProductService {
         product.setPrice(productDTO.getPrice());
         product.setDescription(productDTO.getDescription());
         Product savedProduct = productRepository.save(product);
-        logger.info("Product added successfully: {}", savedProduct.getProductId());
+        logger.info(LoggerMessages.PRODUCT_ADD_SUCCESS, savedProduct.getProductId(), userId);
         eventPublisher.publishEvent(new AddProductEvent(this, userId, productDTO.getProductId(),UserRole.MANAGER));
-
 
         //TODO: mapto function
         //return managerDTO ? right or not ?
@@ -149,37 +131,34 @@ public class ProductServiceImpl implements ProductService {
         managerDTO.setName(savedProduct.getName());
         managerDTO.setPrice(savedProduct.getPrice());
         managerDTO.setDescription(savedProduct.getDescription());
-        managerDTO.setStockQuantity(0); // Default stock
+        managerDTO.setStockQuantity(0);
         return managerDTO;
     }
 
     // Update an existing product (Manager only)
     @Override
     public ManagerProductDTO updateProduct(Integer userId, Long productId, ProductDTO productDTO) {
-        logger.info("Updating product: {}", productId);
+        logger.info(LoggerMessages.PRODUCT_UPDATE,userId, productId);
         Optional<Product> optionalProduct = productRepository.findById(productId);
         if (optionalProduct.isEmpty()){
-            logger.warn("Invalid product details for update: {}", productDTO);
+            logger.warn(LoggerMessages.PRODUCT_UPDATE_INVALID, productDTO);
             throw new IllegalArgumentException("Invalid product details");
         }
         if (!validateProductDetails(productDTO)) {
-            logger.warn("Invalid product details for update: {}", productDTO);
+            logger.warn(LoggerMessages.PRODUCT_UPDATE_INVALID, productDTO);
             throw new IllegalArgumentException("Invalid product details");
         }
 
-        //input for updating a product is only these ??? nothing else? i think not enough info here
+        //TODO: input for updating a product is only these ??? nothing else? i think not enough info here
         Product product = optionalProduct.get();
         product.setName(productDTO.getName());
         product.setPrice(productDTO.getPrice());
         product.setDescription(productDTO.getDescription());
         Product updatedProduct = productRepository.save(product);
-        logger.info("Product updated successfully: {}", updatedProduct.getProductId());
+        logger.info(LoggerMessages.PRODUCT_UPDATE_SUCCESS, updatedProduct.getProductId(), userId);
         eventPublisher.publishEvent(new ViewProductEvent(this, productId, userId, UserRole.MANAGER));
 
-
-
-
-        //return managerDTO ??? is this enough info here ?
+        //TODO: return managerDTO ??? is this enough info here ?
         ManagerProductDTO managerDTO = new ManagerProductDTO();
         managerDTO.setProductId(updatedProduct.getProductId());
         managerDTO.setName(updatedProduct.getName());
@@ -192,70 +171,72 @@ public class ProductServiceImpl implements ProductService {
     // Delete a product by ID (Manager only)
     @Override
     public void deleteProduct(Long productId, Integer userId) {
-        logger.info("Attempting to delete product: {}", productId);
+        logger.info(LoggerMessages.PRODUCT_DELETE_ATTEMPT, userId, productId);
         if (!validateDeletion(productId,userId)) return;
         //update catalog??? need more check
         //update database
         productRepository.deleteById(productId);
-        logger.info("Product {} deleted successfully by {}", productId,userId);
+        logger.info(LoggerMessages.PRODUCT_DELETE_SUCCESS, productId, userId);
         eventPublisher.publishEvent(new ViewProductEvent(this, productId, userId, UserRole.MANAGER));
-
     }
 
     // Validate product details before adding/updating
     @Override
     public Boolean validateProductDetails(ProductDTO productDTO) {
-        //check if enough condition here ?
+        //TODO:  check if enough condition here ?
         return productDTO != null &&
-                productDTO.getName() != null && !productDTO.getName().isBlank() &&
-                productDTO.getPrice() > 0;
+                productDTO.getName() != null && 
+                !productDTO.getName().isBlank() &&
+                productDTO.getName().length() <= Constants.MAX_PRODUCT_NAME_LENGTH &&
+                productDTO.getPrice() >= Constants.MIN_PRODUCT_PRICE &&
+                productDTO.getPrice() <= Constants.MAX_PRODUCT_PRICE &&
+                (productDTO.getDescription() == null || 
+                 productDTO.getDescription().length() <= Constants.MAX_PRODUCT_DESCRIPTION_LENGTH);
     }
-
 
     @Override
     public Integer checkProductQuantity(Long productId) {
-        logger.info("Checking quantity for product: {}", productId);
-
-        Optional<Product> product = getProductById(productId) ;
+        logger.info(LoggerMessages.PRODUCT_QUANTITY_CHECK, productId);
+        Optional<Product> product = getProductById(productId);
         return (product.isPresent()) ? product.get().getStockQuantity() : 0;
     }
 
     // Validate general conditions before deleting a product
     @Override
     public Boolean validateDeletion(Long productId, Integer userId) {
-        logger.info("Validating deletion for product {} by user {}", productId,userId);
+        logger.info(LoggerMessages.PRODUCT_DELETION_VALIDATE, productId, userId);
 
-        //check if quantity of available product is > 0
         if (!checkDeletionConstraints(productId)) {
-            logger.warn("Deletion constraints violated for product: {}", productId);
+            logger.warn(LoggerMessages.PRODUCT_DELETION_CONSTRAINT, productId);
             throw new IllegalStateException("Cannot delete due to constraints");
         }
 
         if (checkOrdersAffected(productId)){
-            logger.warn("Active orders affected by product deletion: {}", productId);
+            logger.warn(LoggerMessages.PRODUCT_DELETION_ORDERS, productId);
             throw new IllegalStateException("Cannot delete due to affected orders");
         }
 
         if (checkDeleteLimit(userId)){
-            logger.warn("Active orders affected by product deletion: {}", productId);
+            logger.warn(LoggerMessages.PRODUCT_DELETION_ORDERS, productId);
             throw new IllegalStateException("Cannot delete due to affected orders");
         }
         return true;
-
     }
 
     // Check if the user has exceeded the deletion limit
     @Override
     public Boolean checkDeleteLimit(Integer userId) {
-        //for log
-        eventPublisher.publishEvent(new CheckDeleteLimitEvent(this, userId));
-        return auditLogService.checkDeleteLimit(userId);
+        logger.info(LoggerMessages.PRODUCT_DELETE_LIMIT, userId);
+        Integer deleteCount = auditLogService.countDeletesByUserId(userId);
+        boolean withinLimit = deleteCount < Constants.MAX_DELETE_LIMIT;
+        logger.info(LoggerMessages.PRODUCT_DELETE_COUNT, userId, deleteCount, withinLimit);
+        return withinLimit;
     }
 
     // Check constraints that might prevent deletion
     @Override
     public Boolean checkDeletionConstraints(Long productId) {
-        logger.info("Checking deletion constraints for product: {}", productId);
+        logger.info(LoggerMessages.PRODUCT_DELETION_CONSTRAINTS_CHECK, productId);
         Integer stock = checkProductQuantity(productId);
         return stock > 0; //Can only delete if stock is above 0
     }
@@ -263,11 +244,7 @@ public class ProductServiceImpl implements ProductService {
     // Check if deleting a product affects any orders
     @Override
     public Boolean checkOrdersAffected(Long productId) {
-        logger.info("Checking if orders are affected for product: {}", productId);
-        //logic to check if any order affected ?
-
+        logger.info(LoggerMessages.PRODUCT_ORDERS_CHECK, productId);
         return false; //assume that No orders affected for now
-
     }
-
 }

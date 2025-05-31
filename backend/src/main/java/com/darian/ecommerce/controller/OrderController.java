@@ -4,12 +4,17 @@ import com.darian.ecommerce.dto.DeliveryInfoDTO;
 import com.darian.ecommerce.dto.InvoiceDTO;
 import com.darian.ecommerce.dto.OrderDTO;
 import com.darian.ecommerce.service.OrderService;
+import com.darian.ecommerce.utils.ApiEndpoints;
+import com.darian.ecommerce.utils.LoggerMessages;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/orders")
+@RequestMapping(ApiEndpoints.ORDERS)
 public class OrderController {
+    private static final Logger logger = LoggerFactory.getLogger(OrderController.class);
     private final OrderService orderService;
 
     public OrderController(OrderService orderService) {
@@ -28,26 +33,29 @@ public class OrderController {
 //        return ResponseEntity.ok(result);
 //    }
 
-    @PostMapping("/{orderId}/cancel")
+    @PostMapping(ApiEndpoints.ORDER_CANCEL)
     public ResponseEntity<Void> cancelOrder(@PathVariable Long orderId) {
+        logger.info(LoggerMessages.ORDER_STATUS_CHANGED, "current", "CANCELLED", orderId);
         orderService.cancelOrder(orderId);
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/{orderId}")
+    @GetMapping(ApiEndpoints.ORDER_BY_ID)
     public ResponseEntity<OrderDTO> getOrderDetails(@PathVariable Long orderId) {
         OrderDTO result = orderService.getOrderDetails(orderId);
+        logger.info(LoggerMessages.ORDER_UPDATED, orderId);
         return ResponseEntity.ok(result);
     }
 
-    @PutMapping("/{orderId}/delivery-info")
+    @PutMapping(ApiEndpoints.ORDER_DELIVERY)
     public ResponseEntity<OrderDTO> setDeliveryInfo(@PathVariable Long orderId,
-                                                    @RequestBody DeliveryInfoDTO deliveryInfoDTO) {
+                                                  @RequestBody DeliveryInfoDTO deliveryInfoDTO) {
         OrderDTO result = orderService.setDeliveryInfo(orderId, deliveryInfoDTO);
+        logger.info(LoggerMessages.ORDER_UPDATED, orderId);
         return ResponseEntity.ok(result);
     }
 
-    @GetMapping("/{orderId}/invoice")
+    @GetMapping(ApiEndpoints.ORDER_BY_ID + "/invoice")
     public ResponseEntity<InvoiceDTO> getInvoice(@PathVariable Long orderId) {
         InvoiceDTO result = orderService.getInvoice(orderId);
         return ResponseEntity.ok(result);

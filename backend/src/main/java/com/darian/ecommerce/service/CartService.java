@@ -2,6 +2,7 @@ package com.darian.ecommerce.service;
 
 import com.darian.ecommerce.dto.CartDTO;
 import com.darian.ecommerce.dto.CartItemDTO;
+import com.darian.ecommerce.entity.Cart;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -24,5 +25,8 @@ public interface CartService {
 
     // Get the list of items in the user's cart
     List<CartItemDTO> getCartItems(Integer userId);
+
+    // Check the availability of a cart
+    Boolean checkAvailability(CartDTO cartDTO);
 }
 

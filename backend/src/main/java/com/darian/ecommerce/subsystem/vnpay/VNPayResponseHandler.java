@@ -7,6 +7,8 @@ import com.darian.ecommerce.dto.VNPayResponse;
 import com.darian.ecommerce.enums.PaymentStatus;
 import com.darian.ecommerce.enums.RefundStatus;
 import com.darian.ecommerce.enums.VNPayResponseStatus;
+import com.darian.ecommerce.utils.ErrorMessages;
+import com.darian.ecommerce.utils.LoggerMessages;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -26,15 +28,14 @@ public class VNPayResponseHandler {
 
     // Convert VNPayResponse to PaymentResult
     protected PaymentResult toPaymentResult(VNPayResponse response) {
-
-        logger.info("Processing payment response: transactionId {}", response.getTransactionId());
+        logger.info(LoggerMessages.VNPAY_PAYMENT_EXECUTED, response.getTransactionId());
         if (response.getStatus().equals(VNPayResponseStatus.FAILURE)) {
-            throw new PaymentProcessingException("Payment processing failed: " + response.getErrorMessage());
+            throw new PaymentProcessingException(String.format(ErrorMessages.VNPAY_TRANSACTION_FAILED, response.getErrorMessage()));
         }
         return PaymentResult.builder()
                 .transactionId(response.getTransactionId())
                 .transactionType(response.getTransactionType())
-                .transactionContent("Payment for"+response.getTransactionId())
+                .transactionContent("Payment for " + response.getTransactionId())
                 .transactionDate(LocalDateTime.now())
                 .errorMessage(response.getErrorMessage())
                 .totalAmount(0F)
@@ -44,16 +45,16 @@ public class VNPayResponseHandler {
 
     // Convert VNPayResponse to RefundResult
     protected RefundResult toRefundResult(VNPayResponse response) {
-        logger.info("Processing refund response: transactionId {}", response.getTransactionId());
+        logger.info(LoggerMessages.VNPAY_REFUND_EXECUTED, response.getTransactionId());
         if (response.getStatus().equals(VNPayResponseStatus.FAILURE)) {
-            throw new PaymentProcessingException("Refund processing failed: " + response.getErrorMessage());
+            throw new PaymentProcessingException(String.format(ErrorMessages.VNPAY_REFUND_FAILED, response.getErrorMessage()));
         }
         return RefundResult.builder()
                 .transactionId(response.getTransactionId())
                 .transactionType(response.getTransactionType())
                 .refundDate(LocalDateTime.now())
                 .errorMessage(response.getErrorMessage())
-                .refundStatus(RefundStatus.REFUNDED )
+                .refundStatus(RefundStatus.REFUNDED)
                 .build();
     }
 }
