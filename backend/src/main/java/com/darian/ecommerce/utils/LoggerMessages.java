@@ -47,7 +47,7 @@ public class LoggerMessages {
     public static final String PRODUCT_UPDATE = "User {} updating product: {}";
     public static final String PRODUCT_UPDATE_INVALID = "Invalid product details for update: {}";
     public static final String PRODUCT_UPDATE_SUCCESS = "Product updated successfully: {} by user {}";
-    public static final String PRODUCT_DELETE_ATTEMPT = "User {} attempting to delete product: {}";
+    public static final String PRODUCT_DELETE = "User {} attempting to delete product: {}";
     public static final String PRODUCT_DELETE_SUCCESS = "Product {} deleted successfully by user {}";
     public static final String PRODUCT_QUANTITY_CHECK = "Checking quantity for product: {}";
     public static final String PRODUCT_DELETION_VALIDATE = "Validating deletion for product {} by user {}";

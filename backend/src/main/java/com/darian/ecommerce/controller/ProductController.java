@@ -8,6 +8,7 @@ import com.darian.ecommerce.dto.RelatedProductDTO;
 import com.darian.ecommerce.enums.UserRole;
 import com.darian.ecommerce.service.ProductService;
 import com.darian.ecommerce.service.RelatedProductService;
+import com.darian.ecommerce.utils.ApiEndpoints;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.resource.ResourceUrlProvider;
@@ -15,7 +16,7 @@ import org.springframework.web.servlet.resource.ResourceUrlProvider;
 import java.util.List;
 
 @RestController
-@RequestMapping("/products")
+@RequestMapping(ApiEndpoints.PRODUCTS)
 public class ProductController {
     private final ProductService productService;
     private final RelatedProductService relatedProductService;
@@ -27,35 +28,35 @@ public class ProductController {
         this.resourceUrlProvider = resourceUrlProvider;
     }
 
-    @GetMapping("/customer")
+    @GetMapping(ApiEndpoints.PRODUCTS_CUSTOMER)
     public ResponseEntity<List<CustomerProductDTO>> getCustomerProductList() {
         List<CustomerProductDTO> products = productService.getProductList(UserRole.CUSTOMER);
         return ResponseEntity.ok(products);
     }
 
-    @GetMapping("/manager")
+    @GetMapping(ApiEndpoints.PRODUCTS_MANAGER)
     public ResponseEntity<List<ManagerProductDTO>> getManagerProductList() {
         List<ManagerProductDTO> products = productService.getProductList(UserRole.MANAGER);
         return ResponseEntity.ok(products);
     }
 
-    @GetMapping("/customer/{productId}")
+    @GetMapping(ApiEndpoints.PRODUCT_CUSTOMER_DETAILS)
     public ResponseEntity<CustomerProductDTO> getCustomerProductDetails(
             @RequestParam Integer userId,
-            @PathVariable Long productId){
-        CustomerProductDTO dto = productService.getProductDetails(userId,productId,UserRole.CUSTOMER);
+            @PathVariable Long productId) {
+        CustomerProductDTO dto = productService.getProductDetails(userId, productId, UserRole.CUSTOMER);
         return ResponseEntity.ok(dto);
-    };
+    }
 
-    @GetMapping("/manager/{productId}")
+    @GetMapping(ApiEndpoints.PRODUCT_MANAGER_DETAILS)
     public ResponseEntity<ManagerProductDTO> getManagerProductDetails(
             @RequestParam Integer userId,
-            @PathVariable Long productId){
-        ManagerProductDTO dto = productService.getProductDetails(userId,productId,UserRole.MANAGER);
+            @PathVariable Long productId) {
+        ManagerProductDTO dto = productService.getProductDetails(userId, productId, UserRole.MANAGER);
         return ResponseEntity.ok(dto);
-    };
+    }
 
-    @GetMapping("/customer/search")
+    @GetMapping(ApiEndpoints.PRODUCT_CUSTOMER_SEARCH)
     public ResponseEntity<List<CustomerProductDTO>> searchProductsForCustomer(
             @RequestParam Integer userId,
             @RequestParam String keyword) {
@@ -63,7 +64,7 @@ public class ProductController {
         return ResponseEntity.ok(products);
     }
 
-    @GetMapping("/manager/search")
+    @GetMapping(ApiEndpoints.PRODUCT_MANAGER_SEARCH)
     public ResponseEntity<List<ManagerProductDTO>> searchProductsForManager(
             @RequestParam Integer userId,
             @RequestParam String keyword) {
@@ -71,14 +72,11 @@ public class ProductController {
         return ResponseEntity.ok(products);
     }
 
-
-    @GetMapping("/{productId}/related")
+    @GetMapping(ApiEndpoints.PRODUCT_RELATED)
     public ResponseEntity<List<RelatedProductDTO>> getRelatedProducts(@PathVariable Long productId) {
         List<RelatedProductDTO> relatedProducts = relatedProductService.suggestRelatedProducts(productId);
         return ResponseEntity.ok(relatedProducts);
     }
-
-
 
     @PostMapping
     public ResponseEntity<ManagerProductDTO> addProduct(
@@ -88,7 +86,7 @@ public class ProductController {
         return ResponseEntity.ok(createdProduct);
     }
 
-    @DeleteMapping("/{productId}")
+    @DeleteMapping(ApiEndpoints.PRODUCT_BY_ID)
     public ResponseEntity<Void> deleteProduct(
             @PathVariable Long productId,
             @RequestParam Integer userId) {
@@ -96,7 +94,7 @@ public class ProductController {
         return ResponseEntity.noContent().build();
     }
 
-    @PutMapping("/{productId}")
+    @PutMapping(ApiEndpoints.PRODUCT_BY_ID)
     public ResponseEntity<ManagerProductDTO> updateProduct(
             @RequestParam Integer userId,
             @PathVariable Long productId,
@@ -104,6 +102,4 @@ public class ProductController {
         ManagerProductDTO updatedProduct = productService.updateProduct(userId, productId, productDTO);
         return ResponseEntity.ok(updatedProduct);
     }
-
-
 }

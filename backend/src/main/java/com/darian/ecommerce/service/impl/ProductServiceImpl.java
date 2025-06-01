@@ -9,10 +9,8 @@ import com.darian.ecommerce.businesslogic.productsearch.ProductSearchFetcherFact
 import com.darian.ecommerce.dto.ManagerProductDTO;
 import com.darian.ecommerce.dto.ProductDTO;
 import com.darian.ecommerce.entity.Product;
-import com.darian.ecommerce.entity.ProductImage;
 import com.darian.ecommerce.enums.UserRole;
 import com.darian.ecommerce.event.AddProductEvent;
-import com.darian.ecommerce.event.CheckDeleteLimitEvent;
 import com.darian.ecommerce.event.SearchProductEvent;
 import com.darian.ecommerce.event.ViewProductEvent;
 import com.darian.ecommerce.repository.ProductRepository;
@@ -23,12 +21,10 @@ import com.darian.ecommerce.utils.LoggerMessages;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class ProductServiceImpl implements ProductService {
@@ -171,7 +167,7 @@ public class ProductServiceImpl implements ProductService {
     // Delete a product by ID (Manager only)
     @Override
     public void deleteProduct(Long productId, Integer userId) {
-        logger.info(LoggerMessages.PRODUCT_DELETE_ATTEMPT, userId, productId);
+        logger.info(LoggerMessages.PRODUCT_DELETE, userId, productId);
         if (!validateDeletion(productId,userId)) return;
         //update catalog??? need more check
         //update database

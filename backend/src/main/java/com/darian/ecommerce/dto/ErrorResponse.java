@@ -1,16 +1,32 @@
 package com.darian.ecommerce.dto;
 
-import lombok.AllArgsConstructor;
+import com.darian.ecommerce.enums.ErrorCode;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
-@NoArgsConstructor
-@AllArgsConstructor
 public class ErrorResponse {
-    private Integer status;
+    private int status;
+    private int errorCode;
     private String error;
     private String message;
+    private LocalDateTime timestamp;
+
+    public ErrorResponse(int status, String error, String message) {
+        this.status = status;
+        this.error = error;
+        this.message = message;
+        this.timestamp = LocalDateTime.now();
+    }
+
+    public ErrorResponse(int status, ErrorCode errorCode, String message) {
+        this.status = status;
+        this.errorCode = errorCode.getCode();
+        this.error = errorCode.getDefaultMessage();
+        this.message = message;
+        this.timestamp = LocalDateTime.now();
+    }
 }

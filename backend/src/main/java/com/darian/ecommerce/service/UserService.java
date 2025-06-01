@@ -1,6 +1,6 @@
 package com.darian.ecommerce.service;
 
-import com.darian.ecommerce.config.exception.user.UsernameNotFoundException;
+import com.darian.ecommerce.dto.LoginDTO;
 import com.darian.ecommerce.dto.UserDTO;
 import com.darian.ecommerce.entity.User;
 
@@ -8,17 +8,16 @@ public interface UserService {
     // Register a new user
     UserDTO register(UserDTO userDTO);
 
-    // Load user by username (for authentication)
-//    UserDTO loadUserByUsername(String username);
+    // Login user
+    UserDTO login(LoginDTO loginDTO);
 
+    // Check if username exists
     Boolean existedByUsername(String username);
 
+    // Check if email exists
     Boolean existedByEmail(String email);
 
-    //     Load user by username for authentication
-    UserDTO loadUserByUsername(String username) throws UsernameNotFoundException;
-
-    User getUserById(Integer customerId);
-
+    // Get user by ID
+    User getUserById(Integer userId);
 
 }

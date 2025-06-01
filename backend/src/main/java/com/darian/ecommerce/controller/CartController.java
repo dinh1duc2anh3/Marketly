@@ -2,11 +2,12 @@ package com.darian.ecommerce.controller;
 
 import com.darian.ecommerce.dto.CartDTO;
 import com.darian.ecommerce.service.CartService;
+import com.darian.ecommerce.utils.ApiEndpoints;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/cart")
+@RequestMapping(ApiEndpoints.CART)
 public class CartController {
     private final CartService cartService;
 
@@ -25,7 +26,7 @@ public class CartController {
     }
 
     // Add a product to the user's cart
-    @PostMapping("/{userId}/add")
+    @PostMapping(ApiEndpoints.CART_ADD)
     public ResponseEntity<CartDTO> addProductToCart(@PathVariable Integer userId,
                                                     @RequestParam Long productId,
                                                     @RequestParam Integer quantity) {
@@ -34,14 +35,14 @@ public class CartController {
     }
 
     // View the user's cart
-    @GetMapping("/{userId}")
+    @GetMapping(ApiEndpoints.CART_BY_USER)
     public ResponseEntity<CartDTO> viewCart(@PathVariable Integer userId) {
         CartDTO cartDTO = cartService.viewCart(userId);
         return ResponseEntity.ok(cartDTO);
     }
 
     // Update the quantity of a product in the user's cart
-    @PutMapping("/{userId}/update")
+    @PutMapping(ApiEndpoints.CART_UPDATE)
     public ResponseEntity<CartDTO> updateCart(@PathVariable Integer userId,
                                               @RequestParam Long productId,
                                               @RequestParam Integer quantity) {
@@ -50,7 +51,7 @@ public class CartController {
     }
 
     // Remove a product from the user's cart
-    @DeleteMapping("/{userId}/remove")
+    @DeleteMapping(ApiEndpoints.CART_REMOVE)
     public ResponseEntity<Void> removeFromCart(@PathVariable Integer userId,
                                                @RequestParam Long productId) {
         cartService.removeFromCart(userId, productId);
@@ -58,7 +59,7 @@ public class CartController {
     }
 
     // Empty the user's cart
-    @DeleteMapping("/{userId}/empty")
+    @DeleteMapping(ApiEndpoints.CART_EMPTY)
     public ResponseEntity<Void> emptyCart(@PathVariable Integer userId) {
         cartService.emptyCart(userId);
         return ResponseEntity.noContent().build();

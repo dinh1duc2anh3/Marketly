@@ -5,6 +5,7 @@ import com.darian.ecommerce.dto.VNPayRequest;
 import com.darian.ecommerce.dto.VNPayResponse;
 import com.darian.ecommerce.enums.VNPayResponseStatus;
 import com.darian.ecommerce.utils.ApiEndpoints;
+import com.darian.ecommerce.utils.Constants;
 import com.darian.ecommerce.utils.LoggerMessages;
 import com.darian.ecommerce.utils.ErrorMessages;
 import org.slf4j.Logger;
@@ -58,7 +59,7 @@ public class VNPayApiGateway {
         logger.info(LoggerMessages.VNPAY_SENDING_REQUEST, request.getOrderId());
         try {
             VNPayResponse response = vnPayAPI.simulateRefund(request);
-            logger.info(LoggerMessages.VNPAY_REFUND_EXECUTED, orderId, response.getStatus());
+            logger.info(LoggerMessages.VNPAY_REFUND_EXECUTED, request.getOrderId(), response.getStatus());
             return response;
         } catch (Exception e) {
             logger.error(LoggerMessages.VNPAY_CONNECTION_ERROR, e.getMessage());

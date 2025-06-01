@@ -1,5 +1,6 @@
 package com.darian.ecommerce.controller;
 
+import com.darian.ecommerce.config.exception.order.OrderNotFoundException;
 import com.darian.ecommerce.dto.DeliveryInfoDTO;
 import com.darian.ecommerce.dto.InvoiceDTO;
 import com.darian.ecommerce.dto.OrderDTO;
@@ -34,14 +35,14 @@ public class OrderController {
 //    }
 
     @PostMapping(ApiEndpoints.ORDER_CANCEL)
-    public ResponseEntity<Void> cancelOrder(@PathVariable Long orderId) {
+    public ResponseEntity<Void> cancelOrder(@PathVariable Long orderId) throws OrderNotFoundException {
         logger.info(LoggerMessages.ORDER_STATUS_CHANGED, "current", "CANCELLED", orderId);
         orderService.cancelOrder(orderId);
         return ResponseEntity.noContent().build();
     }
 
     @GetMapping(ApiEndpoints.ORDER_BY_ID)
-    public ResponseEntity<OrderDTO> getOrderDetails(@PathVariable Long orderId) {
+    public ResponseEntity<OrderDTO> getOrderDetails(@PathVariable Long orderId) throws OrderNotFoundException {
         OrderDTO result = orderService.getOrderDetails(orderId);
         logger.info(LoggerMessages.ORDER_UPDATED, orderId);
         return ResponseEntity.ok(result);
@@ -49,14 +50,14 @@ public class OrderController {
 
     @PutMapping(ApiEndpoints.ORDER_DELIVERY)
     public ResponseEntity<OrderDTO> setDeliveryInfo(@PathVariable Long orderId,
-                                                  @RequestBody DeliveryInfoDTO deliveryInfoDTO) {
+                                                  @RequestBody DeliveryInfoDTO deliveryInfoDTO) throws OrderNotFoundException {
         OrderDTO result = orderService.setDeliveryInfo(orderId, deliveryInfoDTO);
         logger.info(LoggerMessages.ORDER_UPDATED, orderId);
         return ResponseEntity.ok(result);
     }
 
     @GetMapping(ApiEndpoints.ORDER_BY_ID + "/invoice")
-    public ResponseEntity<InvoiceDTO> getInvoice(@PathVariable Long orderId) {
+    public ResponseEntity<InvoiceDTO> getInvoice(@PathVariable Long orderId) throws OrderNotFoundException {
         InvoiceDTO result = orderService.getInvoice(orderId);
         return ResponseEntity.ok(result);
     }
