@@ -11,9 +11,11 @@ import com.darian.ecommerce.repository.AuditLogRepository;
 import com.darian.ecommerce.service.AuditLogService;
 import com.darian.ecommerce.service.ProductService;
 import com.darian.ecommerce.service.UserService;
+import com.darian.ecommerce.subsystem.vnpay.VNPayResponseHandler;
 import com.darian.ecommerce.utils.LoggerMessages;
 import com.darian.ecommerce.utils.ErrorMessages;
 import jakarta.persistence.EntityNotFoundException;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Lazy;
@@ -24,10 +26,9 @@ import java.util.Optional;
 
 @Service
 public class AuditLogServiceImpl implements AuditLogService {
-    // Logger for logging actions to console/file
-    private static final Logger logger = LoggerFactory.getLogger(AuditLogServiceImpl.class);
 
-    // Dependency injected via constructor
+    private static final Logger log = LoggerFactory.getLogger(AuditLogServiceImpl.class);
+
     private final AuditLogRepository auditLogRepository;
     private final UserService userService;
     private final ProductService productService;
@@ -44,64 +45,52 @@ public class AuditLogServiceImpl implements AuditLogService {
     // Log a search action performed by a user
     @Override
     public void logSearchAction(Integer userId, String keyword, UserRole role) {
-        logger.info(LoggerMessages.PRODUCT_SEARCH, userId, role, keyword);
-        //create audit log entity
-        AuditLog log = new AuditLog();
+        log.info(LoggerMessages.PRODUCT_SEARCH, userId, role, keyword);
         User user = userService.getUserById(userId);
-        log.setUser(user);
-        log.setActionType(ActionType.SEARCH_PRODUCTS);
-        log.setKeyword(keyword);
-        log.setRole(role);
-        log.setTimestamp(LocalDateTime.now());
-        //save audit log entity to db
-        auditLogRepository.save(log);
+        
+        AuditLog auditLog = new AuditLog();
+        auditLog.setUser(user);
+        auditLog.setRole(role);
+        auditLog.setActionType(ActionType.SEARCH_PRODUCTS);
+        auditLog.setKeyword(keyword);
+        auditLog.setTimestamp(LocalDateTime.now());
+        auditLogRepository.save(auditLog);
     }
 
-    // Log a product view action by a user
     @Override
     public void logViewProduct(Long productId, Integer userId, UserRole role) {
-        logger.info(LoggerMessages.PRODUCT_VIEW, userId, role, productId);
-
-        //create audit log entity
-        AuditLog log = new AuditLog();
-        log.setActionType(ActionType.VIEW_PRODUCT);
-
-        //fetch + set user
+        log.info(LoggerMessages.PRODUCT_VIEW, userId, role, productId);
         User user = userService.getUserById(userId);
-        log.setUser(user);
-
-        //fetch + set product
-        Product product = productService.getProductById(productId)
-            .orElseThrow(() -> new EntityNotFoundException(String.format(ErrorMessages.PRODUCT_NOT_FOUND, productId)));
-        log.setProduct(product);
-        log.setKeyword(product.getName());
-
-        log.setRole(role);
-
-        //save audit log entity to db
-        auditLogRepository.save(log);
+        Product product = productService.getProductById(productId);
+        
+        AuditLog auditLog = new AuditLog();
+        auditLog.setUser(user);
+        auditLog.setRole(role);
+        auditLog.setActionType(ActionType.VIEW_PRODUCT);
+        auditLog.setProduct(product);
+        auditLog.setKeyword(product.getName());
+        auditLog.setTimestamp(LocalDateTime.now());
+        auditLogRepository.save(auditLog);
     }
 
     // Log an add product action, return true if successful
     @Override
     public Boolean logAddAction(Integer userId, Long productId, UserRole role) {
         try {
-            logger.info(LoggerMessages.PRODUCT_ADD, userId, role, productId);
-
-            //create audit log entity
-            AuditLog log = new AuditLog();
+            log.info(LoggerMessages.PRODUCT_ADD, userId, role, productId);
             User user = userService.getUserById(userId);
-            log.setUser(user);
-            log.setActionType(ActionType.ADD_PRODUCT);
-            Optional<Product> product = productService.getProductById(productId);
-            if (product.isPresent()) log.setProduct(product.get());
-            log.setRole(role);
-            log.setTimestamp(LocalDateTime.now());
-
-            auditLogRepository.save(log);
+            Product product = productService.getProductById(productId);
+            
+            AuditLog auditLog = new AuditLog();
+            auditLog.setUser(user);
+            auditLog.setRole(role);
+            auditLog.setActionType(ActionType.ADD_PRODUCT);
+            auditLog.setProduct(product);
+            auditLog.setTimestamp(LocalDateTime.now());
+            auditLogRepository.save(auditLog);
             return true;
         } catch (Exception e) {
-            logger.error(LoggerMessages.AUDIT_ACTION_FAILED, "add", userId, e.getMessage());
+            log.error(LoggerMessages.AUDIT_ACTION_FAILED, "add", userId, e.getMessage());
             return false;
         }
     }
@@ -110,55 +99,63 @@ public class AuditLogServiceImpl implements AuditLogService {
     @Override
     public Boolean logDeleteAction(Integer userId, Long productId, UserRole role) {
         try {
-            logger.info(LoggerMessages.PRODUCT_DELETE, userId, role, productId);
-            AuditLog log = new AuditLog();
+            log.info(LoggerMessages.PRODUCT_DELETE, userId, role, productId);
             User user = userService.getUserById(userId);
-            log.setUser(user);
-            log.setActionType(ActionType.DELETE_PRODUCT);
-            Optional<Product> product = productService.getProductById(productId);
-            if (product.isPresent()) log.setProduct(product.get());
-            log.setRole(role);
-            log.setTimestamp(LocalDateTime.now());
-            auditLogRepository.save(log);
+            Product product = productService.getProductById(productId);
+            
+            AuditLog auditLog = new AuditLog();
+            auditLog.setUser(user);
+            auditLog.setRole(role);
+            auditLog.setActionType(ActionType.DELETE_PRODUCT);
+            auditLog.setProduct(product);
+            auditLog.setTimestamp(LocalDateTime.now());
+            auditLogRepository.save(auditLog);
             return true;
         } catch (Exception e) {
-            logger.error(LoggerMessages.AUDIT_ACTION_FAILED, "delete", userId, e.getMessage());
+            log.error(LoggerMessages.AUDIT_ACTION_FAILED, "delete", userId, e.getMessage());
             return false;
         }
     }
 
-    // Check if the user has exceeded the delete limit
     @Override
     public Boolean checkDeleteLimit(Integer userId) {
-        logger.info(LoggerMessages.PRODUCT_DELETE_LIMIT, userId);
+        log.info(LoggerMessages.PRODUCT_DELETE_LIMIT, userId);
         Integer deleteCount = countDeletesByUserId(userId);
         boolean withinLimit = deleteCount < 30;
-        logger.info(LoggerMessages.PRODUCT_DELETE_COUNT, userId, deleteCount, withinLimit);
+        log.info(LoggerMessages.PRODUCT_DELETE_COUNT, userId, deleteCount, withinLimit);
         return withinLimit;
     }
-
+//
+//    @Override
+//    public Integer countDeletesByUserId(Integer userId) {
+//        return auditLogRepository.countDeletesByUserId(userId);
+//    }
     @Override
+    //TODO: refactor this method
     public Integer countDeletesByUserId(Integer userId) {
-        return auditLogRepository.countDeletesByUserId(userId);
+        LocalDateTime startOfDay = LocalDateTime.now().withHour(0).withMinute(0).withSecond(0);
+        return auditLogRepository.countByUserAndActionTypeAndTimestampAfter(
+                userService.getUserById(userId), ActionType.DELETE_PRODUCT, startOfDay);
     }
 
     // Log an update product action, return true if successful
     @Override
     public Boolean logUpdateAction(Integer userId, Long productId, UserRole role) {
         try {
-            logger.info(LoggerMessages.PRODUCT_UPDATE, userId, role, productId);
-            AuditLog log = new AuditLog();
+            log.info(LoggerMessages.PRODUCT_UPDATE, userId, role, productId);
             User user = userService.getUserById(userId);
-            log.setUser(user);
-            log.setActionType(ActionType.UPDATE_PRODUCT);
-            Optional<Product> product = productService.getProductById(productId);
-            if (product.isPresent()) log.setProduct(product.get());
-            log.setRole(role);
-            log.setTimestamp(LocalDateTime.now());
-            auditLogRepository.save(log);
+            Product product = productService.getProductById(productId);
+            
+            AuditLog auditLog = new AuditLog();
+            auditLog.setUser(user);
+            auditLog.setRole(role);
+            auditLog.setActionType(ActionType.UPDATE_PRODUCT);
+            auditLog.setProduct(product);
+            auditLog.setTimestamp(LocalDateTime.now());
+            auditLogRepository.save(auditLog);
             return true;
         } catch (Exception e) {
-            logger.error(LoggerMessages.AUDIT_ACTION_FAILED, "update", userId, e.getMessage());
+            log.error(LoggerMessages.AUDIT_ACTION_FAILED, "update", userId, e.getMessage());
             return false;
         }
     }
@@ -167,33 +164,34 @@ public class AuditLogServiceImpl implements AuditLogService {
     @Override
     public Boolean logOrderAction(Integer userId, Long orderId, UserRole role, ActionType action) {
         try {
-            logger.info(LoggerMessages.AUDIT_ORDER_ACTION, userId, role, orderId);
-            AuditLog log = new AuditLog();
+            log.info(LoggerMessages.AUDIT_ORDER_ACTION, userId, role, orderId);
             User user = userService.getUserById(userId);
-            log.setUser(user);
-            log.setActionType(action);
-            log.setRole(role);
-            log.setTimestamp(LocalDateTime.now());
-            auditLogRepository.save(log);
+            
+            AuditLog auditLog = new AuditLog();
+            auditLog.setUser(user);
+            auditLog.setRole(role);
+            auditLog.setActionType(action);
+            auditLog.setKeyword("Order ID: " + orderId);
+            auditLog.setTimestamp(LocalDateTime.now());
+            auditLogRepository.save(auditLog);
             return true;
         } catch (Exception e) {
-            logger.error(LoggerMessages.AUDIT_ACTION_FAILED, "order", userId, e.getMessage());
+            log.error(LoggerMessages.AUDIT_ACTION_FAILED, "order", userId, e.getMessage());
             return false;
         }
     }
 
     // Log a payment transaction
     @Override
-    public void logPayment(BasePaymentResult paymentResult) {
-        logger.info(LoggerMessages.AUDIT_PAYMENT, paymentResult.getTransactionId(), paymentResult.getTransactionType());
-        AuditLog log = new AuditLog();
-        if (paymentResult.getTransactionType().equals(TransactionType.PAYMENT)) {
-            log.setActionType(ActionType.PAY_ORDER);
-        } else if (paymentResult.getTransactionType().equals(TransactionType.REFUND)) {
-            log.setActionType(ActionType.CANCEL_ORDER);
-        }
-        log.setRole(UserRole.CUSTOMER);
-        log.setTimestamp(LocalDateTime.now());
-        auditLogRepository.save(log);
+    public void logPayment(BasePaymentResult result) {
+        log.info(LoggerMessages.AUDIT_PAYMENT, result.getTransactionId(), result.getTransactionType());
+        AuditLog auditLog = new AuditLog();
+        auditLog.setActionType(result.getTransactionType() == TransactionType.PAYMENT ? 
+                ActionType.PAY_ORDER : ActionType.CANCEL_ORDER);
+        auditLog.setKeyword(String.format("%s processed for order %d (Transaction ID: %s)", 
+                result.getTransactionType(), result.getOrderId(), result.getTransactionId()));
+        auditLog.setRole(UserRole.CUSTOMER);
+        auditLog.setTimestamp(LocalDateTime.now());
+        auditLogRepository.save(auditLog);
     }
 }

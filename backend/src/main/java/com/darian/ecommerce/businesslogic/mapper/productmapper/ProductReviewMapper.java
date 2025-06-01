@@ -19,8 +19,7 @@ public class ProductReviewMapper {
     }
 
     public ProductReview toEntity(ProductReviewDTO reviewDTO) {
-        Product product = productService.getProductById(reviewDTO.getProductId())
-                .orElseThrow(() -> new IllegalArgumentException("Product not found"));
+        Product product = productService.getProductById(reviewDTO.getProductId());
 
         User user = userService.getUserById(reviewDTO.getCustomerId());
 

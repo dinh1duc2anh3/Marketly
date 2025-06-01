@@ -30,7 +30,7 @@ public class ErrorMessages {
     public static final String CART_NOT_FOUND = "Cart not found for user: %s";
     public static final String CART_ITEM_NOT_FOUND = "Item not found in cart: %s";
     public static final String CART_INVALID_QUANTITY = "Invalid quantity for product: %s";
-    
+
     // Validation errors
     public static final String VALIDATION_REQUIRED_FIELD = "Required field missing: %s";
     public static final String VALIDATION_INVALID_VALUE = "Invalid value for field: %s";
@@ -40,7 +40,7 @@ public class ErrorMessages {
     public static final String AUTH_INVALID_TOKEN = "Invalid authentication token";
     public static final String AUTH_EXPIRED_TOKEN = "Authentication token expired";
     public static final String AUTH_INSUFFICIENT_PERMISSIONS = "Insufficient permissions for this operation";
-    
+
     private ErrorMessages() {
         // Private constructor to prevent instantiation
     }

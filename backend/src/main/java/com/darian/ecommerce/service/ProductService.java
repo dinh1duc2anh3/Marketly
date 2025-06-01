@@ -4,7 +4,6 @@ import com.darian.ecommerce.dto.ManagerProductDTO;
 import com.darian.ecommerce.dto.ProductDTO;
 import com.darian.ecommerce.entity.Product;
 import com.darian.ecommerce.enums.UserRole;
-import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
@@ -16,7 +15,7 @@ public interface ProductService {
     // Get product details based on user ID, product ID, and role
     <T extends ProductDTO> T getProductDetails(Integer userId, Long productId, UserRole role);
 
-    Optional<Product> getProductById(Long productId);
+    Product getProductById(Long productId);
 
     // Search products by keyword and role
     <T extends ProductDTO> List<T> searchProducts(Integer userId, String keyword, UserRole role);
@@ -37,7 +36,7 @@ public interface ProductService {
     Boolean validateProductDetails(ProductDTO productDTO);
 
     // Check the stock quantity of a product
-    Integer checkProductQuantity(Long productId);
+    Boolean checkProductQuantity(Long productId, Integer quantity);
 
     // Validate conditions before deleting a product
     Boolean validateDeletion(Long productId, Integer userId);

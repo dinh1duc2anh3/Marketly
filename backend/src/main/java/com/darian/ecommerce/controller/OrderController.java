@@ -5,17 +5,22 @@ import com.darian.ecommerce.dto.DeliveryInfoDTO;
 import com.darian.ecommerce.dto.InvoiceDTO;
 import com.darian.ecommerce.dto.OrderDTO;
 import com.darian.ecommerce.service.OrderService;
+import com.darian.ecommerce.subsystem.vnpay.VNPayResponseHandler;
 import com.darian.ecommerce.utils.ApiEndpoints;
 import com.darian.ecommerce.utils.LoggerMessages;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+
 @RestController
 @RequestMapping(ApiEndpoints.ORDERS)
 public class OrderController {
-    private static final Logger logger = LoggerFactory.getLogger(OrderController.class);
+
+    private static final Logger log = LoggerFactory.getLogger(OrderController.class);
+
     private final OrderService orderService;
 
     public OrderController(OrderService orderService) {
@@ -36,7 +41,7 @@ public class OrderController {
 
     @PostMapping(ApiEndpoints.ORDER_CANCEL)
     public ResponseEntity<Void> cancelOrder(@PathVariable Long orderId) throws OrderNotFoundException {
-        logger.info(LoggerMessages.ORDER_STATUS_CHANGED, "current", "CANCELLED", orderId);
+        log.info(LoggerMessages.ORDER_STATUS_CHANGED, "current", "CANCELLED", orderId);
         orderService.cancelOrder(orderId);
         return ResponseEntity.noContent().build();
     }
@@ -44,7 +49,7 @@ public class OrderController {
     @GetMapping(ApiEndpoints.ORDER_BY_ID)
     public ResponseEntity<OrderDTO> getOrderDetails(@PathVariable Long orderId) throws OrderNotFoundException {
         OrderDTO result = orderService.getOrderDetails(orderId);
-        logger.info(LoggerMessages.ORDER_UPDATED, orderId);
+        log.info(LoggerMessages.ORDER_UPDATED, orderId);
         return ResponseEntity.ok(result);
     }
 
@@ -52,7 +57,7 @@ public class OrderController {
     public ResponseEntity<OrderDTO> setDeliveryInfo(@PathVariable Long orderId,
                                                   @RequestBody DeliveryInfoDTO deliveryInfoDTO) throws OrderNotFoundException {
         OrderDTO result = orderService.setDeliveryInfo(orderId, deliveryInfoDTO);
-        logger.info(LoggerMessages.ORDER_UPDATED, orderId);
+        log.info(LoggerMessages.ORDER_UPDATED, orderId);
         return ResponseEntity.ok(result);
     }
 

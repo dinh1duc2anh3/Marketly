@@ -15,7 +15,7 @@ import java.util.List;
 @Service
 public class CategoryServiceImpl implements CategoryService {
     // Logger for logging actions and errors
-    private static final Logger logger = LoggerFactory.getLogger(CategoryServiceImpl.class);
+    private static final Logger log = LoggerFactory.getLogger(CategoryServiceImpl.class);
 
     // Dependencies injected via constructor
     private final CategoryRepository categoryRepository;
@@ -32,7 +32,7 @@ public class CategoryServiceImpl implements CategoryService {
     // Get all product categories
     @Override
     public List<CategoryDTO> findAllCategories() {
-        logger.info(LoggerMessages.CATEGORY_LIST_FETCH);
+        log.info(LoggerMessages.CATEGORY_LIST_FETCH);
         List<Category>  allCategory = categoryRepository.findAll();
 
         return allCategory.stream().map(categoryMapper::toDTO).toList();
@@ -42,9 +42,9 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public CategoryDTO saveCategory(CategoryDTO category) {
         //- check again saveCategory , check if the input is category or categoryDTO
-        logger.info(LoggerMessages.CATEGORY_SAVE, category.getName());
+        log.info(LoggerMessages.CATEGORY_SAVE, category.getName());
         Category savedCategory = categoryRepository.save(categoryMapper.toEntity(category));
-        logger.info(LoggerMessages.CATEGORY_SAVED, savedCategory.getId());
+        log.info(LoggerMessages.CATEGORY_SAVED, savedCategory.getId());
         return category;
     }
 

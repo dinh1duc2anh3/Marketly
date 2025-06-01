@@ -35,8 +35,7 @@ public class OrderItemMapper {
     }
 
     public OrderItem toEntity(OrderItemDTO dto) {
-        Product product = productService.getProductById(dto.getProductId())
-                .orElseThrow(() -> new IllegalArgumentException("Product not found"));
+        Product product = productService.getProductById(dto.getProductId());
 
         return OrderItem.builder()
                 .product(product)

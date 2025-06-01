@@ -31,7 +31,8 @@ public class LoggerMessages {
     public static final String CART_ADD_PRODUCT = "Adding product {} with quantity {} to cart for user {}";
     public static final String CART_UPDATE_QUANTITY = "Updating quantity of product {} to {} in cart for user {}";
     public static final String CART_REMOVE_PRODUCT = "Removing product {} from cart for user {}";
-    public static final String CART_CLEAR = "Clearing cart for user {}";
+    public static final String CART_CLEARING = "Clearing cart for user {}";
+    public static final String CART_CLEARED = "Cleared cart for user {}";
     public static final String CART_VIEW = "Viewing cart for user {}";
     public static final String CART_PRODUCT_NOT_AVAILABLE = "Product {} is not available for user {}";
     

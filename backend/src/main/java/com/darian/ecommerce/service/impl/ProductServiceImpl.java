@@ -17,7 +17,9 @@ import com.darian.ecommerce.repository.ProductRepository;
 import com.darian.ecommerce.service.AuditLogService;
 import com.darian.ecommerce.service.ProductService;
 import com.darian.ecommerce.utils.Constants;
+import com.darian.ecommerce.utils.ErrorMessages;
 import com.darian.ecommerce.utils.LoggerMessages;
+import jakarta.persistence.EntityNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationEventPublisher;
@@ -80,8 +82,9 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public Optional<Product> getProductById(Long productId) {
-        return productRepository.findById(productId);
+    public Product getProductById(Long productId) {
+        return productRepository.findById(productId)
+                .orElseThrow(() -> new EntityNotFoundException(String.format(ErrorMessages.PRODUCT_NOT_FOUND, productId)));
     }
 
     // Search products using Factory Pattern based on role
@@ -191,10 +194,10 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public Integer checkProductQuantity(Long productId) {
+    public Boolean checkProductQuantity(Long productId, Integer quantity) {
         logger.info(LoggerMessages.PRODUCT_QUANTITY_CHECK, productId);
-        Optional<Product> product = getProductById(productId);
-        return (product.isPresent()) ? product.get().getStockQuantity() : 0;
+        Product product = getProductById(productId);
+        return product.getStockQuantity() >= quantity;
     }
 
     // Validate general conditions before deleting a product
@@ -233,8 +236,8 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public Boolean checkDeletionConstraints(Long productId) {
         logger.info(LoggerMessages.PRODUCT_DELETION_CONSTRAINTS_CHECK, productId);
-        Integer stock = checkProductQuantity(productId);
-        return stock > 0; //Can only delete if stock is above 0
+        Product product = getProductById(productId);
+        return product.getStockQuantity() > 0; //Can only delete if stock is above 0
     }
 
     // Check if deleting a product affects any orders

@@ -3,19 +3,24 @@ package com.darian.ecommerce.controller;
 import com.darian.ecommerce.dto.LoginDTO;
 import com.darian.ecommerce.dto.UserDTO;
 import com.darian.ecommerce.service.UserService;
+import com.darian.ecommerce.subsystem.vnpay.VNPayResponseHandler;
 import com.darian.ecommerce.utils.ApiEndpoints;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.Map;
 
-@Slf4j
 @RestController
 @RequestMapping(ApiEndpoints.AUTH)
 public class AuthController {
+
+    private static final Logger log = LoggerFactory.getLogger(AuthController.class);
+
     private final UserService userService;
 
     public AuthController(UserService userService) {

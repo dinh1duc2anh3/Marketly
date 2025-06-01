@@ -1,6 +1,8 @@
 package com.darian.ecommerce.controller;
 
 import com.darian.ecommerce.dto.CartDTO;
+import com.darian.ecommerce.dto.CartItemDTO;
+import com.darian.ecommerce.service.CartItemService;
 import com.darian.ecommerce.service.CartService;
 import com.darian.ecommerce.utils.ApiEndpoints;
 import org.springframework.http.ResponseEntity;
@@ -10,10 +12,12 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping(ApiEndpoints.CART)
 public class CartController {
     private final CartService cartService;
+    private final CartItemService cartItemService;
 
     // Constructor injection for CartService
-    public CartController(CartService cartService) {
+    public CartController(CartService cartService, CartItemService cartItemService) {
         this.cartService = cartService;
+        this.cartItemService = cartItemService;
     }
 
     @RestController
@@ -27,11 +31,11 @@ public class CartController {
 
     // Add a product to the user's cart
     @PostMapping(ApiEndpoints.CART_ADD)
-    public ResponseEntity<CartDTO> addProductToCart(@PathVariable Integer userId,
+    public ResponseEntity<CartItemDTO> addProductToCart(@PathVariable Integer userId,
                                                     @RequestParam Long productId,
                                                     @RequestParam Integer quantity) {
-        CartDTO cartDTO = cartService.addProductToCart(userId, productId, quantity);
-        return ResponseEntity.ok(cartDTO);
+        CartItemDTO cartItemDTO = cartItemService.addToCart(userId, productId, quantity);
+        return ResponseEntity.ok(cartItemDTO);
     }
 
     // View the user's cart
@@ -43,25 +47,25 @@ public class CartController {
 
     // Update the quantity of a product in the user's cart
     @PutMapping(ApiEndpoints.CART_UPDATE)
-    public ResponseEntity<CartDTO> updateCart(@PathVariable Integer userId,
+    public ResponseEntity<CartItemDTO> updateCart(@PathVariable Integer userId,
                                               @RequestParam Long productId,
                                               @RequestParam Integer quantity) {
-        CartDTO cartDTO = cartService.updateCart(userId, productId, quantity);
-        return ResponseEntity.ok(cartDTO);
+        CartItemDTO cartItemDTO = cartItemService.updateQuantity(userId, productId, quantity);
+        return ResponseEntity.ok(cartItemDTO);
     }
 
     // Remove a product from the user's cart
     @DeleteMapping(ApiEndpoints.CART_REMOVE)
     public ResponseEntity<Void> removeFromCart(@PathVariable Integer userId,
                                                @RequestParam Long productId) {
-        cartService.removeFromCart(userId, productId);
+        cartItemService.removeFromCart(userId, productId);
         return ResponseEntity.noContent().build();
     }
 
     // Empty the user's cart
     @DeleteMapping(ApiEndpoints.CART_EMPTY)
     public ResponseEntity<Void> emptyCart(@PathVariable Integer userId) {
-        cartService.emptyCart(userId);
+        cartItemService.clearCart(userId);
         return ResponseEntity.noContent().build();
     }
 

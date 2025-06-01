@@ -9,14 +9,18 @@ import com.darian.ecommerce.exception.BaseException;
 import com.darian.ecommerce.exception.UserNotFoundException;
 import com.darian.ecommerce.repository.UserRepository;
 import com.darian.ecommerce.service.UserService;
+import com.darian.ecommerce.subsystem.vnpay.VNPayResponseHandler;
 import com.darian.ecommerce.utils.ErrorMessages;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-@Slf4j
 @Service
 public class UserServiceImpl implements UserService {
+
+    private static final Logger log = LoggerFactory.getLogger(UserServiceImpl.class);
 
     private final UserRepository userRepository;
     private final UserMapper userMapper;

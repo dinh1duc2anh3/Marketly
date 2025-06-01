@@ -7,6 +7,7 @@ import com.darian.ecommerce.dto.VNPayResponse;
 import com.darian.ecommerce.enums.PaymentStatus;
 import com.darian.ecommerce.enums.RefundStatus;
 import com.darian.ecommerce.enums.VNPayResponseStatus;
+import com.darian.ecommerce.service.impl.CategoryServiceImpl;
 import com.darian.ecommerce.utils.ErrorMessages;
 import com.darian.ecommerce.utils.LoggerMessages;
 import org.slf4j.Logger;
@@ -17,18 +18,16 @@ import java.time.LocalDateTime;
 
 @Component
 public class VNPayResponseHandler {
+    private static final Logger log = LoggerFactory.getLogger(VNPayResponseHandler.class);
     // Cohesion: Functional Cohesion
     // → Mọi method đều xử lý kết quả trả về từ VNPay (convert response → result object).
 
     // SRP: Không vi phạm
     // → Class này chỉ xử lý mapping giữa `VNPayResponse` và kết quả nghiệp vụ (PaymentResult, RefundResult).
 
-
-    private static final Logger logger = LoggerFactory.getLogger(VNPayResponseHandler.class);
-
     // Convert VNPayResponse to PaymentResult
     protected PaymentResult toPaymentResult(VNPayResponse response) {
-        logger.info(LoggerMessages.VNPAY_PAYMENT_EXECUTED, response.getTransactionId());
+        log.info(LoggerMessages.VNPAY_PAYMENT_EXECUTED, response.getTransactionId());
         if (response.getStatus().equals(VNPayResponseStatus.FAILURE)) {
             throw new PaymentProcessingException(String.format(ErrorMessages.VNPAY_TRANSACTION_FAILED, response.getErrorMessage()));
         }
@@ -45,7 +44,7 @@ public class VNPayResponseHandler {
 
     // Convert VNPayResponse to RefundResult
     protected RefundResult toRefundResult(VNPayResponse response) {
-        logger.info(LoggerMessages.VNPAY_REFUND_EXECUTED, response.getTransactionId());
+        log.info(LoggerMessages.VNPAY_REFUND_EXECUTED, response.getTransactionId());
         if (response.getStatus().equals(VNPayResponseStatus.FAILURE)) {
             throw new PaymentProcessingException(String.format(ErrorMessages.VNPAY_REFUND_FAILED, response.getErrorMessage()));
         }
