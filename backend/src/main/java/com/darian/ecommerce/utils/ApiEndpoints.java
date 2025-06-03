@@ -36,7 +36,7 @@ public class ApiEndpoints {
     public static final String ORDER_DELIVERY = "/{orderId}/delivery";
     
     // Payment endpoints
-    public static final String PAYMENTS = BASE_API + "/payments";
+    public static final String PAYMENT = BASE_API + "/payment";
     public static final String PAYMENT_BY_ORDER = "/{orderId}";
     public static final String PAYMENT_REFUND = "/{orderId}/refund";
     

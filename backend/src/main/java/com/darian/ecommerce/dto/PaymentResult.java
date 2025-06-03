@@ -16,4 +16,5 @@ public class PaymentResult extends BasePaymentResult {
     private String transactionContent;
     private LocalDateTime transactionDate;
     private PaymentStatus paymentStatus;
+
 }

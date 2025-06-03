@@ -20,8 +20,8 @@ public class ProductDetailFetcherFactory {
     // Get the appropriate ProductDetailFetcher based on role
     public ProductDetailFetcher<? extends ProductDTO> getFetcher(UserRole role) {
         return switch (role) {
-            case UserRole.CUSTOMER -> new CustomerProductDetailFetcher(productRepository, productMapper);
-            case UserRole.MANAGER -> new ManagerProductDetailFetcher(productRepository, productMapper);
+            case CUSTOMER -> new CustomerProductDetailFetcher(productRepository, productMapper);
+            case MANAGER -> new ManagerProductDetailFetcher(productRepository, productMapper);
             default -> throw new IllegalArgumentException("Invalid role: " + role);
         };
     }

@@ -9,9 +9,15 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class VNPayRequest {
-    private Float amount;
-    private String transactionContent;
     private Long orderId;
-    private String returnUrl;
-    private TransactionType transactionType;
+    private Float amount;
+    private String content;
+    private TransactionType transactionType; 
+    private String bankCode;
+    private String language;
+    
+    // Additional fields for refund
+    private String transactionNo;
+    private String transactionDate;
+    private String createBy;
 }

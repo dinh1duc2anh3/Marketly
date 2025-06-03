@@ -29,16 +29,15 @@ public class VNPayResponseHandler {
     protected PaymentResult toPaymentResult(VNPayResponse response) {
         log.info(LoggerMessages.VNPAY_PAYMENT_EXECUTED, response.getTransactionId());
         if (response.getStatus().equals(VNPayResponseStatus.FAILURE)) {
-            throw new PaymentProcessingException(String.format(ErrorMessages.VNPAY_TRANSACTION_FAILED, response.getErrorMessage()));
+            throw new PaymentProcessingException(String.format(ErrorMessages.VNPAY_TRANSACTION_FAILED, response.getMessage()));
         }
         return PaymentResult.builder()
                 .transactionId(response.getTransactionId())
                 .transactionType(response.getTransactionType())
                 .transactionContent("Payment for " + response.getTransactionId())
                 .transactionDate(LocalDateTime.now())
-                .errorMessage(response.getErrorMessage())
-                .totalAmount(0F)
-                .paymentStatus(PaymentStatus.PAID)
+                .totalAmount(response.getAmount() != null ? response.getAmount().floatValue() : 0F)
+                .paymentStatus(PaymentStatus.SUCCESS)
                 .build();
     }
 
@@ -46,13 +45,12 @@ public class VNPayResponseHandler {
     protected RefundResult toRefundResult(VNPayResponse response) {
         log.info(LoggerMessages.VNPAY_REFUND_EXECUTED, response.getTransactionId());
         if (response.getStatus().equals(VNPayResponseStatus.FAILURE)) {
-            throw new PaymentProcessingException(String.format(ErrorMessages.VNPAY_REFUND_FAILED, response.getErrorMessage()));
+            throw new PaymentProcessingException(String.format(ErrorMessages.VNPAY_REFUND_FAILED, response.getMessage()));
         }
         return RefundResult.builder()
                 .transactionId(response.getTransactionId())
                 .transactionType(response.getTransactionType())
                 .refundDate(LocalDateTime.now())
-                .errorMessage(response.getErrorMessage())
                 .refundStatus(RefundStatus.REFUNDED)
                 .build();
     }

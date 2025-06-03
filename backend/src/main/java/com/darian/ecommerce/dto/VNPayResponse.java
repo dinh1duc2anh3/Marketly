@@ -12,8 +12,15 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class VNPayResponse {
-    private VNPayResponseStatus status;
     private String transactionId;
-    private String errorMessage;
+    private String status;
     private TransactionType transactionType;
+    private String responseCode;
+    private String message;
+    private String bankCode;
+    private String bankTranNo;
+    private String cardType;
+    private String payDate;
+    private String orderInfo;
+    private Long amount;
 }

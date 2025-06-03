@@ -6,11 +6,14 @@ import com.darian.ecommerce.dto.PaymentResult;
 import com.darian.ecommerce.dto.RefundResult;
 import com.darian.ecommerce.entity.Order;
 import com.darian.ecommerce.enums.OrderStatus;
+import com.darian.ecommerce.enums.PaymentMethod;
 import com.darian.ecommerce.enums.PaymentStatus;
+import com.darian.ecommerce.factory.PaymentStrategyFactory;
 import com.darian.ecommerce.repository.PaymentTransactionRepository;
 import com.darian.ecommerce.service.AuditLogService;
 import com.darian.ecommerce.service.OrderService;
 import com.darian.ecommerce.service.PaymentService;
+import com.darian.ecommerce.strategy.PaymentStrategy;
 import com.darian.ecommerce.subsystem.vnpay.VNPaySubsystem;
 import com.darian.ecommerce.utils.ErrorMessages;
 import com.darian.ecommerce.utils.LoggerMessages;
@@ -30,7 +33,10 @@ public class PaymentServiceImpl implements PaymentService {
     // → có thể tách nhỏ thành PaymentProcessor, RefundProcessor nếu phức tạp tăng lên.
 
 
+
     private static final Logger logger = LoggerFactory.getLogger(PaymentServiceImpl.class);
+
+    private final PaymentStrategyFactory paymentStrategyFactory;
 
     private final PaymentTransactionRepository paymentRepository;
     private final VNPaySubsystem vnPaySubsystem;
@@ -38,10 +44,11 @@ public class PaymentServiceImpl implements PaymentService {
     private final AuditLogService auditLogService;
 
     // Constructor injection for dependencies
-    public PaymentServiceImpl(PaymentTransactionRepository paymentRepository,
+    public PaymentServiceImpl(PaymentStrategyFactory paymentStrategyFactory, PaymentTransactionRepository paymentRepository,
                               VNPaySubsystem vnPaySubsystem,
                               OrderService orderService,
                               AuditLogService auditLogService) {
+        this.paymentStrategyFactory = paymentStrategyFactory;
         this.paymentRepository = paymentRepository;
         this.vnPaySubsystem = vnPaySubsystem;
         this.orderService = orderService;
@@ -63,7 +70,7 @@ public class PaymentServiceImpl implements PaymentService {
 
         PaymentResult result = vnPaySubsystem.processPayment(orderId, total, "Payment for order " + orderId);
         if ("SUCCESS".equals(result.getPaymentStatus())) {
-            orderService.updatePaymentStatus(orderId, PaymentStatus.PAID);
+            orderService.updatePaymentStatus(orderId, PaymentStatus.SUCCESS);
             logger.info(LoggerMessages.PAYMENT_COMPLETED, orderId, result.getPaymentStatus());
         } else {
             logger.warn(LoggerMessages.PAYMENT_FAILED, orderId, result.getErrorMessage());
@@ -90,7 +97,7 @@ public class PaymentServiceImpl implements PaymentService {
             return false;
         }
 
-        if (paymentStatus != PaymentStatus.UNPAID) {
+        if (paymentStatus != PaymentStatus.FAILED) {
             logger.warn(LoggerMessages.VALIDATION_FAILED, "payment status", 
                 String.format(ErrorMessages.PAYMENT_ALREADY_PROCESSED, orderId));
             return false;
@@ -109,7 +116,7 @@ public class PaymentServiceImpl implements PaymentService {
         }
         RefundResult result = vnPaySubsystem.processRefund(orderId);
         if ("SUCCESS".equals(result.getRefundStatus())) {
-            orderService.updatePaymentStatus(orderId, PaymentStatus.REFUNDED);
+            orderService.updatePaymentStatus(orderId, PaymentStatus.CANCELLED);
             logger.info(LoggerMessages.REFUND_COMPLETED, orderId, result.getRefundStatus());
         } else {
             logger.warn(LoggerMessages.REFUND_FAILED, orderId, result.getErrorMessage());
@@ -123,4 +130,36 @@ public class PaymentServiceImpl implements PaymentService {
         logger.info(LoggerMessages.VALIDATION_STARTED, "cancellation for order " + orderId);
         return orderService.checkCancellationValidity(orderId);
     }
+//    }
+
+    //TODO here
+
+//
+//    public PaymentResult payOrder(Long orderId, String paymentMethod) throws OrderNotFoundException {
+//        PaymentStrategy strategy = paymentStrategyFactory.createPaymentStrategy(PaymentMethod.valueOf(paymentMethod));
+//        return strategy.processPayment(orderId, null, null);
+
+
+//    // Validate payment details for an order
+//    Boolean validatePayment(Order order) throws OrderNotFoundException {
+//        // Implementation needed
+//        throw new UnsupportedOperationException("Method not implemented");
+//    }
+//
+//    //     Process refund for an order
+//    public RefundResult processRefund(Long orderId, PaymentMethod paymentMethod) {
+//        PaymentStrategy strategy = paymentStrategyFactory.createPaymentStrategy(paymentMethod);
+//        return strategy.processRefund(orderId);
+//    }
+//
+//    //     Check if cancellation is valid for an order
+//    public Boolean checkCancellationValidity(Long orderId) {
+//        // Implementation needed
+//        throw new UnsupportedOperationException("Method not implemented");
+//    }
+//
+//    public PaymentResult processPayment(Long orderId, Float amount, String content, PaymentMethod paymentMethod) {
+//        PaymentStrategy strategy = paymentStrategyFactory.createPaymentStrategy(paymentMethod);
+//        return strategy.processPayment(orderId, amount, content);
+//    }
 }

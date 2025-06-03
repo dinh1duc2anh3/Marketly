@@ -20,29 +20,35 @@ public class VNPayConverter {
     // SRP: Không vi phạm
     // → Lớp chỉ đảm nhiệm việc xây dựng request (builder cho transaction).
 
-    // Convert payment details to VNPayRequest
+    // Build payment request
     protected VNPayRequest buildPaymentRequest(Long orderId, Float amount, String content) {
-        VNPayRequest request = new VNPayRequest();
         return VNPayRequest.builder()
                 .orderId(orderId)
                 .amount(amount)
-                .transactionContent(content)
-                .returnUrl("http://localhost:8080/payments/callback")
+                .content(content)
                 .transactionType(TransactionType.PAYMENT)
+                .bankCode("VNB") // Default to domestic bank
+                .language("vn")     // Default to Vietnamese
                 .build();
     }
 
+    // Build refund request
     protected VNPayRequest buildRefundRequest(Long orderId) {
-        VNPayRequest request = new VNPayRequest();
         return VNPayRequest.builder()
                 .orderId(orderId)
-                .amount(0f)
-                .transactionContent("Refund for " + orderId)
-                .returnUrl("http://localhost:8080/payments/callback")
                 .transactionType(TransactionType.REFUND)
                 .build();
     }
 
-
-
+    // Build payment request with custom bank code
+    protected VNPayRequest buildPaymentRequest(Long orderId, Float amount, String content, String bankCode, String language) {
+        return VNPayRequest.builder()
+                .orderId(orderId)
+                .amount(amount)
+                .content(content)
+                .transactionType(TransactionType.PAYMENT)
+                .bankCode(bankCode)
+                .language(language)
+                .build();
+    }
 }

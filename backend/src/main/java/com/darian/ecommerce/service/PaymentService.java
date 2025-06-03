@@ -4,9 +4,14 @@ import com.darian.ecommerce.config.exception.order.OrderNotFoundException;
 import com.darian.ecommerce.dto.PaymentResult;
 import com.darian.ecommerce.dto.RefundResult;
 import com.darian.ecommerce.entity.Order;
+import com.darian.ecommerce.enums.PaymentMethod;
+import com.darian.ecommerce.factory.PaymentStrategyFactory;
+import com.darian.ecommerce.strategy.PaymentStrategy;
 import org.springframework.stereotype.Service;
 
+@Service
 public interface PaymentService {
+
 
     // Cohesion: Functional Cohesion
     // → Interface chỉ định nghĩa các hành vi liên quan đến thanh toán và hoàn tiền.
@@ -26,4 +31,6 @@ public interface PaymentService {
 
 //     Check if cancellation is valid for an order
     public Boolean checkCancellationValidity(Long orderId);
+
+
 }

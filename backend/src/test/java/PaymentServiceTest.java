@@ -23,7 +23,7 @@ public class PaymentServiceTest {
         // Mock OrderRepository
 
         orderService = Mockito.mock(OrderServiceImpl.class);
-        paymentService = new PaymentServiceImpl(null, null, orderService, null);
+//        paymentService = new PaymentServiceImpl(null, null, orderService, null);
 
     }
 
@@ -32,7 +32,7 @@ public class PaymentServiceTest {
         // Arrange: Tạo một Order với trạng thái CONFIRMED và UNPAID
         Order order = new Order();
         order.setOrderStatus(OrderStatus.CONFIRMED);
-        order.setPaymentStatus(PaymentStatus.UNPAID);
+        order.setPaymentStatus(PaymentStatus.FAILED);
 
         // Mock repository trả về order này khi tìm theo orderIdx
         Mockito.when(orderService.findOrderById(1L)).thenReturn(Optional.of(order));
@@ -49,7 +49,7 @@ public class PaymentServiceTest {
         // Arrange: Tạo một Order với trạng thái PENDING và UNPAID
         Order order = new Order();
         order.setOrderStatus(OrderStatus.PENDING);
-        order.setPaymentStatus(PaymentStatus.UNPAID);
+        order.setPaymentStatus(PaymentStatus.FAILED);
 
         // Mock repository trả về order này khi tìm theo orderId
         Mockito.when(orderService.findOrderById(2L)).thenReturn(Optional.of(order));
@@ -66,7 +66,7 @@ public class PaymentServiceTest {
         // Arrange: Tạo một Order với trạng thái CONFIRMED và PAID
         Order order = new Order();
         order.setOrderStatus(OrderStatus.CONFIRMED);
-        order.setPaymentStatus(PaymentStatus.PAID);
+        order.setPaymentStatus(PaymentStatus.SUCCESS);
 
         // Mock repository trả về order này khi tìm theo orderId
         Mockito.when(orderService.findOrderById(3L)).thenReturn(Optional.of(order));
@@ -83,7 +83,7 @@ public class PaymentServiceTest {
         // Arrange: Tạo một Order với trạng thái CANCELLED và UNPAID
         Order order = new Order();
         order.setOrderStatus(OrderStatus.CANCELLED);
-        order.setPaymentStatus(PaymentStatus.UNPAID);
+        order.setPaymentStatus(PaymentStatus.FAILED);
 
         // Mock repository trả về order này khi tìm theo orderId
         Mockito.when(orderService.findOrderById(4L)).thenReturn(Optional.of(order));

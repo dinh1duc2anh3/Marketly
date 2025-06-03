@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.Builder;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -15,9 +16,9 @@ import java.util.UUID;
 @Entity
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-
 @Table(name = "product")
 public class Product {
     // Primary key
@@ -33,7 +34,7 @@ public class Product {
 
     // Category of the product (1-1 relationship)
     @JoinColumn(name = "category_id", nullable = false)
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     private Category category;
 
     // Name of the product
@@ -84,9 +85,12 @@ public class Product {
      * Auto-set entry date and barcode before first persist
      */
     @PrePersist
-    public void prePersist() {
+    protected void onCreate() {
         if (this.warehouseEntryDate == null) {
             this.warehouseEntryDate = LocalDateTime.now();
+        }
+        if (this.productStatus == null) {
+            this.productStatus = ProductStatus.ACTIVE;
         }
         if (this.barcode == null || this.barcode.isBlank()) {
             this.barcode = generateBarcode();

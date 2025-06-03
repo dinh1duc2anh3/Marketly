@@ -1,8 +1,10 @@
 package com.darian.ecommerce.subsystem.vnpay;
 
 import com.darian.ecommerce.config.exception.payment.ConnectionException;
+import com.darian.ecommerce.dto.PaymentResult;
 import com.darian.ecommerce.dto.VNPayRequest;
 import com.darian.ecommerce.dto.VNPayResponse;
+import com.darian.ecommerce.enums.TransactionType;
 import com.darian.ecommerce.enums.VNPayResponseStatus;
 import com.darian.ecommerce.utils.ApiEndpoints;
 import com.darian.ecommerce.utils.Constants;
@@ -43,14 +45,16 @@ public class VNPayApiGateway {
     public VNPayResponse sendPaymentRequest(VNPayRequest request) throws ConnectionException {
         try {
             log.info("Sending payment request to VNPay for order: {}", request.getOrderId());
-            VNPayResponse response = vnPayAPI.simulatePayment(request);
-            log.info(LoggerMessages.VNPAY_PAYMENT_EXECUTED,
-                    request.getOrderId(), response.getStatus());
-            return response;
+            //TODO : fix this
+//            log.info(LoggerMessages.VNPAY_PAYMENT_EXECUTED,
+//                    request.getOrderId(), response.getStatus());
+//            return response;
+            return null;
         } catch (Exception e) {
             log.error(LoggerMessages.VNPAY_CONNECTION_ERROR, e.getMessage());
             throw new ConnectionException(ErrorMessages.VNPAY_CONNECTION_ERROR);
         }
+
     }
 
     @Retryable(
@@ -61,8 +65,9 @@ public class VNPayApiGateway {
     public VNPayResponse sendRefundRequest(VNPayRequest request) throws ConnectionException {
         try {
             log.info(LoggerMessages.VNPAY_SENDING_REQUEST, request.getOrderId());
-            VNPayResponse response = vnPayAPI.simulateRefund(request);
-            log.info(LoggerMessages.VNPAY_REFUND_EXECUTED, 
+            VNPayResponse response = vnPayAPI.processRefund(request);
+
+            log.info(LoggerMessages.VNPAY_REFUND_EXECUTED,
                     request.getOrderId(), response.getStatus());
             return response;
         } catch (Exception e) {

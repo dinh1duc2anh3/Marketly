@@ -13,8 +13,8 @@ public class RelatedProductMapper {
                 .productId(relatedProduct.getProductId())
                 .name(relatedProduct.getName())
                 .price(relatedProduct.getPrice())
-                .imageUrl(relatedProduct.getImages().isEmpty() ?
-                        "default.jpg" : relatedProduct.getImages().getFirst().getUrl())
+                .imageUrl(relatedProduct.getImages() == null || relatedProduct.getImages().isEmpty() ? 
+                        "default.jpg" : relatedProduct.getImages().get(0).getUrl())
                 .build();
     }
 }
