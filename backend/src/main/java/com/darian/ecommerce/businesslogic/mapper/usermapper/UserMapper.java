@@ -1,11 +1,9 @@
 package com.darian.ecommerce.businesslogic.mapper.usermapper;
 
-import com.darian.ecommerce.dto.UserDTO;
-import com.darian.ecommerce.entity.User;
-import com.darian.ecommerce.enums.UserRole;
+import com.darian.ecommerce.auth.dto.UserDTO;
+import com.darian.ecommerce.auth.entity.User;
+import com.darian.ecommerce.auth.enums.UserRole;
 import org.springframework.stereotype.Component;
-
-import java.time.LocalDateTime;
 
 @Component
 public class UserMapper {

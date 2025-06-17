@@ -41,20 +41,55 @@
     const responseCode = getParam('vnp_ResponseCode');
     const txnRef = getParam('vnp_TxnRef');
     const amount = getParam('vnp_Amount');
+    const bankCode = getParam('vnp_BankCode');
+    const payDate = getParam('vnp_PayDate');
+
     const resultDiv = document.getElementById('payment-result');
 
     if (responseCode === '00') {
         resultDiv.innerHTML = `
-        <h2 class="success">Thanh toán thành công!</h2>
-        <p>Mã đơn hàng: <strong>${txnRef}</strong></p>
-        <p>Số tiền: <strong>${(amount / 100).toLocaleString()} VND</strong></p>
-      `;
+            <h2 class="success">Thanh toán thành công!</h2>
+            <p><strong>Mã đơn hàng:</strong> ${txnRef}</p>
+            <p><strong>Số tiền:</strong> ${(amount / 100).toLocaleString()} VND</p>
+            <p><strong>Ngân hàng:</strong> ${bankCode}</p>
+            <p><strong>Thời gian:</strong> ${payDate}</p>
+        `;
+
+        // Gửi xác nhận về backend
+        fetch('/api/v1/payment/confirm', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                txnRef: txnRef,
+                amount: amount,
+                bankCode: bankCode,
+                payDate: payDate,
+                status: 'SUCCESS'
+            })
+        }).then(res => res.text()).then(data => {
+            console.log("Server xác nhận:", data);
+        });
+
     } else {
         resultDiv.innerHTML = `
-        <h2 class="fail">Thanh toán thất bại!</h2>
-        <p>Mã đơn hàng: <strong>${txnRef || 'Không xác định'}</strong></p>
-        <p>Mã lỗi: <strong>${responseCode}</strong></p>
-      `;
+            <h2 class="fail">Thanh toán thất bại!</h2>
+            <p><strong>Mã đơn hàng:</strong> ${txnRef || 'Không xác định'}</p>
+            <p><strong>Mã lỗi:</strong> ${responseCode}</p>
+        `;
+
+        // Gửi xác nhận thất bại về backend
+        fetch('/api/v1/payment/confirm', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                txnRef: txnRef,
+                amount: amount,
+                status: 'FAILED',
+                responseCode: responseCode
+            })
+        }).then(res => res.text()).then(data => {
+            console.log("Server xác nhận thất bại:", data);
+        });
     }
 </script>
 

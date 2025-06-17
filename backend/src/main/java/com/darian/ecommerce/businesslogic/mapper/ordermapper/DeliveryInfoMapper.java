@@ -1,7 +1,7 @@
 package com.darian.ecommerce.businesslogic.mapper.ordermapper;
 
-import com.darian.ecommerce.dto.DeliveryInfoDTO;
-import com.darian.ecommerce.entity.DeliveryInfo;
+import com.darian.ecommerce.order.dto.DeliveryInfoDTO;
+import com.darian.ecommerce.order.entity.DeliveryInfo;
 import org.springframework.stereotype.Component;
 
 @Component

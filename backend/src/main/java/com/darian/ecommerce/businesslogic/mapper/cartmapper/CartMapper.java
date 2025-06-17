@@ -1,7 +1,7 @@
 package com.darian.ecommerce.businesslogic.mapper.cartmapper;
 
-import com.darian.ecommerce.dto.CartDTO;
-import com.darian.ecommerce.entity.Cart;
+import com.darian.ecommerce.cart.dto.CartDTO;
+import com.darian.ecommerce.cart.entity.Cart;
 import org.springframework.stereotype.Component;
 
 

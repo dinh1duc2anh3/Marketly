@@ -1,6 +1,6 @@
 package com.darian.ecommerce.businesslogic.productsearch;
 
-import com.darian.ecommerce.dto.ProductDTO;
+import com.darian.ecommerce.product.dto.ProductDTO;
 
 import java.util.List;
 

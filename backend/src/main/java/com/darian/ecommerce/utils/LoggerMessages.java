@@ -7,6 +7,11 @@ public class LoggerMessages {
     public static final String PAYMENT_FAILED = "Payment failed for order {}: {}";
     public static final String PAYMENT_VALIDATION_FAILED = "Payment validation failed for order {}";
     public static final String PAYMENT_PROCESSING = "Processing payment for order {} with method {}";
+
+
+    // VNPay messages
+    public static final String VNPAY_IPN_PROCESSING =  "Processing VNPay ipn for txn ref {}";
+    public static final String VNPAY_IPN_COMPLETED = "Completed VNPay ipn for txn ref {}, payment status {}";
     
     // Refund related messages
     public static final String REFUND_INIT = "Initiating refund for order {} with method {}";
@@ -91,7 +96,8 @@ public class LoggerMessages {
     public static final String RELATED_PRODUCTS_GET = "Getting related products for product: {}";
     public static final String RELATED_PRODUCTS_ADD = "User {} adding related product: {} to product: {}";
     public static final String RELATED_PRODUCTS_REMOVE = "User {} removing related product: {} from product: {}";
-    
+
+
     private LoggerMessages() {
         // Private constructor to prevent instantiation
     }

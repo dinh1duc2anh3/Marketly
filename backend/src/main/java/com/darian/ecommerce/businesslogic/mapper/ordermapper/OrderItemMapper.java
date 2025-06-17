@@ -1,9 +1,9 @@
 package com.darian.ecommerce.businesslogic.mapper.ordermapper;
 
-import com.darian.ecommerce.dto.OrderItemDTO;
-import com.darian.ecommerce.entity.OrderItem;
-import com.darian.ecommerce.entity.Product;
-import com.darian.ecommerce.service.ProductService;
+import com.darian.ecommerce.order.dto.OrderItemDTO;
+import com.darian.ecommerce.order.entity.OrderItem;
+import com.darian.ecommerce.product.entity.Product;
+import com.darian.ecommerce.product.service.ProductService;
 import org.springframework.stereotype.Component;
 
 import java.util.List;

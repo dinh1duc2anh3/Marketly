@@ -1,13 +1,13 @@
 package com.darian.ecommerce.subsystem.vnpay;
 
-import com.darian.ecommerce.config.VNPayConfig;
-import com.darian.ecommerce.dto.*;
-import com.darian.ecommerce.enums.PaymentStatus;
-import com.darian.ecommerce.enums.TransactionType;
-import com.darian.ecommerce.config.exception.payment.ConnectionException;
+import com.darian.ecommerce.payment.enums.PaymentStatus;
+import com.darian.ecommerce.payment.dto.PaymentResult;
+import com.darian.ecommerce.payment.dto.RefundResult;
+import com.darian.ecommerce.payment.dto.VNPayRequest;
+import com.darian.ecommerce.payment.dto.VNPayResponse;
+import com.darian.ecommerce.payment.PaymentStrategy;
 import com.darian.ecommerce.utils.LoggerMessages;
 import jakarta.servlet.http.HttpServletRequest;
-import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -20,8 +20,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-@Service
-public class VNPaySubsystemService {
+@Service("vnpay")
+public class VNPaySubsystemService implements PaymentStrategy {
     // Cohesion: Functional Cohesion
     // → Các method đều xử lý một tác vụ cụ thể là "thực thi quy trình thanh toán hoặc hoàn tiền qua VNPay", từ build request → gửi → xử lý response.
 
@@ -33,22 +33,40 @@ public class VNPaySubsystemService {
 
     private final VNPayAPI vnPayAPI;
     private final VNPayConfig vnPayConfig;
-    private final VNPayConverter converter;
+    private final VNPayBuilder builder;
     private final VNPayResponseHandler responseHandler;
     private final VNPayApiGateway apiGateway;
     
-    public VNPaySubsystemService(VNPayAPI vnPayAPI, VNPayConfig vnPayConfig, VNPayConverter converter, VNPayResponseHandler responseHandler, VNPayApiGateway apiGateway) {
+    public VNPaySubsystemService(VNPayAPI vnPayAPI, VNPayConfig vnPayConfig, VNPayBuilder builder, VNPayResponseHandler responseHandler, VNPayApiGateway apiGateway) {
         this.vnPayAPI = vnPayAPI;
         this.vnPayConfig = vnPayConfig;
-        this.converter = converter;
+        this.builder = builder;
         this.responseHandler = responseHandler;
         this.apiGateway = apiGateway;
     }
 
-    public String createPaymentUrl(VNPayRequest request) {
-        request.setTransactionType(TransactionType.PAYMENT);
-        return vnPayAPI.createPaymentUrl(request);
+
+    @Override
+    public PaymentResult processPayment(Long orderId, Float amount, HttpServletRequest request) throws UnsupportedEncodingException {
+        log.info(LoggerMessages.PAYMENT_PROCESSING, orderId, "VNPay");
+        String paymentUrl = VNPayBuilder.buildPaymentUrl(orderId, amount,request);
+        PaymentResult result = new PaymentResult();
+        result.setReturnUrl(paymentUrl);
+        return result;
     }
+
+    @Override
+    // Execute refund via VNPay
+    public RefundResult processRefund(Long orderId) {
+        log.info(LoggerMessages.REFUND_PROCESSING, orderId, "VNPay");
+        VNPayRequest request = builder.buildRefundRequest(orderId);
+        VNPayResponse response = apiGateway.sendRefundRequest(request);
+        log.info(LoggerMessages.REFUND_COMPLETED, orderId, response.getStatus());
+        return responseHandler.toRefundResult(response);
+    }
+
+
+
 
     public PaymentResult processVNPayReturn(Map<String, String> vnpResponse) {
         PaymentResult result = new PaymentResult();
@@ -78,55 +96,7 @@ public class VNPaySubsystemService {
         return result;
     }
 
-    public PaymentResDTO initiatePayment(Long orderId, Float amount, String content, HttpServletRequest request) {
-        log.info(LoggerMessages.PAYMENT_PROCESSING, orderId, "VNPay");
-        Map<String, String> vnpParams = converter.buildPaymentParams(orderId, amount, content, request);
-        String paymentUrl = apiGateway.createPaymentRequest(vnpParams);
-
-        PaymentResDTO paymentResDTO = new PaymentResDTO();
-        paymentResDTO.setStatus("OK");
-        paymentResDTO.setMessage("Successfully");
-        paymentResDTO.setURL(paymentUrl);
-
-        log.info("Payment URL generated for order {}: {}", orderId, paymentUrl);
-        return paymentResDTO;
-    }
-
-    // Execute payment via VNPay
-    protected PaymentResult processPayment(Long orderId, Float amount, String content) {
-        log.info(LoggerMessages.PAYMENT_PROCESSING, orderId, "VNPay");
-        VNPayRequest request = converter.buildPaymentRequest(orderId, amount, content);
-        VNPayResponse response = apiGateway.sendPaymentRequest(request);
-        PaymentResult result = responseHandler.toPaymentResult(response);
-        result.setTotalAmount(amount);
-        result.setTransactionContent(content);
-
-        log.info(LoggerMessages.PAYMENT_COMPLETED, orderId, result.getPaymentStatus());
-        return result;
-    }
-
-    // Execute refund via VNPay
-    protected RefundResult processRefund(Long orderId) {
-        log.info(LoggerMessages.REFUND_PROCESSING, orderId, "VNPay");
-        VNPayRequest request = converter.buildRefundRequest(orderId);
-        VNPayResponse response = apiGateway.sendRefundRequest(request);
-        log.info(LoggerMessages.REFUND_COMPLETED, orderId, response.getStatus());
-        return responseHandler.toRefundResult(response);
-    }
-    private PaymentStatus convertVNPayStatus(String vnpayStatus) {
-        if ("00".equals(vnpayStatus)) {
-            return PaymentStatus.SUCCESS;
-        }
-        return PaymentStatus.FAILED;
-    }
-
-    public PaymentResult handleIpnCallback(Map<String, String> vnpParams) {
-        log.info(LoggerMessages.VNPAY_IPN_PROCESSING, vnpParams.get("vnp_TxnRef"));
-        PaymentResult result = responseHandler.parseIpnResponse(vnpParams);
-        log.info(LoggerMessages.VNPAY_IPN_COMPLETED, vnpParams.get("vnp_TxnRef"), result.getPaymentStatus());
-        return result;
-    }
-    private boolean verifyChecksum(Map<String, String> fields) {
+    protected static boolean verifyChecksum(Map<String, String> fields) {
         String secureHash = fields.remove("vnp_SecureHash");
         List<String> fieldNames = new ArrayList<>(fields.keySet());
         Collections.sort(fieldNames);
@@ -148,4 +118,21 @@ public class VNPaySubsystemService {
         String calculatedHash = VNPayConfig.hmacSHA512(VNPayConfig.secretKey, hashData.toString());
         return secureHash != null && secureHash.equals(calculatedHash);
     }
+
+
+
+//
+//    // Execute payment via VNPay\
+//    TODO: for ipn url flow only
+//    public PaymentResult processPayment(Long orderId, Float amount) {
+//        log.info(LoggerMessages.PAYMENT_PROCESSING, orderId, "VNPay");
+//        VNPayRequest request = builder.buildPaymentRequest(orderId, amount, content);
+//        VNPayResponse response = apiGateway.sendPaymentRequest(request);
+//        PaymentResult result = responseHandler.toPaymentResult(response);
+//        result.setTotalAmount(amount);
+//        result.setTransactionContent(content);
+//
+//        log.info(LoggerMessages.PAYMENT_COMPLETED, orderId, result.getPaymentStatus());
+//        return result;
+//    }
 }

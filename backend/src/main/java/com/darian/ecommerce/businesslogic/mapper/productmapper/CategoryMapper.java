@@ -1,7 +1,7 @@
 package com.darian.ecommerce.businesslogic.mapper.productmapper;
 
-import com.darian.ecommerce.dto.CategoryDTO;
-import com.darian.ecommerce.entity.Category;
+import com.darian.ecommerce.product.dto.CategoryDTO;
+import com.darian.ecommerce.order.entity.Category;
 import org.springframework.stereotype.Component;
 
 @Component

@@ -1,11 +1,11 @@
 package com.darian.ecommerce.businesslogic.mapper.productmapper;
 
-import com.darian.ecommerce.dto.ProductReviewDTO;
-import com.darian.ecommerce.entity.Product;
-import com.darian.ecommerce.entity.ProductReview;
-import com.darian.ecommerce.entity.User;
-import com.darian.ecommerce.service.ProductService;
-import com.darian.ecommerce.service.UserService;
+import com.darian.ecommerce.product.dto.ProductReviewDTO;
+import com.darian.ecommerce.product.entity.Product;
+import com.darian.ecommerce.product.entity.ProductReview;
+import com.darian.ecommerce.auth.entity.User;
+import com.darian.ecommerce.product.service.ProductService;
+import com.darian.ecommerce.auth.UserService;
 import org.springframework.stereotype.Component;
 
 @Component

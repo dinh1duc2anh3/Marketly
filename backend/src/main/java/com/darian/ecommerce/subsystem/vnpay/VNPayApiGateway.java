@@ -1,17 +1,11 @@
 package com.darian.ecommerce.subsystem.vnpay;
 
-import com.darian.ecommerce.config.VNPayConfig;
-import com.darian.ecommerce.config.exception.payment.ConnectionException;
-import com.darian.ecommerce.dto.PaymentResult;
-import com.darian.ecommerce.dto.VNPayRequest;
-import com.darian.ecommerce.dto.VNPayResponse;
-import com.darian.ecommerce.enums.TransactionType;
-import com.darian.ecommerce.enums.VNPayResponseStatus;
-import com.darian.ecommerce.utils.ApiEndpoints;
+import com.darian.ecommerce.payment.exception.ConnectionException;
+import com.darian.ecommerce.payment.dto.VNPayRequest;
+import com.darian.ecommerce.payment.dto.VNPayResponse;
 import com.darian.ecommerce.utils.Constants;
 import com.darian.ecommerce.utils.ErrorMessages;
 import com.darian.ecommerce.utils.LoggerMessages;
-import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.retry.annotation.Backoff;
@@ -39,11 +33,12 @@ public class VNPayApiGateway {
 
 
     private static final Logger log = LoggerFactory.getLogger(VNPayApiGateway.class);
-
     private final VNPayAPI vnPayAPI;
+    private final VNPayConfig vnPayConfig;
 
-    protected VNPayApiGateway(VNPayAPI vnPayAPI) {
+    protected VNPayApiGateway(VNPayAPI vnPayAPI, VNPayConfig vnPayConfig) {
         this.vnPayAPI = vnPayAPI;
+        this.vnPayConfig = vnPayConfig;
     }
 
     @Retryable(
@@ -55,7 +50,8 @@ public class VNPayApiGateway {
         try {
             log.info("Sending payment request to VNPay for order: {}", request.getOrderId());
             //TODO : fix this
-          VNPayResponse response = vnPayAPI.createPaymentUrl(request);
+//            VNPayResponse response = vnPayAPI.createPaymentUrl(request);
+            VNPayResponse response = new VNPayResponse();
             log.info(LoggerMessages.VNPAY_PAYMENT_EXECUTED, request.getOrderId(), response.getStatus());
             return response;
         } catch (Exception e) {

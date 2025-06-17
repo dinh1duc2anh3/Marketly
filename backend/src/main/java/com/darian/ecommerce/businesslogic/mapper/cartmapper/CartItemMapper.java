@@ -1,7 +1,7 @@
 package com.darian.ecommerce.businesslogic.mapper.cartmapper;
 
-import com.darian.ecommerce.dto.CartItemDTO;
-import com.darian.ecommerce.entity.CartItem;
+import com.darian.ecommerce.cart.dto.CartItemDTO;
+import com.darian.ecommerce.cart.entity.CartItem;
 import org.springframework.stereotype.Component;
 
 import java.util.List;

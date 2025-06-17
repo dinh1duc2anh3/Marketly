@@ -1,14 +1,11 @@
 import static org.junit.jupiter.api.Assertions.*;
 
-import com.darian.ecommerce.config.exception.order.OrderNotFoundException;
-import com.darian.ecommerce.entity.Order;
-import com.darian.ecommerce.enums.OrderStatus;
-import com.darian.ecommerce.enums.PaymentStatus;
-import com.darian.ecommerce.repository.OrderRepository;
-import com.darian.ecommerce.service.OrderService;
-import com.darian.ecommerce.service.PaymentService;
-import com.darian.ecommerce.service.impl.OrderServiceImpl;
-import com.darian.ecommerce.service.impl.PaymentServiceImpl;
+import com.darian.ecommerce.order.exception.OrderNotFoundException;
+import com.darian.ecommerce.order.entity.Order;
+import com.darian.ecommerce.order.enums.OrderStatus;
+import com.darian.ecommerce.payment.enums.PaymentStatus;
+import com.darian.ecommerce.order.OrderServiceImpl;
+import com.darian.ecommerce.payment.PaymentServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;

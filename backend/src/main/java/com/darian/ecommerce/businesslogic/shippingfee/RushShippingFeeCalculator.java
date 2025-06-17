@@ -1,6 +1,6 @@
 package com.darian.ecommerce.businesslogic.shippingfee;
 
-import com.darian.ecommerce.dto.BaseOrderDTO;
+import com.darian.ecommerce.order.dto.BaseOrderDTO;
 
 public class RushShippingFeeCalculator implements ShippingFeeCalculator{
     // Calculate rush shipping fee (example logic)

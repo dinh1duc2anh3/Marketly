@@ -1,10 +1,10 @@
 package com.darian.ecommerce.businesslogic.mapper.productmapper;
 
-import com.darian.ecommerce.dto.*;
-import com.darian.ecommerce.entity.Product;
-import com.darian.ecommerce.entity.ProductImage;
-import com.darian.ecommerce.enums.AvailabilityStatus;
-import com.darian.ecommerce.service.RelatedProductService;
+import com.darian.ecommerce.product.entity.Product;
+import com.darian.ecommerce.product.entity.ProductImage;
+import com.darian.ecommerce.order.enums.AvailabilityStatus;
+import com.darian.ecommerce.product.dto.*;
+import com.darian.ecommerce.product.service.RelatedProductService;
 import org.springframework.stereotype.Component;
 
 import java.util.List;

@@ -1,11 +1,11 @@
 package com.darian.ecommerce.businesslogic.mapper.ordermapper;
 
-import com.darian.ecommerce.dto.BaseOrderDTO;
-import com.darian.ecommerce.dto.OrderDTO;
-import com.darian.ecommerce.dto.RushOrderDTO;
-import com.darian.ecommerce.entity.Order;
-import com.darian.ecommerce.entity.User;
-import com.darian.ecommerce.service.UserService;
+import com.darian.ecommerce.order.dto.BaseOrderDTO;
+import com.darian.ecommerce.order.dto.OrderDTO;
+import com.darian.ecommerce.order.dto.RushOrderDTO;
+import com.darian.ecommerce.order.entity.Order;
+import com.darian.ecommerce.auth.entity.User;
+import com.darian.ecommerce.auth.UserService;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;

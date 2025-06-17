@@ -1,9 +1,9 @@
 package com.darian.ecommerce.businesslogic.productsearch;
 
 import com.darian.ecommerce.businesslogic.mapper.productmapper.ProductMapper;
-import com.darian.ecommerce.dto.ProductDTO;
-import com.darian.ecommerce.enums.UserRole;
-import com.darian.ecommerce.repository.ProductRepository;
+import com.darian.ecommerce.product.dto.ProductDTO;
+import com.darian.ecommerce.auth.enums.UserRole;
+import com.darian.ecommerce.product.repository.ProductRepository;
 import org.springframework.stereotype.Component;
 
 @Component

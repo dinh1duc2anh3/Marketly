@@ -1,9 +1,9 @@
 package com.darian.ecommerce.businesslogic.productdetail;
 
 import com.darian.ecommerce.businesslogic.mapper.productmapper.ProductMapper;
-import com.darian.ecommerce.dto.CustomerProductDTO;
-import com.darian.ecommerce.entity.Product;
-import com.darian.ecommerce.repository.ProductRepository;
+import com.darian.ecommerce.product.dto.CustomerProductDTO;
+import com.darian.ecommerce.product.entity.Product;
+import com.darian.ecommerce.product.repository.ProductRepository;
 
 import java.util.Optional;
 
