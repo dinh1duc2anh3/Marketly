@@ -1,7 +1,7 @@
 package com.darian.ecommerce.auth.exception;
 
-import com.darian.ecommerce.config.enums.ErrorCode;
-import com.darian.ecommerce.config.exception.BaseException;
+import com.darian.ecommerce.shared.exception.ErrorCode;
+import com.darian.ecommerce.shared.exception.BaseException;
 
 public class UserNotFoundException extends BaseException {
     public UserNotFoundException(String message) {

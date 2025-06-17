@@ -9,7 +9,7 @@ import com.darian.ecommerce.payment.enums.TransactionType;
 import com.darian.ecommerce.auth.enums.UserRole;
 import com.darian.ecommerce.product.service.ProductService;
 import com.darian.ecommerce.auth.UserService;
-import com.darian.ecommerce.utils.LoggerMessages;
+import com.darian.ecommerce.shared.constants.LoggerMessages;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Lazy;

@@ -1,119 +1,99 @@
-src/main/java/com/darian/ecommerce/
+com.darian.ecommerce
 │
-├── code/
-│   ├── businesslogic/
-│   │   ├── productdetail/
-│   │   │   ├── CustomerProductDetailFetcher.java
-│   │   │   ├── ManagerProductDetailFetcher.java
-│   │   │   ├── ProductDetailFetcher.java
-│   │   │   └── ProductDetailFetcherFactory.java
-│   │   ├── productlist/
-│   │   │   ├── CustomerProductListFetcher.java
-│   │   │   ├── ManagerProductListFetcher.java
-│   │   │   ├── ProductListFetcher.java
-│   │   │   └── ProductListFetcherFactory.java
-│   │   ├── productsearch/
-│   │   │   ├── CustomerProductSearchFetcher.java
-│   │   │   ├── ManagerProductSearchFetcher.java
-│   │   │   ├── ProductSearchFetcher.java
-│   │   │   └── ProductSearchFetcherFactory.java
-│   │   └── shippingfee/
-│   │       ├── RushShippingFeeCalculator.java
-│   │       ├── ShippingFeeCalculator.java
-│   │       ├── ShippingFeeCalculatorFactory.java
-│   │       └── StandardShippingFeeCalculator.java
-│   │
-│   ├── client/
-│   │   └── VNPayClient.java
-│   │
-│   ├── config/
-│   │   └── exception/
-│   │       └── [Các lớp exception]
-│   │
-│   ├── controller/
-│   │   ├── CartController.java
-│   │   ├── OrderController.java
-│   │   ├── PaymentController.java
-│   │   ├── ProductController.java
-│   │   └── VNPaySubsystemAdapter.java
-│   │
-│   ├── converter/
-│   │   └── VNPayConverter.java
-│   │
-│   ├── dto/
-│   │   ├── BaseOrderDTO.java
-│   │   ├── BasePaymentResult.java
-│   │   ├── CartDTO.java
-│   │   ├── CartItemDTO.java
-│   │   ├── CategoryDTO.java
-│   │   ├── CustomerProductDTO.java
-│   │   ├── DeliveryInfoDTO.java
-│   │   ├── ErrorResponse.java
-│   │   ├── InvoiceDTO.java
-│   │   ├── LoginDTO.java
-│   │   ├── ManagerProductDTO.java
-│   │   ├── OrderDTO.java
-│   │   ├── OrderItemDTO.java
-│   │   ├── PaymentResult.java
-│   │   ├── ProductDTO.java
-│   │   ├── ProductEditHistoryDTO.java
-│   │   ├── ProductReviewDTO.java
-│   │   ├── RefundResult.java
-│   │   ├── RushOrderDTO.java
-│   │   ├── UserDTO.java
-│   │   ├── VNPayRequest.java
-│   │   └── VNPayResponse.java
-│   │
+├── audit/
 │   ├── entity/
-│   │   ├── AuditLog.java
-│   │   ├── Cart.java
-│   │   ├── CartItem.java
-│   │   ├── Category.java
-│   │   ├── DeliveryInfo.java
-│   │   ├── Invoice.java
-│   │   ├── Order.java
-│   │   ├── OrderItem.java
-│   │   ├── PaymentTransaction.java
-│   │   ├── Product.java
-│   │   ├── ProductEditHistory.java
-│   │   ├── ProductImage.java
-│   │   ├── ProductReview.java
-│   │   ├── RelatedProduct.java
-│   │   └── User.java
-│   │
+│   ├── enums/
+│   ├── event/
+│   ├── listener/
+│   ├── AuditLogRepository.java
+│   ├── AuditLogService.java
+│   └── AuditLogServiceImpl.java
+│
+├── auth/
+│   ├── controller/
+│   │   └── AuthController.java
+│   ├── dto/
+│   ├── entity/
+│   ├── enums/
+│   ├── exception/
+│   ├── mapper/
 │   ├── repository/
-│   │   ├── AuditLogRepository.java
-│   │   ├── CartRepository.java
-│   │   ├── CategoryRepository.java
-│   │   ├── OrderRepository.java
-│   │   ├── PaymentTransactionRepository.java
-│   │   ├── ProductRepository.java
-│   │   └── ProductReviewRepository.java
-│   │
+│   │   └── UserRepository.java
 │   ├── service/
-│   │   ├── impl/
-│   │   │   ├── AuditLogServiceImpl.java
-│   │   │   ├── CartServiceImpl.java
-│   │   │   ├── OrderServiceImpl.java
-│   │   │   ├── PaymentServiceImpl.java
-│   │   │   └── ProductServiceImpl.java
-│   │   ├── AuditLogService.java
+│   │   ├── UserService.java
+│   │   └── UserServiceImpl.java
+│   └── config/
+│       └── SecurityConfig.java
+│
+├── cart/
+│   ├── controller/
+│   │   └── CartController.java
+│   ├── dto/
+│   ├── entity/
+│   ├── mapper/
+│   ├── repository/
+│   │   ├── CartItemRepository.java
+│   │   └── CartRepository.java
+│   ├── service/
+│   │   ├── CartItemService.java
+│   │   ├── CartItemServiceImpl.java
 │   │   ├── CartService.java
+│   │   └── CartServiceImpl.java
+│
+├── config/
+│   └── WebConfig.java
+│
+├── order/
+│   ├── controller/
+│   │   └── OrderController.java
+│   ├── businesslogic/
+│   │   └── shippingfee/
+│   ├── dto/
+│   ├── entity/
+│   ├── enums/
+│   ├── exception/
+│   ├── mapper/
+│   ├── repository/
+│   │   └── OrderRepository.java
+│   ├── service/
 │   │   ├── OrderService.java
-│   │   ├── PaymentInterface.java
+│   │   └── OrderServiceImpl.java
+│
+├── payment/
+│   ├── controller/
+│   │   └── PaymentController.java
+│   ├── dto/
+│   ├── entity/
+│   ├── enums/
+│   ├── exception/
+│   ├── factory/
+│   │   └── PaymentStrategy.java
+│   ├── repository/
+│   │   └── PaymentTransactionRepository.java
+│   ├── service/
 │   │   ├── PaymentService.java
-│   │   └── ProductService.java
-│   │
-│   ├── subsystem/
-│   │   └── vnpay/
-│   │       ├── VNPayAPI.java
-│   │       ├── VNPayClient.java
-│   │       ├── VNPayConverter.java
-│   │       ├── VNPaySubsystem.java
-│   │       ├── VNPaySubsystemAdapter.java
-│   │       └── VNPaySubsystemService.java
-│   │
-│   ├── utils/
-│   │   └── [Helper classes, nếu có]
-│   │
-│   └── EcommerceApplication.java
+│   │   └── PaymentServiceImpl.java
+│
+├── product/
+│   ├── controller/
+│   │   └── ProductController.java
+│   ├── businesslogic/
+│   ├── dto/
+│   ├── entity/
+│   ├── enums/
+│   ├── event/
+│   ├── mapper/
+│   ├── repository/
+│   └── service/
+│
+├── shared/                        # Các thành phần dùng chung
+│   ├── constants/
+│   ├── exception/
+│   └── utils/
+│
+├── subsystem/
+│   ├── creditcard/
+│   ├── domesticcard/
+│   └── vnpay/
+│
+└── EcommerceApplication.java      # Main entry point

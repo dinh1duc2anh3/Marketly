@@ -2,7 +2,7 @@ package com.darian.ecommerce.cart;
 
 import com.darian.ecommerce.cart.dto.CartDTO;
 import com.darian.ecommerce.cart.dto.CartItemDTO;
-import com.darian.ecommerce.utils.ApiEndpoints;
+import com.darian.ecommerce.shared.constants.ApiEndpoints;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

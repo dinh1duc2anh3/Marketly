@@ -6,7 +6,7 @@ import com.darian.ecommerce.payment.dto.RefundResult;
 import com.darian.ecommerce.payment.dto.VNPayRequest;
 import com.darian.ecommerce.payment.dto.VNPayResponse;
 import com.darian.ecommerce.payment.PaymentStrategy;
-import com.darian.ecommerce.utils.LoggerMessages;
+import com.darian.ecommerce.shared.constants.LoggerMessages;
 import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

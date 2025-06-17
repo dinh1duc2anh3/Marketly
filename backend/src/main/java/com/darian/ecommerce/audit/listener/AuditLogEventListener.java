@@ -3,7 +3,7 @@ package com.darian.ecommerce.audit.listener;
 import com.darian.ecommerce.audit.event.CheckDeleteLimitEvent;
 import com.darian.ecommerce.product.event.*;
 import com.darian.ecommerce.audit.AuditLogService;
-import com.darian.ecommerce.utils.LoggerMessages;
+import com.darian.ecommerce.shared.constants.LoggerMessages;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.event.EventListener;

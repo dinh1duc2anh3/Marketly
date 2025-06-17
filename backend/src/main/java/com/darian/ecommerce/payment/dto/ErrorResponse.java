@@ -1,6 +1,6 @@
 package com.darian.ecommerce.payment.dto;
 
-import com.darian.ecommerce.config.enums.ErrorCode;
+import com.darian.ecommerce.shared.exception.ErrorCode;
 import lombok.Getter;
 import lombok.Setter;
 

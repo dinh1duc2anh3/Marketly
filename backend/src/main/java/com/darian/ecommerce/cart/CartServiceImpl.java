@@ -1,6 +1,6 @@
 package com.darian.ecommerce.cart;
 
-import com.darian.ecommerce.businesslogic.mapper.cartmapper.CartMapper;
+import com.darian.ecommerce.cart.mapper.CartMapper;
 import com.darian.ecommerce.cart.dto.CartDTO;
 import com.darian.ecommerce.cart.entity.Cart;
 import com.darian.ecommerce.cart.entity.CartItem;
@@ -8,7 +8,7 @@ import com.darian.ecommerce.product.entity.Product;
 import com.darian.ecommerce.auth.entity.User;
 import com.darian.ecommerce.product.service.ProductService;
 import com.darian.ecommerce.auth.UserService;
-import com.darian.ecommerce.utils.LoggerMessages;
+import com.darian.ecommerce.shared.constants.LoggerMessages;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Lazy;

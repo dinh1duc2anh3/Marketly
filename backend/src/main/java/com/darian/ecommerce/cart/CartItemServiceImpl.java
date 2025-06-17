@@ -1,13 +1,13 @@
 package com.darian.ecommerce.cart;
 
-import com.darian.ecommerce.businesslogic.mapper.cartmapper.CartItemMapper;
+import com.darian.ecommerce.cart.mapper.CartItemMapper;
 import com.darian.ecommerce.cart.dto.CartItemDTO;
 import com.darian.ecommerce.cart.entity.Cart;
 import com.darian.ecommerce.cart.entity.CartItem;
 import com.darian.ecommerce.product.entity.Product;
 import com.darian.ecommerce.product.service.ProductService;
-import com.darian.ecommerce.utils.ErrorMessages;
-import com.darian.ecommerce.utils.LoggerMessages;
+import com.darian.ecommerce.shared.constants.ErrorMessages;
+import com.darian.ecommerce.shared.constants.LoggerMessages;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;

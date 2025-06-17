@@ -12,7 +12,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import com.darian.ecommerce.utils.ApiEndpoints;
+import com.darian.ecommerce.shared.constants.ApiEndpoints;
 
 import java.util.Arrays;
 

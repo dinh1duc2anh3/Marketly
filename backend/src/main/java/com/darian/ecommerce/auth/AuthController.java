@@ -2,7 +2,7 @@ package com.darian.ecommerce.auth;
 
 import com.darian.ecommerce.auth.dto.LoginDTO;
 import com.darian.ecommerce.auth.dto.UserDTO;
-import com.darian.ecommerce.utils.ApiEndpoints;
+import com.darian.ecommerce.shared.constants.ApiEndpoints;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

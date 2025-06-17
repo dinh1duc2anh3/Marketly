@@ -7,7 +7,7 @@ import com.darian.ecommerce.product.dto.RelatedProductDTO;
 import com.darian.ecommerce.auth.enums.UserRole;
 import com.darian.ecommerce.product.service.ProductService;
 import com.darian.ecommerce.product.service.RelatedProductService;
-import com.darian.ecommerce.utils.ApiEndpoints;
+import com.darian.ecommerce.shared.constants.ApiEndpoints;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.resource.ResourceUrlProvider;

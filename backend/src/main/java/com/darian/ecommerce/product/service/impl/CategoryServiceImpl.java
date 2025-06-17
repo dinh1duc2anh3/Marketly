@@ -1,11 +1,11 @@
 package com.darian.ecommerce.product.service.impl;
 
-import com.darian.ecommerce.businesslogic.mapper.productmapper.CategoryMapper;
+import com.darian.ecommerce.product.mapper.CategoryMapper;
 import com.darian.ecommerce.product.dto.CategoryDTO;
 import com.darian.ecommerce.order.entity.Category;
 import com.darian.ecommerce.product.repository.CategoryRepository;
 import com.darian.ecommerce.product.service.CategoryService;
-import com.darian.ecommerce.utils.LoggerMessages;
+import com.darian.ecommerce.shared.constants.LoggerMessages;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;

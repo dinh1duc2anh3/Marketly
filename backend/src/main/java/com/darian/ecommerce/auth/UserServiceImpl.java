@@ -1,13 +1,13 @@
 package com.darian.ecommerce.auth;
 
-import com.darian.ecommerce.businesslogic.mapper.usermapper.UserMapper;
+import com.darian.ecommerce.auth.mapper.UserMapper;
 import com.darian.ecommerce.auth.dto.LoginDTO;
 import com.darian.ecommerce.auth.dto.UserDTO;
 import com.darian.ecommerce.auth.entity.User;
-import com.darian.ecommerce.config.enums.ErrorCode;
-import com.darian.ecommerce.config.exception.BaseException;
+import com.darian.ecommerce.shared.exception.ErrorCode;
+import com.darian.ecommerce.shared.exception.BaseException;
 import com.darian.ecommerce.auth.exception.UserNotFoundException;
-import com.darian.ecommerce.utils.ErrorMessages;
+import com.darian.ecommerce.shared.constants.ErrorMessages;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.password.PasswordEncoder;
