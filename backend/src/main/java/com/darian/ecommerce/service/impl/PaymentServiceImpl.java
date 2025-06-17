@@ -2,6 +2,7 @@ package com.darian.ecommerce.service.impl;
 
 import com.darian.ecommerce.config.exception.order.OrderNotFoundException;
 import com.darian.ecommerce.config.exception.payment.PaymentException;
+import com.darian.ecommerce.dto.PaymentResDTO;
 import com.darian.ecommerce.dto.PaymentResult;
 import com.darian.ecommerce.dto.RefundResult;
 import com.darian.ecommerce.entity.Order;
@@ -17,11 +18,12 @@ import com.darian.ecommerce.strategy.PaymentStrategy;
 import com.darian.ecommerce.subsystem.vnpay.VNPaySubsystem;
 import com.darian.ecommerce.utils.ErrorMessages;
 import com.darian.ecommerce.utils.LoggerMessages;
+import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
+import java.util.Map;
 
 @Service
 public class PaymentServiceImpl implements PaymentService {
@@ -32,12 +34,8 @@ public class PaymentServiceImpl implements PaymentService {
     // → Dù các method đều liên quan đến payment, nhưng gồm cả `validate`, `checkCancellationValidity`, `refund`, `pay`
     // → có thể tách nhỏ thành PaymentProcessor, RefundProcessor nếu phức tạp tăng lên.
 
-
-
     private static final Logger logger = LoggerFactory.getLogger(PaymentServiceImpl.class);
-
     private final PaymentStrategyFactory paymentStrategyFactory;
-
     private final PaymentTransactionRepository paymentRepository;
     private final VNPaySubsystem vnPaySubsystem;
     private final OrderService orderService;
@@ -56,7 +54,7 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
-    public PaymentResult payOrder(Long orderId, String paymentMethod) throws OrderNotFoundException {
+    public PaymentResult payOrder(Long orderId, String paymentMethod, HttpServletRequest request) throws OrderNotFoundException {
         logger.info(LoggerMessages.PAYMENT_PROCESSING, orderId, paymentMethod);
 
         Order order = orderService.findOrderById(orderId)
@@ -68,12 +66,17 @@ public class PaymentServiceImpl implements PaymentService {
             throw new PaymentException(String.format(ErrorMessages.PAYMENT_INVALID_STATUS, orderId));
         }
 
-        PaymentResult result = vnPaySubsystem.processPayment(orderId, total, "Payment for order " + orderId);
-        if ("SUCCESS".equals(result.getPaymentStatus())) {
-            orderService.updatePaymentStatus(orderId, PaymentStatus.SUCCESS);
-            logger.info(LoggerMessages.PAYMENT_COMPLETED, orderId, result.getPaymentStatus());
-        } else {
-            logger.warn(LoggerMessages.PAYMENT_FAILED, orderId, result.getErrorMessage());
+
+        PaymentResDTO result ;
+        if (PaymentMethod.VNPAY.name().equalsIgnoreCase(paymentMethod)){
+            result = vnPaySubsystem.processPayment(orderId, total, "Payment for order " + orderId,request);
+        }
+        else {
+            PaymentStrategy strategy = paymentStrategyFactory.createPaymentStrategy(PaymentMethod.valueOf(paymentMethod.toUpperCase()));
+            result = new PaymentResDTO();
+            PaymentResult paymentResult = strategy.processPayment(orderId, total,"Payment for order " + orderId, request );
+            result.setStatus(paymentResult.getPaymentStatus().toString());
+            result.setMessage("Payment processed");
         }
         auditLogService.logPayment(result);
         return result;
@@ -130,36 +133,16 @@ public class PaymentServiceImpl implements PaymentService {
         logger.info(LoggerMessages.VALIDATION_STARTED, "cancellation for order " + orderId);
         return orderService.checkCancellationValidity(orderId);
     }
-//    }
 
-    //TODO here
-
-//
-//    public PaymentResult payOrder(Long orderId, String paymentMethod) throws OrderNotFoundException {
-//        PaymentStrategy strategy = paymentStrategyFactory.createPaymentStrategy(PaymentMethod.valueOf(paymentMethod));
-//        return strategy.processPayment(orderId, null, null);
-
-
-//    // Validate payment details for an order
-//    Boolean validatePayment(Order order) throws OrderNotFoundException {
-//        // Implementation needed
-//        throw new UnsupportedOperationException("Method not implemented");
-//    }
-//
-//    //     Process refund for an order
-//    public RefundResult processRefund(Long orderId, PaymentMethod paymentMethod) {
-//        PaymentStrategy strategy = paymentStrategyFactory.createPaymentStrategy(paymentMethod);
-//        return strategy.processRefund(orderId);
-//    }
-//
-//    //     Check if cancellation is valid for an order
-//    public Boolean checkCancellationValidity(Long orderId) {
-//        // Implementation needed
-//        throw new UnsupportedOperationException("Method not implemented");
-//    }
-//
-//    public PaymentResult processPayment(Long orderId, Float amount, String content, PaymentMethod paymentMethod) {
-//        PaymentStrategy strategy = paymentStrategyFactory.createPaymentStrategy(paymentMethod);
-//        return strategy.processPayment(orderId, amount, content);
-//    }
+    @Override
+    public boolean handleVnPayIpn(Map<String, String> vnpParams) {
+        logger.info(LoggerMessages.VNPAY_IPN_PROCESSING, vnpParams.get("vnp_TxnRef"));
+        PaymentResult result = vnPaySubsystem.handleIpnCallback(vnpParams);
+        if ("SUCCESS".equals(result.getPaymentStatus())) {
+            orderService.updatePaymentStatus(Long.valueOf(vnpParams.get("vnp_TxnRef")), PaymentStatus.SUCCESS);
+            auditLogService.logPayment(result);
+            return true;
+        }
+        return false;
+    }
 }

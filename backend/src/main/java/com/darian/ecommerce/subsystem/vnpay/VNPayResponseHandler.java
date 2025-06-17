@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
+import java.util.Map;
 
 @Component
 public class VNPayResponseHandler {
@@ -54,4 +55,34 @@ public class VNPayResponseHandler {
                 .refundStatus(RefundStatus.REFUNDED)
                 .build();
     }
+
+    public PaymentResult parseIpnResponse(Map<String, String> vnpParams) {
+        String vnp_ResponseCode = vnpParams.get("vnp_ResponseCode");
+        String vnp_TransactionStatus = vnpParams.get("vnp_TransactionStatus");
+        String vnp_TxnRef = vnpParams.get("vnp_TxnRef");
+        String vnp_Amount = vnpParams.get("vnp_Amount");
+        String vnp_OrderInfo = vnpParams.get("vnp_OrderInfo");
+
+        PaymentResult result = new PaymentResult();
+        result.setTransactionId(vnp_TxnRef);
+        result.setTotalAmount(vnp_Amount != null ? Float.parseFloat(vnp_Amount) / 100 : 0F);
+        result.setTransactionContent(vnp_OrderInfo);
+        result.setTransactionDate(LocalDateTime.now());
+
+        if ("00".equals(vnp_ResponseCode) && "00".equals(vnp_TransactionStatus)) {
+            result.setPaymentStatus(PaymentStatus.SUCCESS);
+        } else {
+            result.setPaymentStatus(PaymentStatus.FAILED);
+            result.setErrorMessage("Transaction failed with response code: " + vnp_ResponseCode);
+        }
+
+        return result;
+    }
+
+    public boolean validateSignature(Map<String, String> vnpParams) {
+        return VNPaySubsystemService.verifyChecksum(vnpParams); // Delegate to VNPaySubsystemService for consistency
+    }
+}
+
+
 }

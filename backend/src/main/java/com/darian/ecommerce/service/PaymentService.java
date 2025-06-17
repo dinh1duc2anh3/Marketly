@@ -7,7 +7,10 @@ import com.darian.ecommerce.entity.Order;
 import com.darian.ecommerce.enums.PaymentMethod;
 import com.darian.ecommerce.factory.PaymentStrategyFactory;
 import com.darian.ecommerce.strategy.PaymentStrategy;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.stereotype.Service;
+
+import java.util.Map;
 
 @Service
 public interface PaymentService {
@@ -23,6 +26,8 @@ public interface PaymentService {
     // Process payment for an order with a specified payment method
     public PaymentResult payOrder(Long orderId, String paymentMethod) throws OrderNotFoundException;
 
+    PaymentResult payOrder(Long orderId, String paymentMethod, HttpServletRequest request) throws OrderNotFoundException;
+
     // Validate payment details for an order
     Boolean validatePayment(Order order) throws OrderNotFoundException;
 
@@ -33,4 +38,5 @@ public interface PaymentService {
     public Boolean checkCancellationValidity(Long orderId);
 
 
+    boolean handleVnPayIpn(Map<String, String> vnpParams);
 }

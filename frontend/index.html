@@ -21,6 +21,25 @@
           <button id="view-cart-btn">
             🛒 Cart <span id="cart-count">0</span>
           </button>
+          <!-- Authentication buttons (show when not logged in) -->
+          <div id="auth-buttons">
+            <a href="#" id="login-btn" class="btn">Login</a>
+            <a href="#" id="register-btn" class="btn btn-secondary">Register</a>
+          </div>
+          
+          <!-- User menu (show when logged in) -->
+          <div id="user-menu" class="user-menu" style="display: none;">
+            <button id="user-btn" class="btn">
+              👤 <span id="username-display">User</span>
+            </button>
+            <div id="user-dropdown" class="user-dropdown">
+              <a href="#" id="profile-link">My Profile</a>
+              <a href="#" id="orders-link">My Orders</a>
+              <a href="#" id="favorites-link">My Favorites</a>
+              <a href="#" id="manager-link" style="display: none;">Manager Dashboard</a>
+              <a href="#" id="logout-btn">Logout</a>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -134,6 +153,64 @@
       </section>
     </div>
   </main>
+
+  <!-- Login Modal -->
+  <div id="login-modal" class="modal">
+    <div class="modal-content">
+      <span class="close" id="close-login">×</span>
+      <div class="auth-box">
+        <h2>Sign in to your account</h2>
+        <form id="loginForm">
+          <div class="form-group">
+            <label for="login-username">Username</label>
+            <input type="text" id="login-username" name="username" required>
+          </div>
+          <div class="form-group">
+            <label for="login-password">Password</label>
+            <input type="password" id="login-password" name="password" required>
+          </div>
+          <div class="error-message" id="login-error-message" style="display: none;"></div>
+          <button type="submit" class="btn" style="width: 100%;">Sign In</button>
+        </form>
+        <p class="auth-link">
+          Don't have an account? <a href="#" id="switch-to-register">Register here</a>
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Register Modal -->
+  <div id="register-modal" class="modal">
+    <div class="modal-content">
+      <span class="close" id="close-register">×</span>
+      <div class="auth-box">
+        <h2>Create your account</h2>
+        <form id="registerForm">
+          <div class="form-group">
+            <label for="register-username">Username</label>
+            <input type="text" id="register-username" name="username" required>
+          </div>
+          <div class="form-group">
+            <label for="register-email">Email</label>
+            <input type="email" id="register-email" name="email" required>
+          </div>
+          <div class="form-group">
+            <label for="register-password">Password</label>
+            <input type="password" id="register-password" name="password" required>
+          </div>
+          <div class="form-group">
+            <label for="register-confirm-password">Confirm Password</label>
+            <input type="password" id="register-confirm-password" name="confirmPassword" required>
+          </div>
+          <div class="error-message" id="register-error-message" style="display: none;"></div>
+          <button type="submit" class="btn" style="width: 100%;">Register</button>
+        </form>
+        <p class="auth-link">
+          Already have an account? <a href="#" id="switch-to-login">Login here</a>
+        </p>
+      </div>
+    </div>
+  </div>
 
   <!-- Cart Modal -->
   <div id="cart-modal" class="modal">

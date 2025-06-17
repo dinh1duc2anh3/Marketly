@@ -31,12 +31,13 @@ public class SecurityConfig {
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .csrf(csrf -> csrf.disable())
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-            .authorizeHttpRequests(auth -> auth
-                .requestMatchers(ApiEndpoints.AUTH + "/**").permitAll()
-                .requestMatchers(ApiEndpoints.PAYMENT + "/**").permitAll() // Allow all payment endpoints
-                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                .anyRequest().authenticated()
-            );
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/payment/vnpay-return.html").permitAll() // 👈 Cho phép truy cập file tĩnh
+                        .requestMatchers(ApiEndpoints.AUTH + "/**").permitAll()
+                        .requestMatchers(ApiEndpoints.PAYMENT + "/**").permitAll()
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                        .anyRequest().authenticated()
+                );
 
         return http.build();
     }

@@ -1,5 +1,6 @@
 package com.darian.ecommerce.subsystem.vnpay;
 
+import com.darian.ecommerce.config.VNPayConfig;
 import com.darian.ecommerce.config.exception.payment.ConnectionException;
 import com.darian.ecommerce.dto.PaymentResult;
 import com.darian.ecommerce.dto.VNPayRequest;
@@ -16,6 +17,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
+
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 @Component
 public class VNPayApiGateway {
@@ -46,10 +55,9 @@ public class VNPayApiGateway {
         try {
             log.info("Sending payment request to VNPay for order: {}", request.getOrderId());
             //TODO : fix this
-//            log.info(LoggerMessages.VNPAY_PAYMENT_EXECUTED,
-//                    request.getOrderId(), response.getStatus());
-//            return response;
-            return null;
+          VNPayResponse response = vnPayAPI.createPaymentUrl(request);
+            log.info(LoggerMessages.VNPAY_PAYMENT_EXECUTED, request.getOrderId(), response.getStatus());
+            return response;
         } catch (Exception e) {
             log.error(LoggerMessages.VNPAY_CONNECTION_ERROR, e.getMessage());
             throw new ConnectionException(ErrorMessages.VNPAY_CONNECTION_ERROR);
@@ -74,5 +82,33 @@ public class VNPayApiGateway {
             log.error(LoggerMessages.VNPAY_CONNECTION_ERROR, e.getMessage());
             throw new ConnectionException(ErrorMessages.VNPAY_CONNECTION_ERROR);
         }
+    }
+
+    public String createPaymentRequest(Map<String, String> vnpParams) {
+        List<String> fieldNames = new ArrayList<>(vnpParams.keySet());
+        Collections.sort(fieldNames);
+        StringBuilder hashData = new StringBuilder();
+        StringBuilder query = new StringBuilder();
+        for (String fieldName : fieldNames) {
+            String fieldValue = vnpParams.get(fieldName);
+            if (fieldValue != null && !fieldValue.isEmpty()) {
+                try {
+                    hashData.append(fieldName).append('=')
+                            .append(URLEncoder.encode(fieldValue, StandardCharsets.US_ASCII.toString()));
+                    query.append(URLEncoder.encode(fieldName, StandardCharsets.US_ASCII.toString())).append('=')
+                            .append(URLEncoder.encode(fieldValue, StandardCharsets.US_ASCII.toString()));
+                    if (fieldNames.indexOf(fieldName) < fieldNames.size() - 1) {
+                        query.append('&');
+                        hashData.append('&');
+                    }
+                } catch (UnsupportedEncodingException e) {
+                    log.error("Error encoding field {}: {}", fieldName, e.getMessage());
+                }
+            }
+        }
+        String queryUrl = query.toString();
+        String vnp_SecureHash = VNPayConfig.hmacSHA512(vnPayConfig.secretKey, hashData.toString());
+        queryUrl += "&vnp_SecureHash=" + vnp_SecureHash;
+        return vnPayConfig.vnp_PayUrl + "?" + queryUrl;
     }
 }

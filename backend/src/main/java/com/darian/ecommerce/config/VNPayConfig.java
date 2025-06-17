@@ -26,13 +26,14 @@ import java.net.URLEncoder;
 @Configuration
 public class VNPayConfig {
     public static String vnp_PayUrl = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html";
-    public static String vnp_ReturnUrl = "http://localhost:3000/payment/vnpay-return";
+    public static String vnp_ReturnUrl = "http://localhost:8080/payment/vnpay-return.html";
+    public static String vnp_IpnUrl = "http://localhost:8080/api/payment/vnpay-ipn"; // Đặt đúng với endpoint phía dưới
 
     public static String vnp_Version = "2.1.0";
     public static String vnp_Command = "pay";
 
     public static String vnp_TmnCode = "OTE7HWR0";
-    public static String secretKey = "BOB0XLE45NB3SU3HQ9VC4FR3QJ31MYV4";
+    public static String secretKey = "XJ6TS4Q68WCXM3NOGPVW7N3A6BY9BS2Q";
     public static String vnp_ApiUrl = "https://sandbox.vnpayment.vn/merchant_webapi/api/transaction";
 
     public static String hashAllFields(Map fields) {

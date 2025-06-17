@@ -44,7 +44,6 @@ public class PaymentController {
     // → Lớp này chỉ đóng vai trò cầu nối giữa HTTP request và service xử lý logic thanh toán.
 
     private static final Logger log = LoggerFactory.getLogger(PaymentController.class);
-
     private final PaymentService paymentService;
     private final VNPayResponseHandler vnPayResponseHandler;
 
@@ -54,21 +53,22 @@ public class PaymentController {
         this.vnPayResponseHandler = vnPayResponseHandler;
     }
 
-//    // Process payment for an order
-//    @PostMapping(ApiEndpoints.PAYMENT_BY_ORDER)
-//    public ResponseEntity<PaymentResult> payOrder(@PathVariable Long orderId,
-//                                                  @RequestParam String paymentMethod) throws InvalidPaymentMethodException, OrderNotFoundException {
-//        // Validate payment method
-//        try {
-//            PaymentMethod.valueOf(paymentMethod.toUpperCase());
-//        } catch (IllegalArgumentException e) {
-//            throw new InvalidPaymentMethodException(String.format(ErrorMessages.PAYMENT_INVALID_METHOD, paymentMethod));
-//        }
-//        log.info(LoggerMessages.PAYMENT_INIT, orderId, paymentMethod);
-//        PaymentResult result = paymentService.payOrder(orderId, paymentMethod);
-//        log.info(LoggerMessages.PAYMENT_COMPLETED, orderId, result.getPaymentStatus());
-//        return ResponseEntity.ok(result);
-//    }
+    // Process payment for an order
+    @PostMapping(ApiEndpoints.PAYMENT_BY_ORDER)
+    public ResponseEntity<PaymentResult> payOrder(@PathVariable Long orderId,
+                                                  @RequestParam String paymentMethod,
+                                                  HttpServletRequest request) throws InvalidPaymentMethodException, OrderNotFoundException {
+        // Validate payment method
+        try {
+            PaymentMethod.valueOf(paymentMethod.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            throw new InvalidPaymentMethodException(String.format(ErrorMessages.PAYMENT_INVALID_METHOD, paymentMethod));
+        }
+        log.info(LoggerMessages.PAYMENT_INIT, orderId, paymentMethod);
+        PaymentResult result = paymentService.payOrder(orderId, paymentMethod, request);
+        log.info(LoggerMessages.PAYMENT_COMPLETED, orderId, result.getPaymentStatus());
+        return ResponseEntity.ok(result);
+    }
 
     // Process refund for an order
     @PostMapping(ApiEndpoints.PAYMENT_REFUND)
@@ -104,6 +104,7 @@ public class PaymentController {
         vnp_Params.put("vnp_Locale", "vn");
         vnp_Params.put("vnp_ReturnUrl", VNPayConfig.vnp_ReturnUrl);
         vnp_Params.put("vnp_IpAddr", vnp_IpAddr);
+        vnp_Params.put("vnp_IpnUrl", VNPayConfig.vnp_IpnUrl);
 
         Calendar cld = Calendar.getInstance(TimeZone.getTimeZone("Etc/GMT+7"));
         SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmss");
@@ -160,20 +161,25 @@ public class PaymentController {
         return ResponseEntity.status(HttpStatus.OK).body(paymentResDTO);
     }
 
-//    @GetMapping("/vnpay-return")
-//    public ResponseEntity<PaymentResult> vnPayReturn(HttpServletRequest request) {
-//        Map<String, String> responseData = new HashMap<>();
-//        for (Map.Entry<String, String[]> entry : request.getParameterMap().entrySet()) {
-//            responseData.put(entry.getKey(), entry.getValue()[0]);
-//        }
-//
-//        PaymentResult result = vnPayResponseHandler.processVNPayReturn(responseData);
-//        return ResponseEntity.ok(result);
-//    }
-//
-//    @PostMapping("/refund")
-//    public ResponseEntity<PaymentResult> refundPayment(@RequestBody VNPayRequest request) {
-//        PaymentResult result = vnPayResponseHandler.processRefund(request.getOrderId());
-//        return ResponseEntity.ok(result);
-//    }
+    @GetMapping("/vnpay-ipn")
+    public ResponseEntity<String> vnPayIpn(HttpServletRequest request) {
+        Map<String, String> vnpParams = new HashMap<>();
+        for (Map.Entry<String, String[]> entry : request.getParameterMap().entrySet()) {
+            vnpParams.put(entry.getKey(), entry.getValue()[0]);
+        }
+
+        boolean isValid = vnPayResponseHandler.validateSignature(vnpParams); // Bạn cần xử lý xác thực hash
+        if (!isValid) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid signature");
+        }
+
+        // Gọi service cập nhật đơn hàng theo trạng thái
+        boolean updated = paymentService.handleVnPayIpn(vnpParams);
+        if (updated) {
+            return ResponseEntity.ok("OK");
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Fail to update order");
+        }
+    }
+
 }

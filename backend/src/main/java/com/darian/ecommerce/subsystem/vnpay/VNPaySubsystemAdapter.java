@@ -1,12 +1,16 @@
 package com.darian.ecommerce.subsystem.vnpay;
 
+import com.darian.ecommerce.dto.PaymentResDTO;
 import com.darian.ecommerce.dto.PaymentResult;
 import com.darian.ecommerce.dto.RefundResult;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
+import java.util.Map;
+
 @Service
-public class VNPaySubsystemAdapter {
+public class VNPaySubsystemAdapter implements VNPaySubsystem {
     // Cohesion: Functional Cohesion
     // → Lớp này chỉ làm nhiệm vụ kết nối VNPaySubsystem với hệ thống chính bằng cách gọi các method nghiệp vụ đã được trừu tượng hóa.
 
@@ -20,6 +24,11 @@ public class VNPaySubsystemAdapter {
         this.vnPaySubsystemService = vnPaySubsystemService;
     }
 
+    @Override
+    public PaymentResDTO initiatePayment(Long orderId, Float amount, String transactionContent, HttpServletRequest request) {
+        return vnPaySubsystemService.initiatePayment(orderId, amount, transactionContent, request);
+    }
+
     // Process payment through subsystem
     protected PaymentResult processPayment(Long orderId, Float amount, String transactionContent) {
         return vnPaySubsystemService.processPayment(orderId, amount, transactionContent);
@@ -28,5 +37,10 @@ public class VNPaySubsystemAdapter {
     // Process refund through subsystem
     protected RefundResult processRefund(Long orderId) {
         return vnPaySubsystemService.processRefund(orderId);
+    }
+
+    @Override
+    public PaymentResult handleIpnCallback(Map<String, String> vnpParams) {
+        return vnPaySubsystemService.handleIpnCallback(vnpParams);
     }
 }

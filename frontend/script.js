@@ -9,12 +9,18 @@ const searchBar = document.getElementById('search-bar');
 const categoryBtns = document.querySelectorAll('.category-btn');
 const sortDropdown = document.getElementById('sort-dropdown');
 const viewCartBtn = document.getElementById('view-cart-btn');
+//
+const loginModal = document.getElementById('login-modal');
+const registerModal = document.getElementById('register-modal');
 const cartModal = document.getElementById('cart-modal');
 const cartItems = document.getElementById('cart-items');
 const closeModal = document.querySelector('.close');
 const cartCount = document.getElementById('cart-count');
 const cartSubtotal = document.getElementById('cart-subtotal');
 const cartVat = document.getElementById('cart-vat');
+//
+const authButtons = document.getElementById('auth-buttons');
+const userMenu = document.getElementById('user-menu');
 const deliveryFeeElement = document.getElementById('delivery-fee');
 const cartTotalAmount = document.getElementById('cart-total-amount');
 const orderForm = document.getElementById('order-form');
@@ -117,6 +123,25 @@ function initialize() {
 }
 
 function setupEventListeners() {
+  // Authentication
+  document.getElementById('login-btn').addEventListener('click', () => openModal('login'));
+  document.getElementById('register-btn').addEventListener('click', () => openModal('register'));
+  document.getElementById('switch-to-register').addEventListener('click', () => switchModal('register'));
+  document.getElementById('switch-to-login').addEventListener('click', () => switchModal('login'));
+  document.getElementById('logout-btn').addEventListener('click', logout);
+
+  // Modal controls
+  document.getElementById('close-login').addEventListener('click', () => closeModal('login'));
+  document.getElementById('close-register').addEventListener('click', () => closeModal('register'));
+  document.getElementById('close-cart').addEventListener('click', () => closeModal('cart'));
+
+  // Forms
+  document.getElementById('loginForm').addEventListener('submit', handleLogin);
+  document.getElementById('registerForm').addEventListener('submit', handleRegister);
+
+   // User menu dropdown
+  document.getElementById('user-btn').addEventListener('click', toggleUserDropdown);
+
   // Search functionality
   searchBar.addEventListener('input', handleSearch);
   
@@ -129,10 +154,25 @@ function setupEventListeners() {
   sortDropdown.addEventListener('change', handleSort);
   
   // Cart modal
-  viewCartBtn.addEventListener('click', openCartModal);
-  closeModal.addEventListener('click', closeCartModal);
-  window.addEventListener('click', (e) => {
-    if (e.target === cartModal) closeCartModal();
+  // viewCartBtn.addEventListener('click', openCartModal);
+  // closeModal.addEventListener('click', closeCartModal);
+  // Cart
+  document.getElementById('view-cart-btn').addEventListener('click', () => openModal('cart'));
+
+  // window.addEventListener('click', (e) => {
+  //   if (e.target === cartModal) closeCartModal();
+  // });
+
+  // Navigation
+  document.getElementById('manager-link').addEventListener('click', () => {
+    window.location.href = '#manager-dashboard';
+  });
+
+  // Close modals when clicking outside
+  window.addEventListener('click', function(e) {
+    if (e.target.classList.contains('modal')) {
+      e.target.style.display = 'none';
+    }
   });
   
   // Order form
@@ -232,6 +272,105 @@ function handleSort(e) {
   applyFiltersAndSort();
 }
 
+function openModal(type) {
+  const modal = document.getElementById(`${type}-modal`);
+  modal.style.display = 'block';
+}
+
+function closeModal(type) {
+  const modal = document.getElementById(`${type}-modal`);
+  modal.style.display = 'none';
+}
+
+function switchModal(type) {
+  closeModal(type === 'login' ? 'register' : 'login');
+  openModal(type);
+}
+
+function toggleUserDropdown() {
+  const dropdown = document.getElementById('user-dropdown');
+  dropdown.classList.toggle('show');
+}
+
+async function handleLogin(e) {
+  e.preventDefault();
+  const username = document.getElementById('login-username').value;
+  const password = document.getElementById('login-password').value;
+  const errorMessage = document.getElementById('login-error-message');
+
+  // Mock authentication
+  if (username && password) {
+    const user = {
+      id: '123',
+      username: username,
+      email: username + '@example.com',
+      role: username === 'admin' ? 'manager' : 'customer'
+    };
+    
+    currentUser = user;
+    updateAuthState();
+    closeModal('login');
+    showToast(`Welcome back, ${username}!`);
+    
+    // Clear form
+    document.getElementById('loginForm').reset();
+    errorMessage.style.display = 'none';
+  } else {
+    errorMessage.textContent = 'Please enter username and password';
+    errorMessage.style.display = 'block';
+  }
+}
+
+async function handleRegister(e) {
+  e.preventDefault();
+  const username = document.getElementById('register-username').value;
+  const email = document.getElementById('register-email').value;
+  const password = document.getElementById('register-password').value;
+  const confirmPassword = document.getElementById('register-confirm-password').value;
+  const errorMessage = document.getElementById('register-error-message');
+
+  // Reset error message
+  errorMessage.style.display = 'none';
+
+  // Validate password match
+  if (password !== confirmPassword) {
+    errorMessage.textContent = 'Passwords do not match';
+    errorMessage.style.display = 'block';
+    return;
+  }
+
+  // Validate password length
+  if (password.length < 6) {
+    errorMessage.textContent = 'Password must be at least 6 characters long';
+    errorMessage.style.display = 'block';
+    return;
+  }
+
+  // Mock registration
+  const user = {
+    id: Date.now().toString(),
+    username: username,
+    email: email,
+    role: 'customer'
+  };
+  
+  currentUser = user;
+  updateAuthState();
+  closeModal('register');
+  showToast(`Welcome to Marketly, ${username}!`);
+  
+  // Clear form
+  document.getElementById('registerForm').reset();
+}
+
+function logout() {
+  currentUser = null;
+  likedProducts.clear();
+  cart = { items: [] };
+  updateAuthState();
+  showToast('Logged out successfully');
+}
+
 function applyFiltersAndSort() {
   // Apply category filter
   let products = currentCategory === 'all' 
@@ -271,33 +410,36 @@ function applyFiltersAndSort() {
 }
 
 // Cart Functions
-async function addToCart(productId) {
-  try {
-    const response = await fetch(`${API_BASE_URL}/cart/add`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        userId: MOCK_USER_ID,
-        productId: productId,
-        quantity: 1
-      })
+function addToCart(productId) {
+  const product = allProducts.find(p => p.productId === productId);
+  if (!product) return;
+
+  const cartItem = cart.items.find(item => item.productId === productId);
+  if (cartItem) {
+    cartItem.quantity += 1;
+  } else {
+    cart.items.push({
+      productId: productId,
+      name: product.name,
+      price: product.price,
+      image: product.image,
+      quantity: 1
     });
-
-    if (!response.ok) {
-      throw new Error('Failed to add item to cart');
-    }
-
-    const updatedCart = await response.json();
-    cart = updatedCart;
-    updateCartCount();
-    showToast('Item added to cart');
-    saveCartToStorage();
-  } catch (error) {
-    console.error('Error adding to cart:', error);
-    showToast('Failed to add item to cart', 'error');
   }
+
+  updateCart();
+  showToast(`${product.name} added to cart!`);
+}
+
+function toggleLike(productId) {
+  if (likedProducts.has(productId)) {
+    likedProducts.delete(productId);
+    showToast('Removed from favorites');
+  } else {
+    likedProducts.add(productId);
+    showToast('Added to favorites');
+  }
+  renderProducts();
 }
 
 function removeFromCart(productId) {
@@ -404,6 +546,66 @@ function handleDeliveryOptionChange(e) {
   
   calculateCartTotals();
 }
+
+
+function checkAuthState() {
+  // In a real app, check localStorage/sessionStorage for saved session
+  updateAuthState();
+}
+
+function updateAuthState() {
+  if (currentUser) {
+    authButtons.style.display = 'none';
+    userMenu.style.display = 'block';
+    document.getElementById('username-display').textContent = currentUser.username;
+    
+    // Show manager link for managers
+    if (currentUser.role === 'manager') {
+      document.getElementById('manager-link').style.display = 'block';
+    }
+  } else {
+    authButtons.style.display = 'flex';
+    userMenu.style.display = 'none';
+    document.getElementById('manager-link').style.display = 'none';
+  }
+}
+
+function renderProducts() {
+  productsGrid.innerHTML = '';
+  filteredProducts.forEach(product => {
+    const productCard = document.createElement('div');
+    productCard.className = 'product-card';
+    productCard.innerHTML = `
+      <img src="${product.image}" alt="${product.name}" class="product-image">
+      <div class="product-details">
+        <div class="product-category">${product.category}</div>
+        <div class="product-name">${product.name}</div>
+        <div class="product-price">$${product.price.toLocaleString()}</div>
+        <div class="product-rating">
+          <span class="stars">${'★'.repeat(Math.floor(product.rating))}${'☆'.repeat(5 - Math.floor(product.rating))}</span>
+          <span>(${product.rating})</span>
+        </div>
+        <div class="product-actions">
+          <button class="add-to-cart" data-id="${product.productId}">Add to Cart</button>
+          <button class="like-btn ${likedProducts.has(product.productId) ? 'liked' : ''}" data-id="${product.productId}">
+            ♥
+          </button>
+        </div>
+      </div>
+    `;
+    productsGrid.appendChild(productCard);
+  });
+
+  // Add event listeners to buttons
+  document.querySelectorAll('.add-to-cart').forEach(button => {
+    button.addEventListener('click', () => addToCart(button.dataset.id));
+  });
+
+  document.querySelectorAll('.like-btn').forEach(button => {
+    button.addEventListener('click', () => toggleLike(button.dataset.id));
+  });
+}
+
 
 function calculateDeliveryFee() {
   const province = deliveryProvinceSelect.value;

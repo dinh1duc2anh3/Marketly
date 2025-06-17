@@ -1,19 +1,23 @@
 package com.darian.ecommerce.subsystem.vnpay;
 
 import com.darian.ecommerce.config.VNPayConfig;
-import com.darian.ecommerce.dto.PaymentResult;
-import com.darian.ecommerce.dto.RefundResult;
-import com.darian.ecommerce.dto.VNPayRequest;
-import com.darian.ecommerce.dto.VNPayResponse;
+import com.darian.ecommerce.dto.*;
 import com.darian.ecommerce.enums.PaymentStatus;
 import com.darian.ecommerce.enums.TransactionType;
 import com.darian.ecommerce.config.exception.payment.ConnectionException;
 import com.darian.ecommerce.utils.LoggerMessages;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -74,6 +78,20 @@ public class VNPaySubsystemService {
         return result;
     }
 
+    public PaymentResDTO initiatePayment(Long orderId, Float amount, String content, HttpServletRequest request) {
+        log.info(LoggerMessages.PAYMENT_PROCESSING, orderId, "VNPay");
+        Map<String, String> vnpParams = converter.buildPaymentParams(orderId, amount, content, request);
+        String paymentUrl = apiGateway.createPaymentRequest(vnpParams);
+
+        PaymentResDTO paymentResDTO = new PaymentResDTO();
+        paymentResDTO.setStatus("OK");
+        paymentResDTO.setMessage("Successfully");
+        paymentResDTO.setURL(paymentUrl);
+
+        log.info("Payment URL generated for order {}: {}", orderId, paymentUrl);
+        return paymentResDTO;
+    }
+
     // Execute payment via VNPay
     protected PaymentResult processPayment(Long orderId, Float amount, String content) {
         log.info(LoggerMessages.PAYMENT_PROCESSING, orderId, "VNPay");
@@ -102,9 +120,32 @@ public class VNPaySubsystemService {
         return PaymentStatus.FAILED;
     }
 
+    public PaymentResult handleIpnCallback(Map<String, String> vnpParams) {
+        log.info(LoggerMessages.VNPAY_IPN_PROCESSING, vnpParams.get("vnp_TxnRef"));
+        PaymentResult result = responseHandler.parseIpnResponse(vnpParams);
+        log.info(LoggerMessages.VNPAY_IPN_COMPLETED, vnpParams.get("vnp_TxnRef"), result.getPaymentStatus());
+        return result;
+    }
     private boolean verifyChecksum(Map<String, String> fields) {
-        // Implementation of checksum verification based on VNPay documentation
-        // This should use the same HMAC SHA512 algorithm as in VNPayAPI
-        return true; // TODO: Implement actual checksum verification
+        String secureHash = fields.remove("vnp_SecureHash");
+        List<String> fieldNames = new ArrayList<>(fields.keySet());
+        Collections.sort(fieldNames);
+        StringBuilder hashData = new StringBuilder();
+        for (String fieldName : fieldNames) {
+            String fieldValue = fields.get(fieldName);
+            if (fieldValue != null && !fieldValue.isEmpty()) {
+                try {
+                    hashData.append(fieldName).append('=')
+                            .append(URLEncoder.encode(fieldValue, StandardCharsets.US_ASCII.toString()));
+                    if (fieldNames.indexOf(fieldName) < fieldNames.size() - 1) {
+                        hashData.append('&');
+                    }
+                } catch (UnsupportedEncodingException e) {
+                    log.error("Error encoding field {}: {}", fieldName, e.getMessage());
+                }
+            }
+        }
+        String calculatedHash = VNPayConfig.hmacSHA512(VNPayConfig.secretKey, hashData.toString());
+        return secureHash != null && secureHash.equals(calculatedHash);
     }
 }
